@@ -4,15 +4,60 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>MiniMarket - Belanja Praktis</title>
+
 <script src="https://cdn.tailwindcss.com"></script>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif']}}}}</script>
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Inter','sans-serif']
+      }
+    }
+  }
+}
+</script>
+
 <link rel="stylesheet" href="assets/css/style.css">
+
+<style>
+/* FIX WAJIB */
+#pg-checkout{
+  height:100dvh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+/* SCROLL AREA */
+#checkout-scroll{
+  flex:1;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* FIX BUTTON */
+.fixed-btn{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  z-index:999;
+  background:#fff;
+  border-top:1px solid #f1f5f9;
+  padding:16px;
+  padding-bottom:calc(16px + env(safe-area-inset-bottom));
+}
+</style>
+
 </head>
 <body>
 
 <!-- ================= CHECKOUT ================= -->
-<div id="pg-checkout" class="fixed inset-0 bg-white z-50 hidden flex flex-col">
+<div id="pg-checkout" class="fixed inset-0 bg-white z-50">
 
 <header class="sticky top-0 bg-white z-10 border-b border-slate-100">
 <div class="flex items-center justify-between px-4 h-14">
@@ -23,7 +68,7 @@
 </header>
 
 <!-- SCROLL AREA -->
-<div class="flex-1 overflow-y-auto p-4 space-y-3 pb-[180px]">
+<div id="checkout-scroll" class="p-4 space-y-3 pb-[220px]">
 
 <section class="bg-slate-50 rounded-2xl p-4">
 <p class="text-sm font-semibold">Alamat</p>
@@ -46,7 +91,7 @@
 </div>
 
 <!-- FIXED BUTTON -->
-<div class="fixed bottom-0 left-0 right-0 z-[999] bg-white border-t p-4 safe-b">
+<div class="fixed-btn">
 <button class="w-full py-3 bg-blue-600 text-white rounded-xl font-bold">
 Pesan Sekarang
 </button>
