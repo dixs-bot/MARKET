@@ -24,11 +24,15 @@ tailwind.config = {
 <link rel="stylesheet" href="assets/css/style.css">
 
 <style>
-/* FIX WAJIB */
+/* ===== FIX CORE LAYOUT ===== */
 #pg-checkout{
-  height:100dvh;
+  position:fixed;
+  inset:0;
+  background:#fff;
+  z-index:50;
   display:flex;
   flex-direction:column;
+  height:100dvh;
   overflow:hidden;
 }
 
@@ -39,7 +43,7 @@ tailwind.config = {
   -webkit-overflow-scrolling:touch;
 }
 
-/* FIX BUTTON */
+/* FIXED BUTTON */
 .fixed-btn{
   position:fixed;
   bottom:0;
@@ -57,7 +61,7 @@ tailwind.config = {
 <body>
 
 <!-- ================= CHECKOUT ================= -->
-<div id="pg-checkout" class="fixed inset-0 bg-white z-50">
+<div id="pg-checkout" style="display:none;">
 
 <header class="sticky top-0 bg-white z-10 border-b border-slate-100">
 <div class="flex items-center justify-between px-4 h-14">
@@ -68,7 +72,7 @@ tailwind.config = {
 </header>
 
 <!-- SCROLL AREA -->
-<div id="checkout-scroll" class="p-4 space-y-3 pb-[220px]">
+<div id="checkout-scroll" class="p-4 space-y-3 pb-[240px]">
 
 <section class="bg-slate-50 rounded-2xl p-4">
 <p class="text-sm font-semibold">Alamat</p>
@@ -92,12 +96,23 @@ tailwind.config = {
 
 <!-- FIXED BUTTON -->
 <div class="fixed-btn">
-<button class="w-full py-3 bg-blue-600 text-white rounded-xl font-bold">
+<button id="btn-order" class="w-full py-3 bg-blue-600 text-white rounded-xl font-bold">
 Pesan Sekarang
 </button>
 </div>
 
 </div>
+
+<script>
+/* ===== SHOW / HIDE TANPA CLASS hidden ===== */
+function openCheckout(){
+  document.getElementById('pg-checkout').style.display = 'flex';
+}
+
+function closeCheckout(){
+  document.getElementById('pg-checkout').style.display = 'none';
+}
+</script>
 
 </body>
 </html>
