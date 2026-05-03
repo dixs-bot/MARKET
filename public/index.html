@@ -38,6 +38,11 @@ tailwind.config = {
   flex:1;
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
+
+  /* 🔥 FIX UTAMA */
+  display:flex;
+  flex-direction:column;
+  min-height:100%;
 }
 </style>
 
@@ -56,7 +61,7 @@ tailwind.config = {
 </header>
 
 <!-- SCROLL AREA -->
-<div id="checkout-scroll" class="flex-1 overflow-y-auto">
+<div id="checkout-scroll" class="flex-1 overflow-y-auto flex flex-col">
 
 <section class="bg-slate-50 rounded-2xl p-4">
 <p class="text-sm font-semibold">Alamat</p>
@@ -76,8 +81,8 @@ tailwind.config = {
 <textarea class="w-full border p-2 rounded"></textarea>
 </section>
 
-<!-- 🔥 TOMBOL PINDAH KE SINI -->
-<div class="mt-4 space-y-2">
+<!-- 🔥 FIX DI SINI -->
+<div class="mt-auto p-4 space-y-2">
 
 <button data-act="back-to-cart" class="w-full py-2 text-xs text-slate-500">
 Kembali ke Keranjang
