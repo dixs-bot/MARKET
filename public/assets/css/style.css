@@ -12,7 +12,7 @@ body{
   min-height:100dvh;
 }
 
-/* 🔥 FIX SCROLL + LAYOUT */
+/* ===== FIX SCROLL + LAYOUT ===== */
 #pg-checkout{
   height:100dvh;
   display:flex;
@@ -26,13 +26,12 @@ body{
   -webkit-overflow-scrolling:touch;
 }
 
-/* 🔥 FIX BUTTON POSITION */
-.bottom-0{
-  bottom:0; /* FIX ERROR */
-}
+/* ⚠️ HAPUS OVERRIDE BERBAHAYA */
+/* .fixed{ position:fixed !important; }  ❌ DIHAPUS */
 
-.fixed{
-  position:fixed !important;
+/* OPTIONAL (AMAN) */
+.bottom-0{
+  bottom:0;
 }
 
 /* SCROLLBAR */
@@ -69,12 +68,25 @@ body{
 .stagger>*:nth-child(12){animation-delay:.24s}
 
 /* SHEET */
-.sheet{transform:translateY(100%);transition:transform .3s cubic-bezier(.32,.72,0,1);will-change:transform}
-.sheet.open{transform:translateY(0)}
+.sheet{
+  transform:translateY(100%);
+  transition:transform .3s cubic-bezier(.32,.72,0,1);
+  will-change:transform
+}
+.sheet.open{
+  transform:translateY(0)
+}
 
 /* DIM */
-.dim{opacity:0;pointer-events:none;transition:opacity .25s ease}
-.dim.on{opacity:1;pointer-events:auto}
+.dim{
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .25s ease
+}
+.dim.on{
+  opacity:1;
+  pointer-events:auto
+}
 
 /* TAP */
 .tap{transition:transform .1s ease}
@@ -95,7 +107,10 @@ input:focus,textarea:focus{
 }
 
 /* SELECT */
-.sel{transition:border-color .15s,background .15s;cursor:pointer}
+.sel{
+  transition:border-color .15s,background .15s;
+  cursor:pointer
+}
 .sel.on{
   border-color:#2563eb!important;
   background:rgba(37,99,235,.03)!important
@@ -156,7 +171,9 @@ input:focus,textarea:focus{
   padding:4px 0
 }
 
-.back-link:active{color:#2563eb}
+.back-link:active{
+  color:#2563eb
+}
 
 /* REDUCE MOTION */
 @media(prefers-reduced-motion:reduce){
