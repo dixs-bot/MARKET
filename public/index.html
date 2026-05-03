@@ -2,66 +2,90 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>MiniMarket</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>MiniMarket - Belanja Praktis</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="assets/css/style.css">
 
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Inter','sans-serif']
+      }
+    }
+  }
+}
+</script>
+
+<link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
 
 <!-- ================= CHECKOUT ================= -->
-<div id="pg-checkout" class="checkout hidden">
+<div id="pg-checkout" class="fixed inset-0 bg-white z-50 overflow-y-auto">
 
 <!-- HEADER -->
-<header class="checkout-header">
+<header class="sticky top-0 bg-white z-10 border-b border-slate-100">
+<div class="flex items-center justify-between px-4 h-14">
 <button data-act="back-to-cart">←</button>
-<h1>Checkout</h1>
+<h1 class="text-sm font-bold">Checkout</h1>
 <div></div>
+</div>
 </header>
 
 <!-- CONTENT -->
-<div class="checkout-content">
+<div class="p-4 space-y-3 pb-32">
 
-<section class="card">
-<p>Alamat</p>
-<textarea></textarea>
+<!-- ALAMAT -->
+<section class="bg-slate-50 rounded-2xl p-4">
+<p class="text-sm font-semibold">Alamat Pengiriman</p>
+<textarea class="w-full border p-2 rounded" placeholder="Masukkan alamat..."></textarea>
 </section>
 
-<section class="card">
-<p>Pengiriman</p>
+<!-- PENGIRIMAN -->
+<section class="bg-slate-50 rounded-2xl p-4">
+<p class="text-sm font-semibold">Pengiriman</p>
+<p class="text-xs text-slate-400">Pilih metode pengiriman</p>
 </section>
 
-<section class="card">
-<p>Pembayaran</p>
+<!-- PEMBAYARAN -->
+<section class="bg-slate-50 rounded-2xl p-4">
+<p class="text-sm font-semibold">Pembayaran</p>
+<p class="text-xs text-slate-400">Pilih metode pembayaran</p>
 </section>
 
-<section class="card">
-<p>Catatan</p>
-<textarea></textarea>
+<!-- CATATAN -->
+<section class="bg-slate-50 rounded-2xl p-4">
+<p class="text-sm font-semibold">Catatan</p>
+<textarea class="w-full border p-2 rounded" placeholder="Opsional..."></textarea>
 </section>
 
-</div>
+<!-- 🔥 ACTIONS DI BAWAH -->
+<div class="mt-4 space-y-2">
 
-<!-- FOOTER (INI KUNCI FIX) -->
-<div class="checkout-footer">
-
-<button class="back-btn">
+<button data-act="back-to-cart" class="w-full py-2 text-xs text-slate-500">
 Kembali ke Keranjang
 </button>
 
-<button id="btn-order">
+<button id="btn-order" class="w-full py-3 bg-blue-600 text-white rounded-xl font-bold">
 Pesan Sekarang
 </button>
 
-<p class="hint">
+<p class="text-center text-[10px] text-slate-400">
 Lengkapi semua data
 </p>
 
 </div>
 
 </div>
+
+</div>
+
+<script src="assets/js/app.js"></script>
 
 </body>
 </html>
