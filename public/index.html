@@ -24,7 +24,6 @@ tailwind.config = {
 <link rel="stylesheet" href="assets/css/style.css">
 
 <style>
-/* ===== FIX CORE LAYOUT ===== */
 #pg-checkout{
   position:fixed;
   inset:0;
@@ -33,27 +32,12 @@ tailwind.config = {
   display:flex;
   flex-direction:column;
   height:100dvh;
-  overflow:hidden;
 }
 
-/* SCROLL AREA */
 #checkout-scroll{
   flex:1;
   overflow-y:auto;
   -webkit-overflow-scrolling:touch;
-}
-
-/* FIXED BUTTON */
-.fixed-btn{
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  z-index:999;
-  background:#fff;
-  border-top:1px solid #f1f5f9;
-  padding:16px;
-  padding-bottom:calc(16px + env(safe-area-inset-bottom));
 }
 </style>
 
@@ -72,7 +56,7 @@ tailwind.config = {
 </header>
 
 <!-- SCROLL AREA -->
-<div id="checkout-scroll" class="p-4 space-y-3 pb-[240px]">
+<div id="checkout-scroll" class="p-4 space-y-3">
 
 <section class="bg-slate-50 rounded-2xl p-4">
 <p class="text-sm font-semibold">Alamat</p>
@@ -92,19 +76,28 @@ tailwind.config = {
 <textarea class="w-full border p-2 rounded"></textarea>
 </section>
 
-</div>
+<!-- 🔥 TOMBOL PINDAH KE SINI -->
+<div class="mt-4 space-y-2">
 
-<!-- FIXED BUTTON -->
-<div class="fixed-btn">
+<button data-act="back-to-cart" class="w-full py-2 text-xs text-slate-500">
+Kembali ke Keranjang
+</button>
+
 <button id="btn-order" class="w-full py-3 bg-blue-600 text-white rounded-xl font-bold">
 Pesan Sekarang
 </button>
+
+<p class="text-center text-[10px] text-slate-400">
+Lengkapi semua data
+</p>
+
+</div>
+
 </div>
 
 </div>
 
 <script>
-/* ===== SHOW / HIDE TANPA CLASS hidden ===== */
 function openCheckout(){
   document.getElementById('pg-checkout').style.display = 'flex';
 }
