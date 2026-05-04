@@ -79,7 +79,7 @@ d.dim=g('dim');d.csheet=g('cart-sheet');d.clist=g('cart-list');
 d.cnone=g('cart-none');d.cft=g('cart-ft');d.ccnt=g('cart-cnt');
 d.ctotal=g('cart-total');d.fab=g('fab-cart');d.badge=g('cart-badge');
 d.catbar=g('cat-bar');d.pgrid=g('prod-grid');d.pcnt=g('prod-cnt');
-d.pgco=g('pg-checkout');d.inaddr=g('in-addr');d.innote=g('in-note');
+d.pgco=g('pg-checkout');d.coscroll=g('checkout-scroll');d.inaddr=g('in-addr');d.innote=g('in-note');
 d.eaddr=g('err-addr');d.eship=g('err-ship');d.epay=g('err-pay');
 d.ships=g('ship-opts');d.pays=g('pay-opts');d.freebanner=g('free-ship-banner');
 d.coitems=g('co-items');d.ssub=g('s-sub');d.sship=g('s-ship');
@@ -310,7 +310,10 @@ d.eaddr.classList.add('hidden');d.eship.classList.add('hidden');d.epay.classList
 d.inaddr.classList.remove('err-input');
 }
 renderShips();renderPays();renderSummary();validate(false);
-d.pgco.classList.remove('hidden');d.pgco.scrollTop=0;animateIn(d.pgco);currentPage='checkout';
+d.pgco.classList.remove('hidden');
+if(d.coscroll)d.coscroll.scrollTop=0;
+if(d.coscroll)animateIn(d.coscroll);
+currentPage='checkout';
 }
 
 function goToConfirm(){
