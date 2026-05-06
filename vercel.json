@@ -1,16 +1,9 @@
 {
-  "rewrites": [
-    {
-      "source": "/",
-      "destination": "/public/index.html"
-    },
-    {
-      "source": "/assets/:path*",
-      "destination": "/public/assets/:path*"
-    },
+  "redirects": [
     {
       "source": "/admin",
-      "destination": "/admin/index.html"
+      "destination": "/admin/index.html",
+      "permanent": false
     }
   ]
 }
