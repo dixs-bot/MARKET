@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/admin",
-      "destination": "/admin/index.html"
+      "destination": "admin/index.html"
     },
     {
       "source": "/assets/:path*",
