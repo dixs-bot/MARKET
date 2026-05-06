@@ -138,12 +138,6 @@
     }
 }
 
-        UI.renderProducts();
-        UI.renderStats();
-        UI.resetForm();
-        UI.notify('Produk berhasil ditambahkan', 'success');
-    }
-
     function deleteSelected() {
         var S = AdminApp.State;
         var result = ProdService.deleteSelectedProducts(S.selectedIds);
