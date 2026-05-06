@@ -81,13 +81,6 @@ body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#1e293b;min-height:
 
   <a href="/"
     class="text-xs text-blue-600 font-semibold bg-blue-50 px-3.5 py-2 rounded-lg hover:bg-blue-100 transition tap hidden sm:inline-flex items-center gap-1.5">
-    
-    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-    </svg>
-
-    Lihat Toko
-  </a>
 
   <button
     id="btn-logout"
@@ -335,6 +328,22 @@ Hapus Terpilih (<span id="del-count">0</span>)
   }
 
 })();
+</script>
+  
+<script>
+const logoutBtn = document.getElementById('btn-logout');
+
+logoutBtn.addEventListener('click', async () => {
+
+  const ok = confirm('Logout dari admin panel?');
+
+  if (!ok) return;
+
+  await window.supabaseClient.auth.signOut();
+
+  window.location.href = '/admin/login.html';
+
+});
 </script>
 <script src="/assets/js/shared.js"></script>
 <script src="/admin/productService.js"></script>
