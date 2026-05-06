@@ -34,11 +34,20 @@
     };
   }
 
-  function getProducts() {
-    const raw = localStorage.getItem(LS_PRODUCTS);
-    const data = safeParse(raw, []);
-    return data.map(normalizeProduct).filter(p => p);
+ async function getProducts() {
+
+  const { data, error } =
+    await window.supabaseClient
+      .from('products')
+      .select('*');
+
+  if (error) {
+    console.error(error);
+    return [];
   }
+
+  return data.map(normalizeProduct).filter(p => p);
+}
 
   function saveProducts(products) {
     if (!Array.isArray(products)) return false;
