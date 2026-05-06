@@ -18,7 +18,7 @@
         return 'p_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
     }
 
-    function createProduct(input) {
+    async function createProduct(input) {
         var stateProducts = AdminApp.State.products;
         var allIds = {};
         
@@ -48,9 +48,25 @@
         var newProducts = stateProducts.slice();
         newProducts.push(prod);
 
-        if (!MM.saveProducts(newProducts)) {
-            return { ok: false, error: 'storage_full' };
-        }
+       const { data, error } =
+    await window.supabaseClient
+        .from('products')
+        .insert([
+            {
+                name: prod.name,
+                price: prod.price,
+                stock: prod.stock,
+                category: prod.category,
+                image: prod.image
+            }
+        ])
+        .select()
+        .single();
+
+if (error) {
+    console.error(error);
+    return { ok: false, error: error.message };
+}
         
         /* Update Single Source of Truth */
         AdminApp.State.products = newProducts;
