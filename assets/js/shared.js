@@ -65,8 +65,6 @@ async function syncProductsFromSupabase() {
   return data;
 }
 
-function saveProducts(products) {
-
   function saveProducts(products) {
     if (!Array.isArray(products)) return false;
 
