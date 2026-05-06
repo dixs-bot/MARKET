@@ -106,23 +106,37 @@
     /* ===== PRODUCT HANDLERS ===== */
 
     async function addProduct() {
-        if (!UI.validateForm()) { 
-            UI.notify('Lengkapi semua field yang wajib', 'error'); 
-            return; 
+
+    try {
+
+        if (!UI.validateForm()) {
+            UI.notify('Lengkapi semua field yang wajib', 'error');
+            return;
         }
 
         var formData = getFormData();
         var input = buildProductInput(formData);
-       var result = await ProdService.createProduct(input);
 
-        if (!result.ok) { 
-            if (result.error === 'duplicate_id' || result.error === 'invalid_data') {
-                UI.notify('ID produk duplikat, coba lagi', 'error');
-            } else if (result.error === 'storage_full') {
-                UI.notify('Gagal menyimpan, storage penuh', 'error');
-            }
-            return; 
+        var result = await ProdService.createProduct(input);
+
+        if (!result.ok) {
+            UI.notify(result.error || 'Gagal menyimpan produk', 'error');
+            return;
         }
+
+        UI.renderProducts();
+        UI.renderStats();
+        UI.resetForm();
+
+        UI.notify('Produk berhasil ditambahkan', 'success');
+
+    } catch (err) {
+
+        console.error(err);
+
+        UI.notify('Terjadi kesalahan sistem', 'error');
+    }
+}
 
         UI.renderProducts();
         UI.renderStats();
