@@ -1,21 +1,16 @@
 {
-  "cleanUrls": true,
   "rewrites": [
+    {
+      "source": "/admin",
+      "destination": "/admin/index.html"
+    },
     {
       "source": "/assets/:path*",
       "destination": "/public/assets/:path*"
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/admin",
-      "destination": "/admin/index.html",
-      "permanent": false
     },
     {
-      "source": "/",
-      "destination": "/public/index.html",
-      "permanent": false
+      "source": "/(.*)",
+      "destination": "/public/index.html"
     }
   ]
 }
