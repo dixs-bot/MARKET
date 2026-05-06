@@ -545,7 +545,7 @@
 
     /* ===== INITIALIZATION ===== */
 
-    async function init() { {
+    async function init() {
         if (!AdminApp.adminUI) throw new Error("adminUI not loaded");
         if (!AdminApp.productService) throw new Error("productService not loaded");
         if (!AdminApp.categoryService) throw new Error("categoryService not loaded");
