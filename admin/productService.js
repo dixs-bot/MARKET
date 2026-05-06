@@ -41,12 +41,10 @@
         };
 
         var prod = MM.normalizeProduct(raw);
-        if (!prod) { 
+       
+       if (!prod) { 
             return { ok: false, error: 'invalid_data' }; 
         }
-
-        var newProducts = stateProducts.slice();
-        newProducts.push(prod);
 
        const { data, error } =
     await window.supabaseClient
@@ -67,7 +65,13 @@ if (error) {
     console.error(error);
     return { ok: false, error: error.message };
 }
-        
+        /* 🔥 Sync UI State */
+AdminApp.State.products.unshift(data);
+
+return {
+    ok: true,
+    product: data
+};
         /* Update Single Source of Truth */
         AdminApp.State.products = newProducts;
         
