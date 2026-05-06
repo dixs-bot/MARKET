@@ -40,6 +40,33 @@ function getProducts() {
   return data.map(normalizeProduct).filter(p => p);
 }
 
+/* 🔥 TAMBAHKAN DI SINI */
+async function syncProductsFromSupabase() {
+
+  const { data, error } =
+    await window.supabaseClient
+      .from('products')
+      .select('*');
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  localStorage.setItem(
+    LS_PRODUCTS,
+    JSON.stringify(data)
+  );
+
+  window.dispatchEvent(
+    new Event('productsUpdated')
+  );
+
+  return data;
+}
+
+function saveProducts(products) {
+
   function saveProducts(products) {
     if (!Array.isArray(products)) return false;
 
@@ -269,6 +296,7 @@ function getProducts() {
   }
 
   window.MiniMarket = {
+  syncProductsFromSupabase, 
     // storage
     LS_PRODUCTS,
     LS_CART,
