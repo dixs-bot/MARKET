@@ -297,6 +297,20 @@ Hapus Terpilih (<span id="del-count">0</span>)
 <!-- TOAST -->
 <div id="toast" class="toast fixed bottom-6 left-4 right-4 bg-slate-800 text-white px-4 py-3 rounded-xl z-50 text-center text-xs font-medium shadow-lg"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/assets/js/supabase.js"></script>
+<script>
+(async () => {
+
+  const { data } =
+    await window.supabaseClient.auth.getSession();
+
+  if (!data.session) {
+    window.location.href = '/admin/login.html';
+  }
+
+})();
+</script>
 <script src="/assets/js/shared.js"></script>
 <script src="/admin/productService.js"></script>
 <script src="/admin/categoryService.js"></script>
