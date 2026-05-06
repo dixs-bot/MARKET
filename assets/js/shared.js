@@ -312,7 +312,7 @@ function saveProducts(products) {
     getProducts,
     saveProducts,
     normalizeProduct,
-
+    syncProductsFromSupabase, 
     // categories
     normalizeCategory,
     getCategories,
