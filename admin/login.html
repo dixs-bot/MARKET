@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Admin — MiniMarket</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              300: '#93c5fd',
+              400: '#60a5fa',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+            }
+          },
+          animation: {
+            'blob-1': 'blobFloat1 18s ease-in-out infinite',
+            'blob-2': 'blobFloat2 22s ease-in-out infinite',
+            'blob-3': 'blobFloat3 20s ease-in-out infinite',
+            'fade-up': 'fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            'fade-up-delay': 'fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.12s forwards',
+            'fade-up-delay-2': 'fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.24s forwards',
+            'fade-up-delay-3': 'fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.36s forwards',
+            'scale-in': 'scaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            'toast-in': 'toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+            'toast-out': 'toastOut 0.3s cubic-bezier(0.4, 0, 1, 1) forwards',
+            'shine': 'shine 2.5s ease-in-out infinite',
+            'spin-slow': 'spin 1s linear infinite',
+            'success-check': 'successCheck 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+          },
+          keyframes: {
+            blobFloat1: {
+              '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+              '25%': { transform: 'translate(60px, -40px) scale(1.1)' },
+              '50%': { transform: 'translate(-30px, 50px) scale(0.95)' },
+              '75%': { transform: 'translate(40px, 20px) scale(1.05)' },
+            },
+            blobFloat2: {
+              '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+              '25%': { transform: 'translate(-50px, 30px) scale(1.08)' },
+              '50%': { transform: 'translate(40px, -60px) scale(0.92)' },
+              '75%': { transform: 'translate(-20px, -30px) scale(1.04)' },
+            },
+            blobFloat3: {
+              '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+              '25%': { transform: 'translate(30px, 50px) scale(0.96)' },
+              '50%': { transform: 'translate(-60px, -20px) scale(1.1)' },
+              '75%': { transform: 'translate(20px, 40px) scale(1.02)' },
+            },
+            fadeUp: {
+              '0%': { opacity: '0', transform: 'translateY(20px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            scaleIn: {
+              '0%': { opacity: '0', transform: 'scale(0.92)' },
+              '100%': { opacity: '1', transform: 'scale(1)' },
+            },
+            toastIn: {
+              '0%': { opacity: '0', transform: 'translateY(-12px) scale(0.95)' },
+              '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+            },
+            toastOut: {
+              '0%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+              '100%': { opacity: '0', transform: 'translateY(-12px) scale(0.95)' },
+            },
+            shine: {
+              '0%': { transform: 'translateX(-100%) skewX(-15deg)' },
+              '40%, 100%': { transform: 'translateX(200%) skewX(-15deg)' },
+            },
+            successCheck: {
+              '0%': { strokeDashoffset: '48' },
+              '100%': { strokeDashoffset: '0' },
+            },
+          },
+        },
+      },
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      background: linear-gradient(145deg, #f0f5ff 0%, #ffffff 35%, #eff6ff 65%, #f8faff 100%);
+    }
+
+    /* Noise overlay for texture */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    .glass-card {
+      background: rgba(255, 255, 255, 0.72);
+      backdrop-filter: blur(24px) saturate(1.4);
+      -webkit-backdrop-filter: blur(24px) saturate(1.4);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      box-shadow:
+        0 0 0 1px rgba(59, 130, 246, 0.04),
+        0 2px 8px rgba(0, 0, 0, 0.02),
+        0 8px 24px rgba(0, 0, 0, 0.04),
+        0 24px 48px rgba(0, 0, 0, 0.04),
+        0 0 80px rgba(59, 130, 246, 0.03);
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper .input-field {
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      background: rgba(248, 250, 252, 0.8);
+      border: 1.5px solid rgba(203, 213, 225, 0.6);
+    }
+
+    .input-wrapper .input-field:hover {
+      border-color: rgba(148, 163, 184, 0.7);
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .input-wrapper .input-field:focus {
+      outline: none;
+      border-color: #3b82f6;
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1), 0 0 0 1px rgba(59, 130, 246, 0.1);
+    }
+
+    .input-wrapper .input-field::placeholder {
+      color: #94a3b8;
+      font-weight: 400;
+    }
+
+    .input-wrapper .input-label {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      color: #94a3b8;
+      pointer-events: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      background: transparent;
+      padding: 0 4px;
+    }
+
+    .input-wrapper .input-field:focus ~ .input-label,
+    .input-wrapper .input-field:not(:placeholder-shown) ~ .input-label {
+      top: 0;
+      transform: translateY(-50%);
+      font-size: 11.5px;
+      font-weight: 600;
+      color: #2563eb;
+      background: white;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+
+    .btn-login {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%);
+      background-size: 200% 200%;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-login::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(105deg, transparent 40%, rgba(255,255,255,0.15) 45%, rgba(255,255,255,0.25) 50%, rgba(255,255,255,0.15) 55%, transparent 60%);
+      transform: translateX(-100%) skewX(-15deg);
+      animation: shine 3s ease-in-out infinite;
+      animation-delay: 1.5s;
+    }
+
+    .btn-login:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3), 0 8px 24px rgba(37, 99, 235, 0.15), 0 0 0 1px rgba(37, 99, 235, 0.1);
+      background-position: 100% 100%;
+    }
+
+    .btn-login:active:not(:disabled) {
+      transform: translateY(0) scale(0.985);
+      box-shadow: 0 1px 4px rgba(37, 99, 235, 0.2);
+      transition-duration: 0.1s;
+    }
+
+    .btn-login:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .password-toggle {
+      transition: all 0.2s ease;
+    }
+    .password-toggle:hover {
+      color: #3b82f6;
+    }
+    .password-toggle:active {
+      transform: scale(0.9);
+    }
+
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.5;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    @media (max-width: 640px) {
+      .blob { filter: blur(60px); opacity: 0.35; }
+      .glass-card {
+        background: rgba(255, 255, 255, 0.82);
+        backdrop-filter: blur(20px) saturate(1.3);
+        -webkit-backdrop-filter: blur(20px) saturate(1.3);
+      }
+    }
+
+    /* Toast container */
+    .toast-container {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: calc(100% - 48px);
+      max-width: 400px;
+      pointer-events: none;
+    }
+
+    .toast {
+      pointer-events: auto;
+      border-radius: 14px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .toast-error {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(239, 68, 68, 0.15);
+      color: #991b1b;
+      box-shadow: 0 4px 16px rgba(239, 68, 68, 0.1), 0 0 0 1px rgba(239, 68, 68, 0.05);
+    }
+
+    .toast-success {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid rgba(34, 197, 94, 0.15);
+      color: #166534;
+      box-shadow: 0 4px 16px rgba(34, 197, 94, 0.1), 0 0 0 1px rgba(34, 197, 94, 0.05);
+    }
+
+    .success-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .success-check-circle {
+      stroke-dasharray: 166;
+      stroke-dashoffset: 166;
+      animation: drawCircle 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .success-check-mark {
+      stroke-dasharray: 48;
+      stroke-dashoffset: 48;
+      animation: successCheck 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;
+    }
+
+    @keyframes drawCircle {
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* Subtle grid pattern */
+    .grid-pattern {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.03;
+      background-size: 60px 60px;
+      background-image:
+        linear-gradient(to right, #2563eb 1px, transparent 1px),
+        linear-gradient(to bottom, #2563eb 1px, transparent 1px);
+      pointer-events: none;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-[100dvh] p-4 sm:p-6 relative">
+
+  <!-- Background effects -->
+  <div class="grid-pattern"></div>
+
+  <div class="blob w-[420px] h-[420px] bg-brand-300 animate-blob-1" style="top: -10%; left: -8%;"></div>
+  <div class="blob w-[360px] h-[360px] bg-blue-200 animate-blob-2" style="bottom: -8%; right: -5%;"></div>
+  <div class="blob w-[280px] h-[280px] bg-indigo-200 animate-blob-3" style="top: 50%; left: 60%;"></div>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- Success overlay (hidden by default) -->
+  <div class="success-overlay hidden" id="success-overlay">
+    <div class="flex flex-col items-center gap-5 opacity-0" id="success-content" style="transition: opacity 0.3s ease 0.1s;">
+      <svg width="80" height="80" viewBox="0 0 52 52" fill="none">
+        <circle class="success-check-circle" cx="26" cy="26" r="24" stroke="#22c55e" stroke-width="2.5" fill="none"/>
+        <path class="success-check-mark" d="M15 27l7 7 15-15" stroke="#22c55e" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="text-center">
+        <p class="text-slate-800 font-semibold text-lg">Login berhasil</p>
+        <p class="text-slate-400 text-sm mt-1">Mengalihkan ke dashboard...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Login card -->
+  <div class="glass-card rounded-2xl sm:rounded-3xl w-full max-w-[420px] p-8 sm:p-10 relative z-10 animate-scale-in opacity-0">
+
+    <!-- Header -->
+    <div class="text-center mb-9 opacity-0 animate-fade-up">
+      <!-- Logo -->
+      <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-br from-brand-500 to-brand-700 shadow-lg shadow-brand-500/20 mb-5">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 01-8 0"/>
+        </svg>
+      </div>
+      <h1 class="text-2xl sm:text-[26px] font-bold text-slate-900 tracking-tight">MiniMarket</h1>
+      <p class="text-slate-400 text-sm mt-1.5 font-medium">Admin Dashboard Access</p>
+    </div>
+
+    <!-- Form -->
+    <form id="login-form" class="space-y-5" autocomplete="on" novalidate>
+
+      <!-- Email -->
+      <div class="input-wrapper opacity-0 animate-fade-up-delay">
+        <input
+          type="email"
+          id="email"
+          name="email"
+          class="input-field w-full h-[54px] rounded-xl px-4 pt-2 text-[15px] text-slate-800 font-medium"
+          placeholder="Email"
+          autocomplete="email"
+          required
+          aria-label="Email address"
+        >
+        <label for="email" class="input-label">Email</label>
+      </div>
+
+      <!-- Password -->
+      <div class="input-wrapper opacity-0 animate-fade-up-delay-2">
+        <input
+          type="password"
+          id="password"
+          name="password"
+          class="input-field w-full h-[54px] rounded-xl px-4 pt-2 pr-[52px] text-[15px] text-slate-800 font-medium"
+          placeholder="Password"
+          autocomplete="current-password"
+          required
+          aria-label="Password"
+        >
+        <label for="password" class="input-label">Password</label>
+        <button
+          type="button"
+          class="password-toggle absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-300 p-1.5"
+          id="toggle-password"
+          aria-label="Toggle password visibility"
+          tabindex="0"
+        >
+          <!-- Eye icon -->
+          <svg id="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          <!-- Eye-off icon -->
+          <svg id="eye-closed" class="hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19m-6.72-1.07a3 3 0 11-4.24-4.24"/>
+            <line x1="1" y1="1" x2="23" y2="23"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Login button -->
+      <div class="pt-2 opacity-0 animate-fade-up-delay-3">
+        <button
+          type="submit"
+          id="btn-login"
+          class="btn-login w-full h-[54px] rounded-xl text-white font-semibold text-[15px] tracking-wide flex items-center justify-center gap-2.5"
+          aria-label="Login"
+        >
+          <span id="btn-text">Masuk</span>
+          <!-- Spinner -->
+          <svg id="btn-spinner" class="hidden animate-spin-slow" width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.25)" stroke-width="3"/>
+            <path d="M12 2a10 10 0 019.95 9" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+          <!-- Arrow icon (default) -->
+          <svg id="btn-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="5" y1="12" x2="19" y2="12"/>
+            <polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </button>
+      </div>
+    </form>
+
+    <!-- Footer -->
+    <div class="mt-8 text-center opacity-0 animate-fade-up-delay-3">
+      <div class="w-10 h-[1px] bg-slate-200 mx-auto mb-5"></div>
+      <p class="text-xs text-slate-300 font-medium">&copy; 2025 MiniMarket. All rights reserved.</p>
+    </div>
+  </div>
+
+  <script src="/assets/js/supabase.js"></script>
+
+  <script>
+    // ===== Toast system =====
+    function showToast(message, type = 'error') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type} animate-toast-in`;
+
+      const iconSvg = type === 'error'
+        ? `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`
+        : `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0 mt-0.5"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+
+      toast.innerHTML = `${iconSvg}<span>${message}</span>`;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.remove('animate-toast-in');
+        toast.classList.add('animate-toast-out');
+        toast.addEventListener('animationend', () => toast.remove());
+      }, 4000);
+    }
+
+    // ===== Password toggle =====
+    const toggleBtn = document.getElementById('toggle-password');
+    const passwordInput = document.getElementById('password');
+    const eyeOpen = document.getElementById('eye-open');
+    const eyeClosed = document.getElementById('eye-closed');
+
+    toggleBtn.addEventListener('click', () => {
+      const isPassword = passwordInput.type === 'password';
+      passwordInput.type = isPassword ? 'text' : 'password';
+      eyeOpen.classList.toggle('hidden', isPassword);
+      eyeClosed.classList.toggle('hidden', !isPassword);
+      passwordInput.focus();
+    });
+
+    // ===== Loading state =====
+    const btnLogin = document.getElementById('btn-login');
+    const btnText = document.getElementById('btn-text');
+    const btnSpinner = document.getElementById('btn-spinner');
+    const btnArrow = document.getElementById('btn-arrow');
+
+    function setLoading(loading) {
+      btnLogin.disabled = loading;
+      btnText.textContent = loading ? 'Memproses...' : 'Masuk';
+      btnSpinner.classList.toggle('hidden', !loading);
+      btnArrow.classList.toggle('hidden', loading);
+    }
+
+    // ===== Success overlay =====
+    function showSuccess() {
+      const overlay = document.getElementById('success-overlay');
+      const content = document.getElementById('success-content');
+      overlay.classList.remove('hidden');
+      requestAnimationFrame(() => {
+        content.style.opacity = '1';
+      });
+    }
+
+    // ===== Form submission =====
+    const form = document.getElementById('login-form');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      // Basic validation
+      if (!email) {
+        showToast('Silakan masukkan email Anda', 'error');
+        document.getElementById('email').focus();
+        return;
+      }
+      if (!password) {
+        showToast('Silakan masukkan password Anda', 'error');
+        document.getElementById('password').focus();
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) {
+          showToast(error.message, 'error');
+          setLoading(false);
+          return;
+        }
+
+        // Success
+        setLoading(false);
+        showSuccess();
+
+        // Redirect after animation
+        setTimeout(() => {
+          window.location.href = '/admin/index.html';
+        }, 1600);
+
+      } catch (err) {
+        showToast('Terjadi kesalahan koneksi. Silakan coba lagi.', 'error');
+        setLoading(false);
+      }
+    });
+
+    // ===== Enter key support =====
+    document.getElementById('email').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        document.getElementById('password').focus();
+      }
+    });
+  </script>
+</body>
+</html>
