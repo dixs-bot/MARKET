@@ -105,7 +105,7 @@
 
     /* ===== PRODUCT HANDLERS ===== */
 
-    function addProduct() {
+    async function addProduct() {
         if (!UI.validateForm()) { 
             UI.notify('Lengkapi semua field yang wajib', 'error'); 
             return; 
@@ -113,7 +113,7 @@
 
         var formData = getFormData();
         var input = buildProductInput(formData);
-        var result = ProdService.createProduct(input);
+       var result = await ProdService.createProduct(input);
 
         if (!result.ok) { 
             if (result.error === 'duplicate_id' || result.error === 'invalid_data') {
