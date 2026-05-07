@@ -89,6 +89,97 @@ export function selVou(vid) {
 }
 
 export function validate(showErr) {
+
+    var n =
+        state.d.inname.value
+            .trim()
+            .length >= 3;
+
+    var ph =
+        state.d.inphone.value
+            .replace(/\D/g, '')
+            .length >= 10;
+
+    var a =
+        state.d.inaddr.value
+            .trim()
+            .length >= 10;
+
+    var s =
+        state.co.ship !== '';
+
+    var p =
+        state.co.pay !== '';
+
+    var ok =
+        n && ph && a && s && p;
+
+    if (ok) {
+
+        state.d.border.disabled = false;
+
+        state.d.border.classList.remove(
+            'btn-off'
+        );
+
+        state.d.border.classList.add(
+            'btn-on'
+        );
+
+        state.d.hint.textContent =
+            'Siap pesan';
+
+    } else {
+
+        state.d.border.disabled = true;
+
+        state.d.border.classList.add(
+            'btn-off'
+        );
+
+        state.d.border.classList.remove(
+            'btn-on'
+        );
+
+        state.d.hint.textContent =
+            'Lengkapi semua data';
+    }
+
+    if (showErr !== true)
+        return ok;
+
+    state.d.eaddr.classList.toggle(
+        'hidden',
+        a
+    );
+
+    state.d.eship.classList.toggle(
+        'hidden',
+        s
+    );
+
+    state.d.epay.classList.toggle(
+        'hidden',
+        p
+    );
+
+    state.d.inaddr.classList.toggle(
+        'err-input',
+        !a
+    );
+
+    state.d.inname.classList.toggle(
+        'err-input',
+        !n
+    );
+
+    state.d.inphone.classList.toggle(
+        'err-input',
+        !ph
+    );
+
+    return ok;
+}
     var a  = state.d.inaddr.value.trim().length >= 10;
     var s  = state.co.ship !== '';
     var p  = state.co.pay  !== '';
