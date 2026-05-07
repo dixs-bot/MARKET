@@ -170,7 +170,7 @@
         UI.showEditModal(p.name, p.price, p.stock, 'product');
     }
 
-    function saveEditProduct() {
+    async function saveEditProduct() {
         var S = AdminApp.State;
         var editData = UI.getEditFormData();
         
@@ -202,7 +202,7 @@
             return;
         }
 
-        var result = ProdService.editProductData(S.editingProductId, validation.data.name, validation.data.price, validation.data.stock);
+        var result = await ProdService.editProductData(S.editingProductId, validation.data.name, validation.data.price, validation.data.stock);
 
         if (result.ok) {
             UI.hideEditModal();
