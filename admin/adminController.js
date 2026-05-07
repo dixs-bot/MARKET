@@ -216,11 +216,11 @@
 
     /* ===== CATEGORY HANDLERS ===== */
 
-    function addCategory() {
+    async function addCategory() {
         if (!d.catName) return;
 
         var S = AdminApp.State;
-        var result = CatService.createCategory(d.catName.value, S.pendingCatImage);
+        var result = await CatService.createCategory(d.catName.value, S.pendingCatImage);
         
         if (!result.ok) {
             if (result.error === 'empty_name' || result.error === 'too_short') {
