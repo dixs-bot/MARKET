@@ -132,50 +132,86 @@ body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#1e293b;min-height:
 
 .orders-btn{
   position:relative;
+
   display:inline-flex;
   align-items:center;
   gap:8px;
+
   padding:10px 18px;
+
   border-radius:14px;
+
   font-size:13px;
   font-weight:700;
+
   color:#9A3412;
-  background:linear-gradient(
-    135deg,
-    rgba(255,247,237,.95),
-    rgba(254,215,170,.85)
-  );
-  border:1px solid rgba(251,146,60,.25);
-  transition:.35s cubic-bezier(.22,1,.36,1);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,247,237,.92),
+      rgba(254,215,170,.72)
+    );
+
+  border:
+    1px solid rgba(251,146,60,.16);
+
   overflow:hidden;
+
+  transition:
+    all .28s cubic-bezier(.22,1,.36,1);
+
   box-shadow:
-    0 4px 18px rgba(251,146,60,.12);
+    0 2px 10px rgba(251,146,60,.08);
 }
 
 .orders-btn:hover{
-  transform:translateY(-2px) scale(1.04);
+
+  transform:
+    translateY(-1px);
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,247,237,.98),
+      rgba(254,215,170,.82)
+    );
+
   box-shadow:
-    0 10px 30px rgba(249,115,22,.22);
+    0 6px 18px rgba(251,146,60,.14);
 }
 
 .orders-badge{
+
   position:absolute;
-  top:-6px;
-  right:-6px;
-  min-width:20px;
-  height:20px;
-  padding:0 6px;
+
+  top:-4px;
+  right:-4px;
+
+  min-width:18px;
+  height:18px;
+
+  padding:0 5px;
+
   border-radius:999px;
+
   background:#EF4444;
+
   color:#fff;
-  font-size:10px;
-  font-weight:800;
+
+  font-size:9px;
+  font-weight:700;
+
   display:flex;
   align-items:center;
   justify-content:center;
-  animation:pulseBadge 1.8s infinite;
-}
 
+  box-shadow:
+    0 2px 8px rgba(239,68,68,.18);
+
+  animation:
+    pulseSoft 3.2s ease-in-out infinite;
+}
 .logout-btn{
   position:relative;
   display:inline-flex;
@@ -211,12 +247,16 @@ body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#1e293b;min-height:
   }
 }
 
-@keyframes pulseBadge{
+@keyframes pulseSoft{
+
   0%,100%{
     transform:scale(1);
+    opacity:1;
   }
+
   50%{
-    transform:scale(1.12);
+    transform:scale(1.06);
+    opacity:.92;
   }
 }
 
