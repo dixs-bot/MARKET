@@ -1,5 +1,4 @@
 import { state, WA, fmt } from './utils.js';
-const MM = window.MiniMarket;
 import { addCart, delCart, selShip, selPay, selVou, validate, resetCO, goToInvoice, load } from './services.js';
 import {
     cache,
@@ -25,6 +24,7 @@ import {
     unlock,
     animateIn
 } from './ui.js';
+const MM = window.MiniMarket;
 
 /* ── navigation & flow ── */
 function navTo(name) {
@@ -154,11 +154,13 @@ function onProductsUpdated() {
 /* ── init ── */
 async function init() {
 
-    /* 🔥 sync database dulu */
-    await MM.syncProductsFromSupabase();
-    await MM.syncCategoriesFromSupabase();
     cache();
     load();
+
+    /* 🔥 sync database setelah DOM siap */
+    await MM.syncProductsFromSupabase();
+    await MM.syncCategoriesFromSupabase();
+
     initInputListeners();
 
     renderCats();
