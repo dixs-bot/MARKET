@@ -419,54 +419,48 @@ async function fetchOrders() {
    * @param {Function} onDelete - Callback for deleted orders
    * @returns {Promise<void>}
    */
-  async function subscribeRealtime(callback) {
+async function subscribeRealtime(callback) {
 
   try {
 
     if (!window.supabaseClient) {
-
-      console.error(
-        'Supabase client tidak ditemukan'
-      );
-
+      console.error('Supabase client tidak ditemukan');
       return;
     }
 
-    window.supabaseClient
+    const channel = window.supabaseClient.channel(
+      'orders-realtime'
+    );
 
-      .channel('orders-realtime')
+    channel.on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'orders'
+      },
 
-      .on(
-        'postgres_changes',
+      async (payload) => {
 
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'orders'
-        },
+        console.log(
+          '[Realtime order]',
+          payload
+        );
 
-        async function(payload) {
+        await fetchOrders();
 
-          console.log(
-            '[Realtime order]',
-            payload
+        if (
+          typeof callback === 'function'
+        ) {
+
+          callback(
+            getFilteredOrders()
           );
-
-          await fetchOrders();
-
-          if (
-            typeof callback ===
-            'function'
-          ) {
-
-            callback(
-              getFilteredOrders()
-            );
-          }
         }
-      )
+      }
+    );
 
-      .subscribe();
+    channel.subscribe();
 
   } catch (err) {
 
@@ -476,12 +470,6 @@ async function fetchOrders() {
     );
   }
 }
-
-  /**
-   * Full sync: fetch fresh data from Supabase and replace local state
-   * TODO: Implement with fetchOrders() result mapping
-   * @returns {Promise<Object[]>}
-   */
   async function syncOrders() {
     // TODO: Uncomment for Supabase integration
     // const freshData = await fetchOrders();
