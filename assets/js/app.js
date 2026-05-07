@@ -155,12 +155,12 @@ function onProductsUpdated() {
 async function init() {
 
     cache();
-    d.inname =
+   state.d.inname =
   document.getElementById(
     'inname'
   );
 
-d.inphone =
+state.d.inphone =
   document.getElementById(
     'inphone'
   );
