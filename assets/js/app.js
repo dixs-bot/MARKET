@@ -132,6 +132,28 @@ function viewDetail(oid) {
 
 /* ── input listeners ── */
 function initInputListeners() {
+state.d.inphone.addEventListener(
+    'input',
+    function () {
+
+        this.value =
+            this.value.replace(
+                /[^0-9]/g,
+                ''
+            );
+
+        validate(false);
+    }
+);
+
+state.d.inname.addEventListener(
+    'input',
+    function () {
+
+        validate(false);
+    }
+);
+
     state.d.inaddr.addEventListener('input', function () {
         state.d.eaddr.classList.add('hidden'); state.d.inaddr.classList.remove('err-input'); validate(false);
     });
