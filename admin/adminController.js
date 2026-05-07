@@ -522,6 +522,108 @@ async function deleteSelected() {
         }
     }
 
+           }
+    }
+
+    async function loadOrders() {
+
+    const { data, error } =
+        await window.supabaseClient
+            .from('orders')
+            .select('*')
+            .order('created_at', {
+                ascending: false
+            });
+
+    if (error) {
+        console.error(error);
+        return;
+    }
+
+    renderOrders(data || []);
+}
+
+function renderOrders(orders) {
+
+    const wrap =
+        document.getElementById(
+            'orders-list'
+        );
+
+    if (!wrap) return;
+
+    if (!orders.length) {
+
+        wrap.innerHTML = `
+            <div class="text-xs text-slate-400">
+                Belum ada pesanan
+            </div>
+        `;
+
+        return;
+    }
+
+    wrap.innerHTML =
+        orders.map(order => `
+
+        <div class="border border-slate-100 rounded-2xl p-4 bg-white">
+
+            <div class="flex items-start justify-between mb-3">
+
+                <div>
+
+                    <h3 class="font-bold text-sm text-slate-800">
+                        ${order.id}
+                    </h3>
+
+                    <p class="text-xs text-slate-400 mt-1">
+                        ${order.address}
+                    </p>
+
+                </div>
+
+                <span class="px-2 py-1 rounded-full text-[10px] font-semibold bg-blue-100 text-blue-700">
+                    ${order.status}
+                </span>
+
+            </div>
+
+            <div class="space-y-2 mb-4">
+
+                ${(order.items || []).map(item => `
+
+                    <div class="flex items-center justify-between text-xs">
+
+                        <span class="text-slate-600">
+                            ${item.name} × ${item.qty}
+                        </span>
+
+                        <span class="font-semibold text-slate-700">
+                            Rp ${item.price * item.qty}
+                        </span>
+
+                    </div>
+
+                `).join('')}
+
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+
+                <span class="text-xs text-slate-500">
+                    Total
+                </span>
+
+                <span class="text-sm font-bold text-slate-800">
+                    Rp ${order.total}
+                </span>
+
+            </div>
+
+        </div>
+
+    `).join('');
+}
     /* ===== GLOBAL SYNC LISTENERS ===== */
 
     window.addEventListener('productsUpdated', function () {
@@ -581,6 +683,7 @@ async function deleteSelected() {
         UI.updateDelButton(0);
         UI.updateChkAll(false, false, AdminApp.State.products.length);
         initEvents();
+        await loadOrders();
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
