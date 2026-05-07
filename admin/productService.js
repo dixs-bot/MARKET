@@ -103,7 +103,7 @@ return {
 };
     }
 
-    function editProductData(id, newName, newPrice, newStock) {
+   async function editProductData(id, newName, newPrice, newStock) {
         var editProducts = AdminApp.State.products.slice();
         var p = null;
 
@@ -116,20 +116,32 @@ return {
 
         if (!p) return { ok: false, error: 'not_found' };
 
-        p.name  = newName;
-        p.price = newPrice;
-        p.stock = newStock;
+       
+       const { error } =
+    await window.supabaseClient
+        .from('products')
+        .update({
+            name: newName,
+            price: newPrice,
+            stock: newStock
+        })
+        .eq('id', id);
 
-        if (!MM.saveProducts(editProducts)) {
-            return { ok: false, error: 'storage_full' };
-        }
-        
-        /* Update Single Source of Truth */
-        AdminApp.State.products = editProducts;
-        
-        window.dispatchEvent(new Event('productsUpdated'));
+if (error) {
+    console.error(error);
 
-        return { ok: true };
+    return {
+        ok: false,
+        error: error.message
+    };
+}
+
+/* 🔥 Sync ulang dari database */
+await MM.syncProductsFromSupabase();
+
+return {
+    ok: true
+};
     }
 
     window.AdminApp.productService = {
