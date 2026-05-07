@@ -17,7 +17,7 @@
             .replace(/(^-|-$)/g, '');
     }
 
-    function createCategory(name, image) {
+    async function createCategory(name, image) {
         if (!name || name.trim().length === 0) {
             return { ok: false, error: 'empty_name', message: 'Nama kategori tidak boleh kosong' };
         }
@@ -51,17 +51,36 @@
             return { ok: false, error: 'invalid_data', message: 'Data kategori tidak valid' }; 
         }
 
-        var newCats = stateCats.slice();
-        newCats.push(cat);
+       const { data, error } =
+    await window.supabaseClient
+        .from('categories')
+        .insert([
+            {
+                id: cat.id,
+                name: cat.name,
+                image: cat.image
+            }
+        ])
+        .select()
+        .single();
 
-        if (!MM.saveCategories(newCats)) {
-            return { ok: false, error: 'storage_full', message: 'Gagal menyimpan kategori' };
-        }
+if (error) {
+    console.error(error);
 
-        /* Update Single Source of Truth */
-        AdminApp.State.categories = newCats;
+    return {
+        ok: false,
+        error: error.message,
+        message: 'Gagal menyimpan kategori'
+    };
+}
 
-        return { ok: true, data: cat };
+/* 🔥 Sync ulang database */
+await MM.syncCategoriesFromSupabase();
+
+return {
+    ok: true,
+    data: data
+};
     }
 
     function updateCategory(id, newName) {
