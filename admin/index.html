@@ -67,39 +67,92 @@ body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#1e293b;min-height:
 
 <!-- HEADER -->
 <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-lg border-b border-slate-100">
-<div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-<div class="flex items-center gap-3">
-<div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
-<svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-</div>
-<div>
-<h1 class="text-base font-bold text-slate-800 leading-tight">Admin Panel</h1>
-<p class="text-[10px] text-slate-400 leading-tight">MiniMarket Management</p>
-</div>
-</div>
-<div class="flex items-center gap-2">
 
-  <a href="/"
-    class="text-xs text-blue-600 font-semibold bg-blue-50 px-3.5 py-2 rounded-lg hover:bg-blue-100 transition tap hidden sm:inline-flex items-center gap-1.5">
+  <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
 
-  <button
-    id="btn-logout"
-    class="px-3.5 py-2 rounded-lg bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition tap inline-flex items-center gap-1.5"
-  >
+    <!-- LOGO -->
+    <div class="flex items-center gap-3">
 
-    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1"/>
-    </svg>
+      <div class="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
 
-    Logout
-  </button>
+        <svg class="w-5 h-5 text-white"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24">
 
-</div>
-<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-Lihat Toko
-</a>
-</div>
+          <path stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+
+          <path stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+
+        </svg>
+
+      </div>
+
+      <div>
+
+        <h1 class="text-base font-bold text-slate-800 leading-tight">
+          Admin Panel
+        </h1>
+
+        <p class="text-[10px] text-slate-400 leading-tight">
+          MiniMarket Management
+        </p>
+
+      </div>
+
+    </div>
+
+    <!-- ACTIONS -->
+    <div class="flex items-center gap-2">
+
+      <!-- ORDERS BUTTON -->
+      <a href="/admin/orders.html"
+        class="relative text-xs text-orange-600 font-semibold bg-orange-50 px-3.5 py-2 rounded-lg hover:bg-orange-100 transition tap inline-flex items-center gap-1.5">
+
+        📦 Pesanan
+
+        <span
+          id="orders-badge"
+          class="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center hidden">
+
+          0
+
+        </span>
+
+      </a>
+
+      <!-- LOGOUT -->
+      <button
+        id="btn-logout"
+        class="px-3.5 py-2 rounded-lg bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition tap inline-flex items-center gap-1.5">
+
+        <svg class="w-3.5 h-3.5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24">
+
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h6a2 2 0 012 2v1" />
+
+        </svg>
+
+        Logout
+
+      </button>
+
+    </div>
+
+  </div>
+
 </header>
 
 <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
