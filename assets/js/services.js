@@ -180,26 +180,6 @@ export function validate(showErr) {
 
     return ok;
 }
-    var a  = state.d.inaddr.value.trim().length >= 10;
-    var s  = state.co.ship !== '';
-    var p  = state.co.pay  !== '';
-    var ok = a && s && p;
-    if (ok) {
-        state.d.border.disabled = false;
-        state.d.border.classList.remove('btn-off'); state.d.border.classList.add('btn-on');
-        state.d.hint.textContent = 'Siap pesan';
-    } else {
-        state.d.border.disabled = true;
-        state.d.border.classList.add('btn-off'); state.d.border.classList.remove('btn-on');
-        state.d.hint.textContent = 'Lengkapi semua data';
-    }
-    if (showErr !== true) return ok;
-    state.d.eaddr.classList.toggle('hidden', a);
-    state.d.eship.classList.toggle('hidden', s);
-    state.d.epay.classList.toggle('hidden',  p);
-    state.d.inaddr.classList.toggle('err-input', !a);
-    return ok;
-}
 
 export function resetCO() { state.co.ship = ''; state.co.pay = ''; state.co.vou = null; }
 
