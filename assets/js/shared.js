@@ -317,7 +317,7 @@ async function syncProductsFromSupabase() {
   }
 
   window.MiniMarket = {
-  syncProductsFromSupabase, 
+   
     // storage
     LS_PRODUCTS,
     LS_CART,
@@ -341,7 +341,7 @@ async function syncProductsFromSupabase() {
     editCategory,
     deleteCategory,
     reorderCategories,
-
+    syncCategoriesFromSupabase,
     // orders
     loadOrders,
 
