@@ -87,7 +87,25 @@ class="sheet fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-[60] max-h-[
 <div class="w-16"></div>
 </div></header>
 <div id="checkout-scroll" class="p-4 space-y-3 pb-4">
-<section class="bg-slate-50 rounded-2xl p-4"><div class="flex items-center gap-2 mb-2.5"><div class="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">1</div><p class="text-sm font-semibold text-slate-800">Alamat Pengiriman</p><span id="err-addr" class="text-[10px] text-red-500 font-semibold ml-auto hidden">Min. 10 karakter</span></div><textarea id="in-addr" class="w-full p-3 border-2 border-slate-200 rounded-xl resize-none text-sm bg-white" rows="2" placeholder="Masukkan alamat lengkap (min. 10 karakter)..."></textarea></section>
+<section class="bg-slate-50 rounded-2xl p-4"><div class="flex items-center gap-2 mb-2.5"><div class="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">1</div><p class="text-sm font-semibold text-slate-800">Alamat Pengiriman</p><span id="err-addr" class="text-[10px] text-red-500 font-semibold ml-auto hidden">Min. 10 karakter</span></div>
+<div class="space-y-3">
+
+  <input
+    id="inname"
+    type="text"
+    placeholder="Nama lengkap"
+    class="w-full h-11 px-4 rounded-xl border border-slate-200 text-sm"
+  >
+
+  <input
+    id="inphone"
+    type="tel"
+    placeholder="Nomor HP"
+    class="w-full h-11 px-4 rounded-xl border border-slate-200 text-sm"
+  >
+
+</div>
+<textarea id="in-addr" class="w-full p-3 border-2 border-slate-200 rounded-xl resize-none text-sm bg-white" rows="2" placeholder="Masukkan alamat lengkap (min. 10 karakter)..."></textarea></section>
 <section class="bg-slate-50 rounded-2xl p-4"><div class="flex items-center gap-2 mb-2.5"><div class="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">2</div><p class="text-sm font-semibold text-slate-800">Pengiriman</p><span id="err-ship" class="text-[10px] text-red-500 font-semibold ml-auto hidden">*Pilih satu</span></div><div id="free-ship-banner" class="hidden mb-2 px-3 py-2 bg-green-50 border border-green-100 rounded-lg text-xs text-green-700 font-medium">Gratis ongkir belanja Rp 50.000+</div><div id="ship-opts" class="space-y-2"></div></section>
 <section class="bg-slate-50 rounded-2xl p-4"><div class="flex items-center gap-2 mb-2.5"><div class="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-xs font-bold">3</div><p class="text-sm font-semibold text-slate-800">Pembayaran</p><span id="err-pay" class="text-[10px] text-red-500 font-semibold ml-auto hidden">*Pilih satu</span></div><div id="pay-opts" class="space-y-2"></div></section>
 <section class="bg-slate-50 rounded-2xl p-4"><div class="flex items-center justify-between"><div class="flex items-center gap-2.5"><span class="text-xl">&#127991;&#65039;</span><div><p class="text-sm font-semibold text-slate-800">Voucher</p><p id="v-label" class="text-[11px] text-slate-400">Opsional</p></div></div><button data-act="open-vou" class="text-blue-600 text-xs font-semibold tap px-3 py-1.5 rounded-lg">Pilih</button></div></section>
