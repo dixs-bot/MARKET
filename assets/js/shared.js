@@ -89,6 +89,29 @@ async function syncProductsFromSupabase() {
     }
   }
 
+  async function syncCategoriesFromSupabase() {
+
+    const { data, error } =
+        await window.supabaseClient
+            .from('categories')
+            .select('*');
+
+    if (error) {
+        console.error(error);
+        return [];
+    }
+
+    localStorage.setItem(
+        LS_CATEGORIES,
+        JSON.stringify(data)
+    );
+
+    window.dispatchEvent(
+        new Event('categoriesUpdated')
+    );
+
+    return data;
+}
   // 🔥 ATOMIC STOCK UPDATE (WAJIB UNTUK APP.JS)
   function atomicDeductStock(cart){
     const prods = getProducts();
