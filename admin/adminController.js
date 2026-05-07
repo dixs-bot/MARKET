@@ -561,7 +561,8 @@
         AdminApp.State.products = MM.getProducts();
         AdminApp.State.categories = MM.getCategories();
 
-        await MM.syncProductsFromSupabase();
+        await MM.syncProductsFromSupabase(); 
+        await MM.syncCategoriesFromSupabase();
        
         UI.renderStats();
         UI.updateProductCategoryDropdown();
