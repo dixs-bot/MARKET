@@ -362,8 +362,6 @@ async function fetchOrders() {
 
   return orders;
 }
-    return Promise.resolve(orders);
-  }
 
   /**
    * Permanently delete an order from Supabase
