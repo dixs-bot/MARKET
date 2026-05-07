@@ -1,4 +1,5 @@
 import { state, WA, fmt } from './utils.js';
+const MM = window.MiniMarket;
 import { addCart, delCart, selShip, selPay, selVou, validate, resetCO, goToInvoice, load } from './services.js';
 import {
     cache,
