@@ -155,6 +155,15 @@ function onProductsUpdated() {
 async function init() {
 
     cache();
+    d.inname =
+  document.getElementById(
+    'inname'
+  );
+
+d.inphone =
+  document.getElementById(
+    'inphone'
+  );
     load();
 
     /* 🔥 sync database setelah DOM siap */
