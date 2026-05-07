@@ -43,7 +43,7 @@ Svc.subscribeRealtime(
   /**
    * Simulate initial data loading, then render orders
    */
- async function startupLoad() {
+async function startupLoad() {
 
   try {
 
@@ -56,6 +56,20 @@ Svc.subscribeRealtime(
       filtered,
       true
     );
+
+  } catch (error) {
+
+    console.error(
+      'Gagal memuat orders:',
+      error
+    );
+
+    UI.showToast(
+      'Gagal memuat data orders',
+      'error'
+    );
+  }
+}
 
   /* ------------------------------------------
      DELEGATED EVENT HANDLING
