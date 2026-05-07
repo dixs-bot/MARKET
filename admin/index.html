@@ -79,16 +79,35 @@ body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#1e293b;min-height:
 }
 
 .logo-box{
+
   width:42px;
   height:42px;
   border-radius:14px;
-  background:linear-gradient(135deg,#2563EB,#60A5FA);
+
+  background:
+    linear-gradient(
+      135deg,
+      #2563EB,
+      #60A5FA
+    );
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   box-shadow:
     0 4px 18px rgba(37,99,235,.25);
-  animation:floatY 3s ease-in-out infinite;
+
+  transition:
+    transform .3s ease,
+    box-shadow .3s ease;
+}
+ 
+  .logo-box:hover{
+  transform:translateY(-2px) scale(1.03);
+
+  box-shadow:
+    0 10px 28px rgba(37,99,235,.32);
 }
 
 .logo-glow{
