@@ -42,7 +42,21 @@ const OrdersController = (() => {
       filtered,
       true
     );
+/* 🔥 realtime sync */
+Svc.subscribeRealtime(
+  function(updatedOrders) {
 
+    UI.renderOrders(
+      updatedOrders,
+      true
+    );
+
+    UI.showToast(
+      'Pesanan baru masuk',
+      'success'
+    );
+  }
+);
   } catch(err) {
 
     console.error(err);
