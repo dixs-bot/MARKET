@@ -522,8 +522,7 @@ async function deleteSelected() {
         }
     }
 
-           }
-    }
+           
 
     async function loadOrders() {
 
