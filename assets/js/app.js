@@ -151,14 +151,28 @@ function onProductsUpdated() {
 }
 
 /* ── init ── */
-function init() {
-    cache(); load(); initInputListeners();
-    renderCats(); renderProds(); patchBadge();
-    navTo('home'); state.currentPage = 'home';
+async function init() {
+
+    /* 🔥 sync database dulu */
+    await MM.syncProductsFromSupabase();
+
+    cache();
+    load();
+    initInputListeners();
+
+    renderCats();
+    renderProds();
+    patchBadge();
+
+    navTo('home');
+    state.currentPage = 'home';
 }
 
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
-else init();
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
 
 /* Scroll-lock failsafe every 3 s */
 setInterval(function () {
