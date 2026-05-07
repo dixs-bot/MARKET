@@ -182,7 +182,7 @@
                 return;
             }
 
-            var updateResult = CatService.updateCategory(S.editingCategoryId, catName);
+            var updateResult = await CatService.updateCategory(S.editingCategoryId, catName);
             if (updateResult.ok) {
                 UI.hideEditModal();
                 UI.renderCategories();
@@ -249,7 +249,7 @@
         UI.hideConfirm();
 
         if (S.pendingDeleteCategory) {
-            var delResult = CatService.deleteCategory(S.pendingDeleteCategory);
+            var delResult = await CatService.deleteCategory(S.pendingDeleteCategory);
             S.pendingDeleteCategory = null;
             
             if (delResult.ok) {
