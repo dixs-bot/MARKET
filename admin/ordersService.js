@@ -413,26 +413,53 @@ async function fetchOrders() {
    * @param {Function} onDelete - Callback for deleted orders
    * @returns {Promise<void>}
    */
-  async function subscribeRealtime(onInsert, onUpdate, onDelete) {
-    // TODO: Uncomment for Supabase realtime
-    // window.supabaseClient
-    //   .channel('orders-changes')
-    //   .on('postgres_changes', {
-    //     event: 'INSERT',
-    //     schema: 'public',
-    //     table: 'orders',
-    //   }, (payload) => onInsert(payload.new))
-    //   .on('postgres_changes', {
-    //     event: 'UPDATE',
-    //     schema: 'public',
-    //     table: 'orders',
-    //   }, (payload) => onUpdate(payload.new))
-    //   .on('postgres_changes', {
-    //     event: 'DELETE',
-    //     schema: 'public',
-    //     table: 'orders',
-    //   }, (payload) => onDelete(payload.old))
-    //   .subscribe();
+   async function subscribeRealtime(callback, onUpdate, onDelete) {
+
+  if (!window.supabaseClient) {
+
+    console.error(
+      'Supabase client not found'
+    );
+
+    return;
+  }
+
+  window.supabaseClient
+
+    .channel('orders-realtime')
+
+    .on(
+      'postgres_changes',
+
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'orders'
+      },
+
+      async function(payload) {
+
+        console.log(
+          '[Realtime order]',
+          payload
+        );
+
+        await fetchOrders();
+
+        if (
+          typeof callback ===
+          'function'
+        ) {
+
+          callback(
+            getFilteredOrders()
+          );
+        }
+      }
+    )
+
+    .subscribe();
+}
 
     return Promise.resolve();
   }
@@ -497,56 +524,3 @@ async function fetchOrders() {
   };
 
 })();
-/* ------------------------------------------
-   REALTIME ORDERS
------------------------------------------- */
-
-function subscribeRealtime(callback) {
-
-  if (!window.supabaseClient) {
-    console.error(
-      'Supabase client not found'
-    );
-    return;
-  }
-
-  window.supabaseClient
-
-    .channel('orders-realtime')
-
-    .on(
-      'postgres_changes',
-
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'orders'
-      },
-
-      async function(payload) {
-
-        console.log(
-          '[Realtime order]',
-          payload
-        );
-
-        await fetchOrders();
-
-        if (
-          typeof callback ===
-          'function'
-        ) {
-
-          callback(
-            getFilteredOrders()
-          );
-        }
-      }
-    )
-
-    .subscribe();
-}
-window.OrdersService = OrdersService;
-subscribeRealtime:
-  subscribeRealtime,
-   };
