@@ -283,10 +283,11 @@ export async function goToInvoice() {
                 {
                     id: newOrder.id,
 
-                    customer_name: '',
+                     customer_name:
+                     state.d.inname.value.trim(),
 
-                    phone: '',
-
+                     phone:
+                       state.d.inphone.value.trim(),
                     address:
                         newOrder.address,
 
@@ -330,64 +331,10 @@ export async function goToInvoice() {
 
         return;
     }
-
-    state.curOrder = newOrder;
-const { error } =
-  await window.supabaseClient
-    .from('orders')
-    .insert([
-      {
-        id: newOrder.id,
-
-        customer_name:
-          state.d.inname.value.trim(),
-
-        phone:
-          state.d.inphone.value.trim(),
-
-        address:
-          newOrder.address,
-
-        items:
-          newOrder.items,
-
-        subtotal:
-          newOrder.subtotal,
-
-        shipping_cost:
-          newOrder.shipPrice,
-
-        total:
-          newOrder.total,
-
-        payment_method:
-          newOrder.payment.name,
-
-        shipping_method:
-          newOrder.shipping.name,
-
-        status:
-          'pending'
-      }
-    ]);
-
-if (error) {
-
-  console.error(error);
-
-  notify(
-    'Gagal menyimpan pesanan'
-  );
-
-  state.d.mload.classList.add(
-    'hidden'
-  );
-
-  state.isProcessing = false;
-
-  return;
-}
-    state.orders.push(
+    
+      state.curOrder = newOrder;
+   
+      state.orders.push(
         state.curOrder
     );
 
