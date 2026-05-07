@@ -123,7 +123,7 @@ const OrdersService = (() => {
   /* ------------------------------------------
      APPLICATION STATE
      ------------------------------------------ */
-  let orders = JSON.parse(JSON.stringify(MOCK_ORDERS));
+  let orders = [];
   let currentFilter = 'all';
   let searchQuery = '';
   let deleteTargetId = null;
@@ -310,25 +310,58 @@ const OrdersService = (() => {
    * TODO: Replace with actual Supabase query
    * @returns {Promise<Object[]>}
    */
-  async function fetchOrders() {
-    // TODO: Uncomment for Supabase integration
-    // const { data, error } = await window.supabaseClient
-    //   .from('orders')
-    //   .select(`
-    //     *,
-    //     order_items (
-    //       product_name,
-    //       quantity,
-    //       price,
-    //       product_image
-    //     )
-    //   `)
-    //   .order('created_at', { ascending: false });
-    //
-    // if (error) throw error;
-    // return data;
+async function fetchOrders() {
 
-    // Local fallback — returns current state
+  const { data, error } =
+    await window.supabaseClient
+      .from('orders')
+      .select('*')
+      .order('created_at', {
+        ascending: false
+      });
+
+  if (error) {
+
+    console.error(error);
+
+    return [];
+  }
+
+  orders = (data || []).map(order => {
+
+    return {
+
+      id:
+        order.id,
+
+      customer:
+        order.customer_name,
+
+      email:
+        '-',
+
+      phone:
+        order.phone,
+
+      address:
+        order.address,
+
+      status:
+        order.status,
+
+      date:
+        new Date(
+          order.created_at
+        ).toLocaleString('id-ID'),
+
+      products:
+        order.items || []
+    };
+
+  });
+
+  return orders;
+}
     return Promise.resolve(orders);
   }
 
