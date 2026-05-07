@@ -79,20 +79,28 @@ return {
         var ids = Object.keys(selectedIds);
         if (!ids.length) return { ok: false, error: 'none_selected' };
 
-        var newProducts = [];
-        var currentProducts = AdminApp.State.products;
-        
-        for (var i = 0; i < currentProducts.length; i++) {
-            if (!selectedIds[currentProducts[i].id]) newProducts.push(currentProducts[i]);
-        }
-        
+       const { error } =
+    await window.supabaseClient
+        .from('products')
+        .delete()
+        .in('id', ids);
 
-        /* Update Single Source of Truth */
-        AdminApp.State.products = newProducts;
-        
-        window.dispatchEvent(new Event('productsUpdated'));
-        
-        return { ok: true, count: ids.length };
+if (error) {
+    console.error(error);
+
+    return {
+        ok: false,
+        error: error.message
+    };
+}
+
+/* 🔥 Sync ulang dari database */
+await MM.syncProductsFromSupabase();
+
+return {
+    ok: true,
+    count: ids.length
+};
     }
 
     function editProductData(id, newName, newPrice, newStock) {
