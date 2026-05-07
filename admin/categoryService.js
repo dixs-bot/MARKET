@@ -83,7 +83,7 @@ return {
 };
     }
 
-    function updateCategory(id, newName) {
+    async function updateCategory(id, newName) {
         if (!newName || newName.trim().length === 0) {
             return { ok: false, error: 'empty_name', message: 'Nama kategori tidak boleh kosong' };
         }
@@ -111,43 +111,59 @@ return {
 
         if (!found) return { ok: false, error: 'not_found', message: 'Kategori tidak ditemukan' };
 
-        if (!MM.saveCategories(updatedCats)) {
-            return { ok: false, error: 'storage_full', message: 'Gagal mengubah kategori' };
-        }
+    const { error } =
+    await window.supabaseClient
+        .from('categories')
+        .update({
+            name: newName.trim()
+        })
+        .eq('id', id);
 
-        /* Update Single Source of Truth */
-        AdminApp.State.categories = updatedCats;
+if (error) {
+    console.error(error);
 
-        return { ok: true };
+    return {
+        ok: false,
+        error: error.message,
+        message: 'Gagal mengubah kategori'
+    };
+}
+
+/* 🔥 Sync ulang */
+await MM.syncCategoriesFromSupabase();
+
+return {
+    ok: true
+};
     }
 
-    function deleteCategory(id) {
+    async function deleteCategory(id) {
         if (id === 'all') {
             return { ok: false, error: 'default_protected', message: 'Kategori default tidak bisa dihapus' };
         }
 
-        var stateCats = AdminApp.State.categories;
-        var newCats = [];
-        var found = false;
-        
-        for (var i = 0; i < stateCats.length; i++) {
-            if (stateCats[i].id === id) {
-                found = true;
-                continue; 
-            }
-            newCats.push(stateCats[i]);
-        }
+       const { error } =
+    await window.supabaseClient
+        .from('categories')
+        .delete()
+        .eq('id', id);
 
-        if (!found) return { ok: false, error: 'not_found', message: 'Kategori tidak ditemukan' };
+if (error) {
+    console.error(error);
 
-        if (!MM.saveCategories(newCats)) {
-            return { ok: false, error: 'storage_full', message: 'Gagal menghapus kategori' };
-        }
+    return {
+        ok: false,
+        error: error.message,
+        message: 'Gagal menghapus kategori'
+    };
+}
 
-        /* Update Single Source of Truth */
-        AdminApp.State.categories = newCats;
+/* 🔥 Sync ulang */
+await MM.syncCategoriesFromSupabase();
 
-        return { ok: true };
+return {
+    ok: true
+};
     }
 
     function reorderCategories(ids) {
