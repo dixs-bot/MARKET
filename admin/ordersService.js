@@ -312,55 +312,61 @@ const OrdersService = (() => {
    */
 async function fetchOrders() {
 
-  const { data, error } =
-    await window.supabaseClient
-      .from('orders')
-      .select('*')
-      .order('created_at', {
-        ascending: false
-      });
+  try {
 
-  if (error) {
+    const { data, error } =
+      await window.supabaseClient
+        .from('orders')
+        .select('*')
+        .order('created_at', {
+          ascending: false
+        });
 
-    console.error(error);
+    if (error) {
+
+      console.error(error);
+
+      return [];
+    }
+
+    orders = (data || []).map(order => {
+
+      return {
+
+        id: order.id,
+
+        customer: order.customer_name,
+
+        email: '-',
+
+        phone: order.phone,
+
+        address: order.address,
+
+        status: order.status,
+
+        date:
+          new Date(
+            order.created_at
+          ).toLocaleString('id-ID'),
+
+        products:
+          order.items || []
+      };
+
+    });
+
+    return orders;
+
+  } catch (err) {
+
+    console.error(
+      'Fetch orders error:',
+      err
+    );
 
     return [];
   }
-
-  orders = (data || []).map(order => {
-
-    return {
-
-      id:
-        order.id,
-
-      customer:
-        order.customer_name,
-
-      email:
-        '-',
-
-      phone:
-        order.phone,
-
-      address:
-        order.address,
-
-      status:
-        order.status,
-
-      date:
-        new Date(
-          order.created_at
-        ).toLocaleString('id-ID'),
-
-      products:
-        order.items || []
-    };
-
-  });
-
-  return orders;
 }
 
   /**
@@ -413,54 +419,63 @@ async function fetchOrders() {
    * @param {Function} onDelete - Callback for deleted orders
    * @returns {Promise<void>}
    */
-   async function subscribeRealtime(callback) {
+  async function subscribeRealtime(callback) {
 
-  if (!window.supabaseClient) {
+  try {
+
+    if (!window.supabaseClient) {
+
+      console.error(
+        'Supabase client tidak ditemukan'
+      );
+
+      return;
+    }
+
+    window.supabaseClient
+
+      .channel('orders-realtime')
+
+      .on(
+        'postgres_changes',
+
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'orders'
+        },
+
+        async function(payload) {
+
+          console.log(
+            '[Realtime order]',
+            payload
+          );
+
+          await fetchOrders();
+
+          if (
+            typeof callback ===
+            'function'
+          ) {
+
+            callback(
+              getFilteredOrders()
+            );
+          }
+        }
+      )
+
+      .subscribe();
+
+  } catch (err) {
 
     console.error(
-      'Supabase client not found'
+      'Realtime subscribe error:',
+      err
     );
-
-    return;
   }
-
-  window.supabaseClient
-
-    .channel('orders-realtime')
-
-    .on(
-      'postgres_changes',
-
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'orders'
-      },
-
-      async function(payload) {
-
-        console.log(
-          '[Realtime order]',
-          payload
-        );
-
-        await fetchOrders();
-
-        if (
-          typeof callback ===
-          'function'
-        ) {
-
-          callback(
-            getFilteredOrders()
-          );
-        }
-      }
-    )
-
-    .subscribe();
 }
-
 
   /**
    * Full sync: fetch fresh data from Supabase and replace local state
