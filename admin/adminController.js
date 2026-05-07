@@ -623,6 +623,7 @@ function renderOrders(orders) {
         </div>
 
     `).join('');
+  
 }
     /* ===== GLOBAL SYNC LISTENERS ===== */
 
