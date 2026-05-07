@@ -121,88 +121,262 @@ export function goToInvoice() {
     state.d.mconf.classList.add('hidden');
     state.d.mload.classList.remove('hidden');
 
-    setTimeout(function () {
-        try {
-            var sm = null, pm = null;
-            for (var i = 0; i < SHIPS.length; i++) if (SHIPS[i].id === state.co.ship) { sm = SHIPS[i]; break; }
-            for (var j = 0; j < PAYS.length;  j++) if (PAYS[j].id  === state.co.pay)  { pm = PAYS[j];  break; }
+  try {
 
-            if (!sm || !pm) {
-                notify('Pilih pengiriman dan pembayaran');
-                state.d.mload.classList.add('hidden');
-                state.isProcessing = false;
-                return;
-            }
+    var sm = null;
+    var pm = null;
 
-            var stockResult = window.MiniMarket.atomicDeductStock(state.cart);
-
-            if (!stockResult.ok) {
-                notify('Stok tidak cukup: ' + stockResult.errors.join(', '));
-                state.d.mload.classList.add('hidden');
-                state.d.pgco.classList.remove('hidden');
-                renderShips(); renderPays(); renderSummary(); validate(false);
-                state.currentPage  = 'checkout';
-                state.isProcessing = false;
-                return;
-            }
-
-            var sub       = subTotal();
-            var autoFree  = sub >= FREE_SHIP_MIN;
-            var baseShip  = sm.price;
-            var finalShip = autoFree ? 0 : baseShip;
-            var disc      = 0;
-            if (state.co.vou && sub >= state.co.vou.min) disc = state.co.vou.disc;
-            var total     = Math.max(0, sub + finalShip - disc);
-
-            var newOrder = {
-                id:        'ord_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
-                items:     state.cart.slice(),
-                address:   state.d.inaddr.value.trim(),
-                shipping:  sm,
-                payment:   pm,
-                subtotal:  sub,
-                shipPrice: finalShip,
-                discount:  disc,
-                total:     total,
-                notes:     state.d.innote.value.trim(),
-                status:    'diproses',
-                createdAt: Date.now()
-            };
-
-            var orderCheck = window.MiniMarket.validateOrder(newOrder);
-            if (!orderCheck.ok) {
-                console.error('[MiniMarket] order validation failed:', orderCheck.reason);
-                notify('Gagal memproses pesanan (' + orderCheck.reason + ')');
-                state.d.mload.classList.add('hidden');
-                state.isProcessing = false;
-                return;
-            }
-
-            state.curOrder = newOrder;
-            state.orders.push(state.curOrder);
-
-            state.cart = [];
-            resetCO();
-            save();
-
-            renderCart();
-            renderProds();
-            patchBadge();
-
-            state.d.mload.classList.add('hidden');
-            state.d.pgco.classList.add('hidden');
-            renderInv();
-            state.d.pginv.classList.remove('hidden');
-            state.d.pginv.scrollTop = 0;
-            animateIn(state.d.pginv);
-            state.currentPage = 'invoice';
-
-        } catch (err) {
-            console.error('Order error:', err);
-            state.d.mload.classList.add('hidden');
-            notify('Gagal memproses pesanan');
-        } finally {
-            state.isProcessing = false;
+    for (var i = 0; i < SHIPS.length; i++) {
+        if (SHIPS[i].id === state.co.ship) {
+            sm = SHIPS[i];
+            break;
         }
-    }, 600);
+    }
+
+    for (var j = 0; j < PAYS.length; j++) {
+        if (PAYS[j].id === state.co.pay) {
+            pm = PAYS[j];
+            break;
+        }
+    }
+
+    if (!sm || !pm) {
+
+        notify('Pilih pengiriman dan pembayaran');
+
+        state.d.mload.classList.add('hidden');
+
+        state.isProcessing = false;
+
+        return;
+    }
+
+    var stockResult =
+        window.MiniMarket.atomicDeductStock(
+            state.cart
+        );
+
+    if (!stockResult.ok) {
+
+        notify(
+            'Stok tidak cukup: ' +
+            stockResult.errors.join(', ')
+        );
+
+        state.d.mload.classList.add('hidden');
+
+        state.d.pgco.classList.remove('hidden');
+
+        renderShips();
+        renderPays();
+        renderSummary();
+
+        validate(false);
+
+        state.currentPage = 'checkout';
+
+        state.isProcessing = false;
+
+        return;
+    }
+
+    var sub = subTotal();
+
+    var autoFree =
+        sub >= FREE_SHIP_MIN;
+
+    var baseShip =
+        sm.price;
+
+    var finalShip =
+        autoFree ? 0 : baseShip;
+
+    var disc = 0;
+
+    if (
+        state.co.vou &&
+        sub >= state.co.vou.min
+    ) {
+        disc = state.co.vou.disc;
+    }
+
+    var total =
+        Math.max(
+            0,
+            sub + finalShip - disc
+        );
+
+    var newOrder = {
+
+        id:
+            'ord_' +
+            Date.now() +
+            '_' +
+            Math.random()
+                .toString(36)
+                .substr(2, 5),
+
+        items:
+            state.cart.slice(),
+
+        address:
+            state.d.inaddr.value.trim(),
+
+        shipping:
+            sm,
+
+        payment:
+            pm,
+
+        subtotal:
+            sub,
+
+        shipPrice:
+            finalShip,
+
+        discount:
+            disc,
+
+        total:
+            total,
+
+        notes:
+            state.d.innote.value.trim(),
+
+        status:
+            'pending',
+
+        createdAt:
+            Date.now()
+    };
+
+    var orderCheck =
+        window.MiniMarket.validateOrder(
+            newOrder
+        );
+
+    if (!orderCheck.ok) {
+
+        console.error(
+            '[MiniMarket] order validation failed:',
+            orderCheck.reason
+        );
+
+        notify(
+            'Gagal memproses pesanan (' +
+            orderCheck.reason +
+            ')'
+        );
+
+        state.d.mload.classList.add('hidden');
+
+        state.isProcessing = false;
+
+        return;
+    }
+
+    /* 🔥 INSERT ORDER KE SUPABASE */
+    const { error } =
+        await window.supabaseClient
+            .from('orders')
+            .insert([
+                {
+                    id: newOrder.id,
+
+                    customer_name: '',
+
+                    phone: '',
+
+                    address:
+                        newOrder.address,
+
+                    items:
+                        newOrder.items,
+
+                    subtotal:
+                        newOrder.subtotal,
+
+                    shipping_cost:
+                        newOrder.shipPrice,
+
+                    discount:
+                        newOrder.discount,
+
+                    total:
+                        newOrder.total,
+
+                    payment_method:
+                        newOrder.payment.name,
+
+                    shipping_method:
+                        newOrder.shipping.name,
+
+                    status:
+                        'pending'
+                }
+            ]);
+
+    if (error) {
+
+        console.error(error);
+
+        notify(
+            'Gagal menyimpan order'
+        );
+
+        state.d.mload.classList.add('hidden');
+
+        state.isProcessing = false;
+
+        return;
+    }
+
+    state.curOrder = newOrder;
+
+    state.orders.push(
+        state.curOrder
+    );
+
+    state.cart = [];
+
+    resetCO();
+
+    save();
+
+    renderCart();
+
+    renderProds();
+
+    patchBadge();
+
+    state.d.mload.classList.add('hidden');
+
+    state.d.pgco.classList.add('hidden');
+
+    renderInv();
+
+    state.d.pginv.classList.remove('hidden');
+
+    state.d.pginv.scrollTop = 0;
+
+    animateIn(state.d.pginv);
+
+    state.currentPage = 'invoice';
+
+} catch (err) {
+
+    console.error(
+        'Order error:',
+        err
+    );
+
+    state.d.mload.classList.add('hidden');
+
+    notify(
+        'Gagal memproses pesanan'
+    );
+
+} finally {
+
+    state.isProcessing = false;
 }
