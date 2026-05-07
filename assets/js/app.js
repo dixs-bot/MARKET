@@ -155,7 +155,7 @@ async function init() {
 
     /* 🔥 sync database dulu */
     await MM.syncProductsFromSupabase();
-
+    await MM.syncCategoriesFromSupabase();
     cache();
     load();
     initInputListeners();
