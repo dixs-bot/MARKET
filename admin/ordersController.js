@@ -25,7 +25,21 @@ const OrdersController = (() => {
     bindSearchInput();
     startupLoad();
   }
+/* 🔥 realtime sync */
+Svc.subscribeRealtime(
+  function(updatedOrders) {
 
+    UI.renderOrders(
+      updatedOrders,
+      true
+    );
+
+    UI.showToast(
+      'Pesanan baru masuk',
+      'success'
+    );
+  }
+);
   /**
    * Simulate initial data loading, then render orders
    */
@@ -42,31 +56,6 @@ const OrdersController = (() => {
       filtered,
       true
     );
-/* 🔥 realtime sync */
-Svc.subscribeRealtime(
-  function(updatedOrders) {
-
-    UI.renderOrders(
-      updatedOrders,
-      true
-    );
-
-    UI.showToast(
-      'Pesanan baru masuk',
-      'success'
-    );
-  }
-);
-  } catch(err) {
-
-    console.error(err);
-
-    UI.showToast(
-      'Gagal memuat pesanan',
-      'error'
-    );
-  }
-}
 
   /* ------------------------------------------
      DELEGATED EVENT HANDLING
