@@ -29,12 +29,30 @@ const OrdersController = (() => {
   /**
    * Simulate initial data loading, then render orders
    */
-  function startupLoad() {
-    setTimeout(() => {
-      const filtered = Svc.getFilteredOrders();
-      UI.renderOrders(filtered, true);
-    }, 900);
+ async function startupLoad() {
+
+  try {
+
+    await Svc.fetchOrders();
+
+    const filtered =
+      Svc.getFilteredOrders();
+
+    UI.renderOrders(
+      filtered,
+      true
+    );
+
+  } catch(err) {
+
+    console.error(err);
+
+    UI.showToast(
+      'Gagal memuat pesanan',
+      'error'
+    );
   }
+}
 
   /* ------------------------------------------
      DELEGATED EVENT HANDLING
