@@ -113,7 +113,7 @@ export function validate(showErr) {
 export function resetCO() { state.co.ship = ''; state.co.pay = ''; state.co.vou = null; }
 
 /* ── place order ── */
-export function goToInvoice() {
+export async function goToInvoice() {
     if (state.isProcessing)      return;
     if (state.d.border.disabled) return;
     state.isProcessing = true;
@@ -379,4 +379,7 @@ export function goToInvoice() {
 } finally {
 
     state.isProcessing = false;
+}
+
+
 }
