@@ -72,15 +72,10 @@ return {
     ok: true,
     product: data
 };
-        /* Update Single Source of Truth */
-        AdminApp.State.products = newProducts;
-        
-        window.dispatchEvent(new Event('productsUpdated'));
-        
-        return { ok: true, data: prod };
+    
     }
 
-    function deleteSelectedProducts(selectedIds) {
+   async function deleteSelectedProducts(selectedIds) {
         var ids = Object.keys(selectedIds);
         if (!ids.length) return { ok: false, error: 'none_selected' };
 
@@ -91,9 +86,6 @@ return {
             if (!selectedIds[currentProducts[i].id]) newProducts.push(currentProducts[i]);
         }
         
-        if (!MM.saveProducts(newProducts)) {
-            return { ok: false, error: 'storage_full' };
-        }
 
         /* Update Single Source of Truth */
         AdminApp.State.products = newProducts;
