@@ -413,7 +413,7 @@ async function fetchOrders() {
    * @param {Function} onDelete - Callback for deleted orders
    * @returns {Promise<void>}
    */
-   async function subscribeRealtime(callback, onUpdate, onDelete) {
+   async function subscribeRealtime(callback) {
 
   if (!window.supabaseClient) {
 
@@ -461,8 +461,6 @@ async function fetchOrders() {
     .subscribe();
 }
 
-    return Promise.resolve();
-  }
 
   /**
    * Full sync: fetch fresh data from Supabase and replace local state
