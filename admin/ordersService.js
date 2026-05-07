@@ -497,5 +497,56 @@ async function fetchOrders() {
   };
 
 })();
+/* ------------------------------------------
+   REALTIME ORDERS
+------------------------------------------ */
 
+function subscribeRealtime(callback) {
+
+  if (!window.supabaseClient) {
+    console.error(
+      'Supabase client not found'
+    );
+    return;
+  }
+
+  window.supabaseClient
+
+    .channel('orders-realtime')
+
+    .on(
+      'postgres_changes',
+
+      {
+        event: '*',
+        schema: 'public',
+        table: 'orders'
+      },
+
+      async function(payload) {
+
+        console.log(
+          '[Realtime order]',
+          payload
+        );
+
+        await fetchOrders();
+
+        if (
+          typeof callback ===
+          'function'
+        ) {
+
+          callback(
+            getFilteredOrders()
+          );
+        }
+      }
+    )
+
+    .subscribe();
+}
 window.OrdersService = OrdersService;
+subscribeRealtime:
+  subscribeRealtime,
+   };
