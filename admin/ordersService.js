@@ -518,7 +518,7 @@ function subscribeRealtime(callback) {
       'postgres_changes',
 
       {
-        event: '*',
+        event: 'INSERT',
         schema: 'public',
         table: 'orders'
       },
