@@ -148,10 +148,17 @@
 
   </main>
 
-  <!-- Module scripts (load order matters: service → UI → controller) -->
-  <script src="ordersService.js"></script>
-  <script src="ordersUI.js"></script>
-  <script src="ordersController.js"></script>
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="/assets/js/supabase.js"></script>
+
+<!-- Orders modules -->
+<script src="ordersService.js"></script>
+
+<script src="ordersUI.js"></script>
+
+<script src="ordersController.js"></script>
 
 </body>
 </html>
