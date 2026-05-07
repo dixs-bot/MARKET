@@ -138,19 +138,29 @@
     }
 }
 
-    function deleteSelected() {
-        var S = AdminApp.State;
-        var result = ProdService.deleteSelectedProducts(S.selectedIds);
-        
-        if (!result.ok) return;
+async function deleteSelected() {
 
-        S.selectedIds = {};
-        UI.renderProducts();
-        UI.updateDelButton(0);
-        UI.updateChkAll(false, false, S.products.length);
-        UI.renderStats();
-        UI.notify(result.count + ' produk berhasil dihapus', 'success');
-    }
+    var S = AdminApp.State;
+
+    var result =
+        await ProdService.deleteSelectedProducts(
+            S.selectedIds
+        );
+
+    if (!result.ok) return;
+
+    S.selectedIds = {};
+
+    UI.renderProducts();
+    UI.updateDelButton(0);
+    UI.updateChkAll(false, false, S.products.length);
+    UI.renderStats();
+
+    UI.notify(
+        result.count + ' produk berhasil dihapus',
+        'success'
+    );
+}
 
     function openEditProduct(id) {
         var S = AdminApp.State;
@@ -244,7 +254,7 @@
         UI.notify('Kategori berhasil ditambahkan', 'success');
     }
 
-    function handleDeleteAction() {
+    async function handleDeleteAction() {
         var S = AdminApp.State;
         UI.hideConfirm();
 
