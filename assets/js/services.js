@@ -145,38 +145,38 @@ export function validate(showErr) {
             'Lengkapi semua data';
     }
 
-    if (showErr !== true)
-        return ok;
+    if (showErr === true) {
 
-    state.d.eaddr.classList.toggle(
-        'hidden',
-        a
-    );
+        state.d.eaddr.classList.toggle(
+            'hidden',
+            a
+        );
 
-    state.d.eship.classList.toggle(
-        'hidden',
-        s
-    );
+        state.d.eship.classList.toggle(
+            'hidden',
+            s
+        );
 
-    state.d.epay.classList.toggle(
-        'hidden',
-        p
-    );
+        state.d.epay.classList.toggle(
+            'hidden',
+            p
+        );
 
-    state.d.inaddr.classList.toggle(
-        'err-input',
-        !a
-    );
+        state.d.inaddr.classList.toggle(
+            'err-input',
+            !a
+        );
 
-    state.d.inname.classList.toggle(
-        'err-input',
-        !n
-    );
+        state.d.inname.classList.toggle(
+            'err-input',
+            !n
+        );
 
-    state.d.inphone.classList.toggle(
-        'err-input',
-        !ph
-    );
+        state.d.inphone.classList.toggle(
+            'err-input',
+            !ph
+        );
+    }
 
     return ok;
 }
