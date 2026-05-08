@@ -230,8 +230,7 @@ updateOrdersBadge();
     Svc.clearDeleteTarget();
 
     // After animation completes, remove from state and re-render
-    setTimeout(() => {
-      await Svc.deleteOrder(orderId);
+      setTimeout(async () => {
       const filtered = Svc.getFilteredOrders();
       UI.renderOrders(filtered, false);
       UI.showToast(`Pesanan ${orderId} berhasil dihapus`, 'error');
