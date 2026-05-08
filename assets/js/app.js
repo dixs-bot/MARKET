@@ -1,5 +1,5 @@
 import { state, WA, fmt } from './utils.js';
-import { addCart, delCart, selShip, selPay, selVou, validate, resetCO, goToInvoice, load } from './services.js';
+import { addCart, delCart, selShip, selPay, selVou, validate, resetCO, goToInvoice, cancelOrder, load } from './services.js';
 import {
     cache,
     notify,
