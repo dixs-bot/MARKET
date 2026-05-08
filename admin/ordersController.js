@@ -49,10 +49,12 @@ async function startupLoad() {
 
   try {
 
-    await Svc.fetchOrders();
+  await Svc.fetchOrders();
 
-    const filtered =
-      Svc.getFilteredOrders();
+await updateOrdersBadge();
+
+const filtered =
+  Svc.getFilteredOrders();
 
     UI.renderOrders(
       filtered,
