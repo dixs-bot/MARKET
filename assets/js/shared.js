@@ -112,49 +112,109 @@ async function syncProductsFromSupabase() {
 
     return data;
 }
-  // 🔥 ATOMIC STOCK UPDATE (WAJIB UNTUK APP.JS)
-  function atomicDeductStock(cart){
+async function atomicDeductStock(cart){
+
+  try {
+
     const prods = getProducts();
-    const map   = {};
-    for(let i=0;i<prods.length;i++) map[prods[i].id] = prods[i];
+
+    const map = {};
+
+    for(let i=0;i<prods.length;i++){
+
+      map[prods[i].id] =
+        prods[i];
+    }
 
     const errors = [];
 
+    /* VALIDASI STOCK */
     for(let i=0;i<cart.length;i++){
+
       const it = cart[i];
-      const p  = map[it.id];
+
+      const p =
+        map[it.id];
 
       if(!p){
+
         errors.push(it.name);
+
         continue;
       }
 
       if(p.stock < it.qty){
+
         errors.push(it.name);
       }
     }
 
     if(errors.length){
-      return { ok:false, errors };
+
+      return {
+        ok:false,
+        errors
+      };
     }
 
-    // deduct
+    /* DEDUCT STOCK */
     for(let i=0;i<cart.length;i++){
+
       const it = cart[i];
-      const p  = map[it.id];
 
-      p.stock -= it.qty;
+      const p =
+        map[it.id];
 
-      // sync cart snapshot
+      const newStock =
+        p.stock - it.qty;
+
+      p.stock = newStock;
+
+      /* sync cart snapshot */
       it.price = p.price;
       it.image = p.image;
+
+      /* 🔥 UPDATE SUPABASE */
+      const { error } =
+        await window.supabaseClient
+          .from('products')
+          .update({
+            stock:newStock
+          })
+          .eq('id', p.id);
+
+      if(error){
+
+        console.error(error);
+
+        return {
+          ok:false,
+          errors:[
+            'Gagal update stock realtime'
+          ]
+        };
+      }
     }
 
+    /* SAVE LOCAL CACHE */
     saveProducts(prods);
 
-    return { ok:true };
-  }
+    return {
+      ok:true
+    };
 
+  } catch(err){
+
+    console.error(err);
+
+    return {
+      ok:false,
+      errors:[
+        'Terjadi kesalahan stock'
+      ]
+    };
+  }
+}
   // 🔥 VALIDATE ORDER (DIPAKAI APP.JS)
   function validateOrder(o){
     if(!o) return { ok:false, reason:"empty order" };
