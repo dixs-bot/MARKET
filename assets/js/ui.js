@@ -316,46 +316,153 @@ export function renderInv() {
 }
 
 export function renderOrders() {
+
     if (!state.orders.length) {
-        state.d.olist.classList.add('hidden'); state.d.oempty.classList.remove('hidden'); return;
+
+        state.d.olist.classList.add('hidden');
+
+        state.d.oempty.classList.remove('hidden');
+
+        return;
     }
-    state.d.olist.classList.remove('hidden'); state.d.oempty.classList.add('hidden');
+
+    state.d.olist.classList.remove('hidden');
+
+    state.d.oempty.classList.add('hidden');
 
     var h = '';
-    for (var i = state.orders.length - 1; i >= 0; i--) {
-        var o    = state.orders[i];
-        var sl   = o.status.charAt(0).toUpperCase() + o.status.slice(1);
+
+    for (
+        var i = state.orders.length - 1;
+        i >= 0;
+        i--
+    ) {
+
+        var o = state.orders[i];
+
+        var sl =
+            o.status.charAt(0)
+            .toUpperCase() +
+            o.status.slice(1);
+
         var prev = '';
-        var mx   = Math.min(o.items.length, 2);
-        for (var j = 0; j < mx; j++) {
-            var it = o.items[j];
+
+        var mx =
+            Math.min(
+                o.items.length,
+                2
+            );
+
+        for (
+            var j = 0;
+            j < mx;
+            j++
+        ) {
+
+            var it =
+                o.items[j];
+
             prev +=
 
-    '<div class="flex items-center gap-2">' +
+                '<div class="flex items-center gap-2">' +
 
-    '<img src="' +
-    (
-        it.image ||
-        FALLBACK_IMG
-    ) +
-    '" class="w-8 h-8 rounded-lg object-cover bg-slate-100" onerror="this.onerror=null;this.src=\'' + FALLBACK_IMG + '\'">' +
+                '<img src="' +
 
-    '<div class="flex-1 min-w-0">' +
+                (
+                    it.image ||
+                    FALLBACK_IMG
+                ) +
 
-    '<p class="text-[11px] font-medium text-slate-800 truncate">' +
-    it.name +
-    '</p>' +
+                '" class="w-8 h-8 rounded-lg object-cover bg-slate-100" onerror="this.onerror=null;this.src=\'' +
 
-    '<p class="text-[10px] text-slate-400">' +
-    it.qty +
-    'x ' +
-    fmt(it.price) +
-    '</p>' +
+                FALLBACK_IMG +
 
-    '</div>' +
+                '\'">' +
 
-    '</div>';
+                '<div class="flex-1 min-w-0">' +
+
+                '<p class="text-[11px] font-medium text-slate-800 truncate">' +
+
+                it.name +
+
+                '</p>' +
+
+                '<p class="text-[10px] text-slate-400">' +
+
+                it.qty +
+
+                'x ' +
+
+                fmt(it.price) +
+
+                '</p>' +
+
+                '</div>' +
+
+                '</div>';
+        }
+
+        if (o.items.length > 2) {
+
+            prev +=
+                '<p class="text-[10px] text-slate-400">+' +
+
+                (
+                    o.items.length - 2
+                ) +
+
+                ' lainnya</p>';
+        }
+
+        h +=
+
+            '<div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-100">' +
+
+            '<div class="flex justify-between mb-2">' +
+
+            '<span class="text-[10px] text-slate-400">#' +
+
+            o.id +
+
+            '</span>' +
+
+            '<span class="st-' +
+
+            o.status +
+
+            ' text-[10px] font-semibold px-2.5 py-0.5 rounded-full">' +
+
+            sl +
+
+            '</span>' +
+
+            '</div>' +
+
+            '<div class="space-y-1.5 mb-2">' +
+
+            prev +
+
+            '</div>' +
+
+            '<div class="flex justify-between pt-2 border-t border-slate-200">' +
+
+            '<span class="text-sm font-bold text-blue-600">' +
+
+            fmt(o.total) +
+
+            '</span>' +
+
+            '<button data-odet="' +
+
+            o.id +
+
+            '" class="text-blue-600 text-[11px] font-semibold tap">Detail</button>' +
+
+            '</div>' +
+
+            '</div>';
     }
+
     state.d.olist.innerHTML = h;
 }
 
