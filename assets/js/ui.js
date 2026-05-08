@@ -452,11 +452,35 @@ export function renderOrders() {
 
             '</span>' +
 
-            '<button data-odet="' +
+           '<div class="flex items-center gap-2">' +
 
-            o.id +
+'<button data-odet="' +
 
-            '" class="text-blue-600 text-[11px] font-semibold tap">Detail</button>' +
+o.id +
+
+'" class="text-blue-600 text-[11px] font-semibold tap">Detail</button>' +
+
+(
+
+    o.status === 'pending' ||
+
+    o.status === 'processing'
+
+        ?
+
+    '<button data-cancel="' +
+
+    o.id +
+
+    '" class="text-red-500 text-[11px] font-semibold tap">Batalkan</button>'
+
+        :
+
+    ''
+
+) +
+
+'</div>' +
 
             '</div>' +
 
