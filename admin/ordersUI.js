@@ -160,7 +160,7 @@ const OrdersUI = (() => {
     return `
       <div class="flex items-center gap-3">
         <img
-          src="${product.img}"
+          src="${   product.image ||   window.MiniMarket.FALLBACK_IMG }"
           alt="${product.name}"
           class="product-img w-11 h-11 shrink-0"
           loading="lazy"
