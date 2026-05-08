@@ -376,6 +376,31 @@ async function atomicDeductStock(cart){
     return saveCategories(ordered);
   }
 
+  /* 🔥 REALTIME PRODUCTS */
+window.supabaseClient
+
+  .channel('products-realtime')
+
+  .on(
+    'postgres_changes',
+
+    {
+      event: '*',
+      schema: 'public',
+      table: 'products'
+    },
+
+    async () => {
+
+      console.log(
+        'Realtime products update'
+      );
+
+      await syncProductsFromSupabase();
+    }
+  )
+
+  .subscribe();
   window.MiniMarket = {
    
     // storage
