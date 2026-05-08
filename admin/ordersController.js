@@ -29,10 +29,12 @@ const OrdersController = (() => {
 Svc.subscribeRealtime(
   function(updatedOrders) {
 
-    UI.renderOrders(
-      updatedOrders,
-      true
-    );
+   UI.renderOrders(
+  updatedOrders,
+  true
+);
+
+updateOrdersBadge();
 
     UI.showToast(
       'Pesanan baru masuk',
@@ -71,22 +73,55 @@ async function startupLoad() {
   }
 }
 
-  /* ------------------------------------------
-     DELEGATED EVENT HANDLING
-     All interactive elements use data-action
-     attributes handled through one listener
-     ------------------------------------------ */
-
   function bindDelegatedEvents() {
     document.addEventListener('click', handleDelegatedClick);
     document.addEventListener('keydown', handleKeyboard);
   }
 
-  /**
-   * Central click router — reads data-action from
-   * the closest matching ancestor of the click target
-   * @param {MouseEvent} e
-   */
+  async function updateOrdersBadge() {
+
+    try {
+
+        const badge =
+            document.getElementById(
+                'orders-badge'
+            );
+
+        if (!badge) return;
+
+        const { count, error } =
+            await window.supabaseClient
+                .from('orders')
+                .select('*', {
+                    count: 'exact',
+                    head: true
+                })
+                .eq('status', 'pending');
+
+        if (error) {
+
+            console.error(error);
+
+            return;
+        }
+
+        badge.textContent =
+            count || 0;
+
+        badge.style.display =
+            count > 0
+                ? 'flex'
+                : 'none';
+
+    } catch (err) {
+
+        console.error(
+            'Badge error:',
+            err
+        );
+    }
+}
+   
   function handleDelegatedClick(e) {
     const el = e.target.closest('[data-action]');
     if (!el) return;
