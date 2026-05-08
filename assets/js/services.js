@@ -180,49 +180,54 @@ export function validate(showErr) {
 
     return ok;
 }
-export function resetCO() { state.co.ship = ''; state.co.pay = ''; state.co.vou = null; }
-const cancelBtn =
-
-    e.target.closest(
-        '[data-cancel]'
-    );
-
-if (cancelBtn) {
-
-    const id =
-
-        cancelBtn.dataset.cancel;
-
-    const ok =
-        confirm(
-            'Batalkan pesanan ini?'
-        );
-
-    if (!ok) return;
-
-    const success =
-
-        await cancelOrder(id);
-
-    if (!success) {
-
-        notify(
-            'Gagal membatalkan pesanan'
-        );
-
-        return;
-    }
-
-    notify(
-        'Pesanan dibatalkan'
-    );
-
-    await loadOrders();
-
-    renderOrders();
-
-    return;
+export function resetCO() {
+    state.co.ship = '';
+    state.co.pay = '';
+    state.co.vou = null;
 }
+export async function cancelOrder(
+    orderId
+) {
+
+    try {
+
+        const { error } =
+
+            await window.supabaseClient
+
+                .from('orders')
+
+                .update({
+
+                    status:
+                        'cancelled'
+                })
+
+                .eq(
+                    'id',
+                    orderId
+                );
+
+        if (error) {
+
+            console.error(error);
+
+            return false;
+        }
+
+        return true;
+
+    } catch (err) {
+
+        console.error(
+            'Cancel order error:',
+            err
+        );
+
+        return false;
+    }
+}
+
 /* ── place order ── */
 export async function goToInvoice() {
     if (state.isProcessing)      return;
