@@ -50,11 +50,27 @@ export function fmt(val) {
 }
 
 export function findProd(id) {
-    var prods = MM.getProducts();
-    for (var i = 0; i < prods.length; i++) if (prods[i].id === id) return prods[i];
+
+    var prods =
+        MM.getProducts();
+
+    for (
+        var i = 0;
+        i < prods.length;
+        i++
+    ) {
+
+        if (
+            String(prods[i].id) ===
+            String(id)
+        ) {
+
+            return prods[i];
+        }
+    }
+
     return null;
 }
-
 export function findCart(id) {
     for (var i = 0; i < state.cart.length; i++) if (state.cart[i].id === id) return { it: state.cart[i], i: i };
     return null;
