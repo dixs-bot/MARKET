@@ -236,7 +236,27 @@ export async function goToInvoice() {
 
     state.d.mconf.classList.add('hidden');
     state.d.mload.classList.remove('hidden');
+const {
 
+    data: { session }
+
+} = await window.supabaseClient
+    .auth
+    .getSession();
+
+if (!session) {
+
+    notify(
+        'Silakan login terlebih dahulu'
+    );
+
+    window.location.href =
+        '/auth.html';
+
+    state.isProcessing = false;
+
+    return;
+}
   try {
 
     var sm = null;
@@ -414,8 +434,11 @@ export async function goToInvoice() {
             .insert([
                 {
                     id: newOrder.id,
-
-                     customer_name:
+                   
+                    user_id:
+                      session.user.id,
+                     
+                    customer_name:
                      state.d.inname.value.trim(),
 
                      phone:
