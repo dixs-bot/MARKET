@@ -228,8 +228,59 @@ window.addEventListener('categoriesUpdated', function () {
 });
 
 /* ── global click handler ── */
-document.addEventListener('click', function (e) {
-    var el;
+document.addEventListener(
+
+    'click',
+
+    async function (e) {
+
+        var el;
+
+        /* 🔥 CANCEL ORDER */
+        const cancelBtn =
+
+            e.target.closest(
+                '[data-cancel]'
+            );
+
+        if (cancelBtn) {
+
+            const id =
+
+                cancelBtn.dataset.cancel;
+
+            const ok =
+                confirm(
+                    'Batalkan pesanan ini?'
+                );
+
+            if (!ok) return;
+
+            const success =
+
+                await cancelOrder(id);
+
+            if (!success) {
+
+                notify(
+                    'Gagal membatalkan pesanan'
+                );
+
+                return;
+            }
+
+            notify(
+                'Pesanan dibatalkan'
+            );
+
+            await loadOrders();
+
+            renderOrders();
+
+            return;
+        }
+
+        /* handler lain bawah sini */
 
     if (e.target.closest("[data-act='checkout']")) {
         goToCheckout();
