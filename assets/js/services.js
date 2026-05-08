@@ -44,7 +44,6 @@ export function addCart(pid, delta) {
     if (state.cart.length >= MAX_CART) { notify('Keranjang penuh (maks ' + MAX_CART + ' item)'); return; }
 
     var prod = findProd(pid);
-    console.log(prod);
     if (!prod) return;
 
     var f   = findCart(pid);
