@@ -221,10 +221,10 @@ export async function goToInvoice() {
         return;
     }
 
-    var stockResult =
-        window.MiniMarket.atomicDeductStock(
-            state.cart
-        );
+   var stockResult =
+    await window.MiniMarket.atomicDeductStock(
+        state.cart
+    );
 
     if (!stockResult.ok) {
 
