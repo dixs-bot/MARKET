@@ -181,7 +181,48 @@ export function validate(showErr) {
     return ok;
 }
 export function resetCO() { state.co.ship = ''; state.co.pay = ''; state.co.vou = null; }
+const cancelBtn =
 
+    e.target.closest(
+        '[data-cancel]'
+    );
+
+if (cancelBtn) {
+
+    const id =
+
+        cancelBtn.dataset.cancel;
+
+    const ok =
+        confirm(
+            'Batalkan pesanan ini?'
+        );
+
+    if (!ok) return;
+
+    const success =
+
+        await cancelOrder(id);
+
+    if (!success) {
+
+        notify(
+            'Gagal membatalkan pesanan'
+        );
+
+        return;
+    }
+
+    notify(
+        'Pesanan dibatalkan'
+    );
+
+    await loadOrders();
+
+    renderOrders();
+
+    return;
+}
 /* ── place order ── */
 export async function goToInvoice() {
     if (state.isProcessing)      return;
