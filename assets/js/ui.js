@@ -261,7 +261,13 @@ export function renderInv() {
     for (var i = 0; i < o.items.length; i++) {
         var it = o.items[i];
         ih += '<div class="flex items-center gap-2.5">' +
-              '<img src="' + it.image + '" class="w-10 h-10 rounded-lg object-cover bg-white" onerror="this.onerror=null;this.src=\'' + FALLBACK_IMG + '\'">' +
+             
+ <img src="' +
+(
+  it.image ||
+  FALLBACK_IMG
+) +
+'" class="w-10 h-10 rounded-lg object-cover bg-white" onerror="this.onerror=null;this.src=\'' + FALLBACK_IMG + '\'">' +
               '<div class="flex-1 min-w-0"><p class="text-xs font-medium text-slate-800 truncate">' + it.name + '</p>' +
               '<p class="text-[10px] text-slate-400">' + it.qty + 'x ' + fmt(it.price) + '</p></div>' +
               '<span class="text-xs font-semibold text-slate-800">' + fmt(it.price * it.qty) + '</span></div>';
@@ -306,7 +312,12 @@ export function renderOrders() {
         for (var j = 0; j < mx; j++) {
             var it = o.items[j];
             prev += '<div class="flex items-center gap-2">' +
-                    '<img src="' + it.image + '" class="w-8 h-8 rounded-lg object-cover bg-slate-100" onerror="this.onerror=null;this.src=\'' + FALLBACK_IMG + '\'">' +
+                    '<img src="' +
+(
+  it.image ||
+  FALLBACK_IMG
+) +
+'" class="w-8 h-8 rounded-lg object-cover bg-slate-100" onerror="this.onerror=null;this.src=\'' + FALLBACK_IMG + '\'">' +
                     '<div class="flex-1 min-w-0"><p class="text-[11px] font-medium text-slate-800 truncate">' + it.name + '</p>' +
                     '<p class="text-[10px] text-slate-400">' + it.qty + 'x ' + fmt(it.price) + '</p></div></div>';
         }
