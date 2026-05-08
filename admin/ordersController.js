@@ -230,11 +230,26 @@ updateOrdersBadge();
     Svc.clearDeleteTarget();
 
     // After animation completes, remove from state and re-render
-      setTimeout(async () => {
-      const filtered = Svc.getFilteredOrders();
-      UI.renderOrders(filtered, false);
-      UI.showToast(`Pesanan ${orderId} berhasil dihapus`, 'error');
-    }, 380);
+     setTimeout(async () => {
+
+  await Svc.deleteOrder(orderId);
+
+  await Svc.fetchOrders();
+
+  const filtered =
+    Svc.getFilteredOrders();
+
+  UI.renderOrders(
+    filtered,
+    false
+  );
+
+  UI.showToast(
+    `Pesanan ${orderId} berhasil dihapus`,
+    'error'
+  );
+
+}, 380);
   }
 
   /* ------------------------------------------
