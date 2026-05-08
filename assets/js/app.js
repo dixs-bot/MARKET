@@ -236,70 +236,65 @@ document.addEventListener(
 
         var el;
 
-        /* 🔥 CANCEL ORDER */
-        const cancelBtn =
+       /* 🔥 CANCEL ORDER */
+const cancelBtn =
 
-            e.target.closest(
-                '[data-cancel]'
-            );
+    e.target.closest(
+        '[data-cancel]'
+    );
 
-        if (cancelBtn) {
+if (cancelBtn) {
 
-            const id =
+    const id =
 
-                cancelBtn.dataset.cancel;
+        cancelBtn.dataset.cancel;
 
-            const ok =
-                confirm(
-                    'Batalkan pesanan ini?'
-                );
+    const ok =
+        confirm(
+            'Batalkan pesanan ini?'
+        );
 
-            if (!ok) return;
+    if (!ok) return;
 
-            const success =
+    const success =
 
-                for (
-    var i = 0;
-    i < state.orders.length;
-    i++
-) {
+        await cancelOrder(id);
 
-    if (
-        String(state.orders[i].id) ===
-        String(id)
+    if (!success) {
+
+        notify(
+            'Gagal membatalkan pesanan'
+        );
+
+        return;
+    }
+
+    for (
+        var i = 0;
+        i < state.orders.length;
+        i++
     ) {
 
-        state.orders[i].status =
-            'cancelled';
+        if (
+            String(state.orders[i].id) ===
+            String(id)
+        ) {
 
-        break;
-    }
-}
+            state.orders[i].status =
+                'cancelled';
 
-save();
-
-renderOrders();
-
-            if (!success) {
-
-                notify(
-                    'Gagal membatalkan pesanan'
-                );
-
-                return;
-            }
-
-            notify(
-                'Pesanan dibatalkan'
-            );
-
-            await loadOrders();
-
-            renderOrders();
-
-            return;
+            break;
         }
+    }
 
+    notify(
+        'Pesanan dibatalkan'
+    );
+
+    renderOrders();
+
+    return;
+}
         /* handler lain bawah sini */
 
     if (e.target.closest("[data-act='checkout']")) {
