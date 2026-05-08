@@ -42,19 +42,18 @@ updateOrdersBadge();
     );
   }
 );
-  /**
-   * Simulate initial data loading, then render orders
-   */
-async function startupLoad() {
+
+   
+   async function startupLoad() {
 
   try {
 
-  await Svc.fetchOrders();
+    await Svc.fetchOrders();
 
-await updateOrdersBadge();
+    await updateOrdersBadge();
 
-const filtered =
-  Svc.getFilteredOrders();
+    const filtered =
+      Svc.getFilteredOrders();
 
     UI.renderOrders(
       filtered,
