@@ -241,13 +241,50 @@ const OrdersService = (() => {
    * @param {string} id
    * @returns {boolean} True if order was found and removed
    */
-  function deleteOrder(id) {
-    const idx = orders.findIndex(o => o.id === id);
-    if (idx === -1) return false;
-    orders.splice(idx, 1);
-    return true;
-  }
+async function deleteOrder(id) {
 
+  try {
+
+    const { error } =
+
+      await window.supabaseClient
+
+        .from('orders')
+
+        .delete()
+
+        .eq('id', id);
+
+    if (error) {
+
+      console.error(error);
+
+      return false;
+    }
+
+    const idx =
+      orders.findIndex(
+
+        o => o.id === id
+      );
+
+    if (idx !== -1) {
+
+      orders.splice(idx, 1);
+    }
+
+    return true;
+
+  } catch (err) {
+
+    console.error(
+      'Delete order error:',
+      err
+    );
+
+    return false;
+  }
+}
   /**
    * Update an order's status
    * @param {string} id
