@@ -286,9 +286,25 @@ export async function goToInvoice() {
                 .toString(36)
                 .substr(2, 5),
 
-        items:
-            state.cart.slice(),
+       items:
+    state.cart.map(item => ({
 
+        id:
+            item.id,
+
+        name:
+            item.name,
+
+        qty:
+            item.qty,
+
+        price:
+            item.price,
+
+        image:
+            item.image ||
+            '/assets/img/kategori.jpeg'
+    })),
         address:
             state.d.inaddr.value.trim(),
 
