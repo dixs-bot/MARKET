@@ -4,8 +4,11 @@
   const LS_ORDERS   = "mo3";
   const LS_CATEGORIES = "categories";
 
-  const FALLBACK_IMG = "https://via.placeholder.com/150";
-  const FALLBACK_CAT_IMG = "https://via.placeholder.com/150";
+const FALLBACK_IMG =
+"/assets/img/kategori.jpeg";
+
+const FALLBACK_CAT_IMG =
+"/assets/img/kategori.jpeg";
 
   function fmt(n){
     return "Rp " + (n || 0).toLocaleString("id-ID");
