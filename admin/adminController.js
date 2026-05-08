@@ -624,12 +624,84 @@ function renderOrders(orders) {
     `).join('');
   
 }
+
+   function renderLowStockPanel() {
+
+    const list =
+        document.getElementById(
+            'low-stock-list'
+        );
+
+    const count =
+        document.getElementById(
+            'low-stock-count'
+        );
+
+    if (!list || !count) return;
+
+    const products =
+        MM.getProducts();
+
+    const lowStock =
+        products.filter(p =>
+            p.stock <= 5
+        );
+
+    count.textContent =
+        lowStock.length;
+
+    if (!lowStock.length) {
+
+        list.innerHTML = `
+            <div class="text-xs text-slate-400 text-center py-6">
+                Semua stok aman 👍
+            </div>
+        `;
+
+        return;
+    }
+
+    list.innerHTML =
+        lowStock.map(product => `
+
+            <div class="flex items-center justify-between p-3 rounded-xl border border-red-100 bg-red-50/50">
+
+                <div class="flex items-center gap-3">
+
+                    <img
+                        src="${product.image}"
+                        class="w-12 h-12 rounded-lg object-cover border"
+                    >
+
+                    <div>
+
+                        <p class="text-xs font-semibold text-slate-700">
+                            ${product.name}
+                        </p>
+
+                        <p class="text-[11px] text-slate-400">
+                            Stok menipis
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="text-red-600 font-bold text-sm">
+                    ${product.stock}
+                </div>
+
+            </div>
+
+        `).join('');
+}
     /* ===== GLOBAL SYNC LISTENERS ===== */
 
     window.addEventListener('productsUpdated', function () {
         AdminApp.State.products = MM.getProducts();
         UI.renderProducts();
         UI.renderStats();
+        renderLowStockPanel();
         UI.updateDelButton(selectedCount());
         UI.updateChkAll(isAllSelected(), isSomeSelected(), AdminApp.State.products.length);
     });
@@ -677,6 +749,7 @@ function renderOrders(orders) {
         await MM.syncCategoriesFromSupabase();
        
         UI.renderStats();
+        renderLowStockPanel();
         UI.updateProductCategoryDropdown();
         UI.renderCategories();
         UI.renderProducts();
