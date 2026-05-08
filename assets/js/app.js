@@ -258,7 +258,27 @@ document.addEventListener(
 
             const success =
 
-                await cancelOrder(id);
+                for (
+    var i = 0;
+    i < state.orders.length;
+    i++
+) {
+
+    if (
+        String(state.orders[i].id) ===
+        String(id)
+    ) {
+
+        state.orders[i].status =
+            'cancelled';
+
+        break;
+    }
+}
+
+save();
+
+renderOrders();
 
             if (!success) {
 
