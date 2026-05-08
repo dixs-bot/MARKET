@@ -252,7 +252,7 @@
             }
 
             h += '<div class="w-10 h-10 rounded-full overflow-hidden bg-slate-100 shrink-0 border border-slate-200">';
-h += '<img src="' + (c.image || "/admin/assets/img/kategori.jpeg") + '" alt="' + c.name + '" class="w-full h-full object-cover" onerror="this.onerror=null;this.src=\'/admin/assets/img/kategori.jpeg\'">';
+h += '<img src="' + (c.image || "/assets/img/kategori.jpeg") + '" alt="' + c.name + '" class="w-full h-full object-cover" onerror="this.onerror=null;this.src=\'/assets/img/kategori.jpeg\'">';
             h += '</div>';
 
             h += '<div class="flex-1 min-w-0">';
@@ -311,7 +311,22 @@ h += '<img src="' + (c.image || "/admin/assets/img/kategori.jpeg") + '" alt="' +
         h += '<div class="prod-card card overflow-hidden' + selCls + '" data-id="' + p.id + '">';
         h += '<div class="relative">';
         h += '<input type="checkbox" class="chk absolute top-2.5 left-2.5 z-10" data-chk="' + p.id + '"' + (isSelected ? ' checked' : '') + '>';
-        h += '<img src="' + p.image + '" alt="' + p.name + '" class="w-full aspect-square object-cover bg-slate-100" loading="lazy" onerror="this.onerror=null;this.src=\'' + FALLBACK_IMG + '\'">';
+        h += '<img src="' +
+
+(
+    p.image ||
+    FALLBACK_IMG
+) +
+
+'" alt="' +
+
+p.name +
+
+'" class="w-full aspect-square object-cover bg-slate-100" loading="lazy" onerror="this.onerror=null;this.src=\'' +
+
+FALLBACK_IMG +
+
+'\'">'; alt="' + p.name + '" class="w-full aspect-square object-cover bg-slate-100" loading="lazy" onerror="this.onerror=null;this.src=\'' + FALLBACK_IMG + '\'">';
         h += '</div>';
         h += '<div class="p-3">';
         h += '<span class="badge mb-1.5">' + catName + '</span>';
