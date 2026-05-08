@@ -676,5 +676,76 @@ document
   });
 
 </script>
+<script>
+
+async function updateOrdersBadge() {
+
+  try {
+
+    const badge =
+      document.getElementById(
+        'orders-badge'
+      );
+
+    if (!badge) return;
+
+    const { count, error } =
+      await window.supabaseClient
+        .from('orders')
+        .select('*', {
+          count: 'exact',
+          head: true
+        })
+        .eq('status', 'pending');
+
+    if (error) {
+
+      console.error(error);
+
+      return;
+    }
+
+    badge.textContent =
+      count || 0;
+
+    badge.style.display =
+      count > 0
+        ? 'flex'
+        : 'none';
+
+  } catch (err) {
+
+    console.error(
+      'Badge realtime error:',
+      err
+    );
+  }
+}
+
+/* load awal */
+updateOrdersBadge();
+
+/* realtime */
+window.supabaseClient
+  .channel('orders-badge-realtime')
+
+  .on(
+    'postgres_changes',
+
+    {
+      event: '*',
+      schema: 'public',
+      table: 'orders'
+    },
+
+    async () => {
+
+      await updateOrdersBadge();
+    }
+  )
+
+  .subscribe();
+
+</script>
 </body>
 </html>
