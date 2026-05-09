@@ -695,6 +695,50 @@ function renderOrders(orders) {
 
         `).join('');
 }
+
+   /* ===== STORES ===== */
+
+async function loadStores(){
+
+    const {
+        data,
+        error
+    } = await window.supabaseClient
+        .from('stores')
+        .select('*')
+        .order('name');
+
+    if(error){
+
+        console.error(error);
+        return;
+    }
+
+    renderStoreOptions(data || []);
+}
+
+function renderStoreOptions(stores){
+
+    const select =
+        document.getElementById(
+            'product-store'
+        );
+
+    if(!select) return;
+
+    select.innerHTML =
+        '<option value=\"\">Pilih Cabang</option>';
+
+    stores.forEach(store => {
+
+        select.innerHTML += `
+            <option value="${store.id}">
+                ${store.name}
+            </option>
+        `;
+    });
+}
+   
     /* ===== GLOBAL SYNC LISTENERS ===== */
 
     window.addEventListener('productsUpdated', function () {
@@ -756,6 +800,7 @@ function renderOrders(orders) {
         UI.updateDelButton(0);
         UI.updateChkAll(false, false, AdminApp.State.products.length);
         initEvents();
+        await loadOrders();
         await loadOrders();
     }
 
