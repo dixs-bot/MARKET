@@ -799,9 +799,10 @@ function renderStoreOptions(stores){
         UI.renderProducts();
         UI.updateDelButton(0);
         UI.updateChkAll(false, false, AdminApp.State.products.length);
-        initEvents();
-        await loadOrders();
-        await loadOrders();
+       initEvents();
+
+await loadStores();
+await loadOrders();
     }
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
