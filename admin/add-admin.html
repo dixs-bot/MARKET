@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Tambah Admin — LUMORA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;650;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          colors: {
+            brand: {
+              50:'#eff6ff',100:'#dbeafe',200:'#bfdbfe',300:'#93c5fd',
+              400:'#60a5fa',500:'#3b82f6',600:'#2563eb',700:'#1d4ed8',
+              800:'#1e40af',900:'#1e3a8a'
+            }
+          },
+          animation: {
+            'blob-1':'blobFloat1 20s ease-in-out infinite',
+            'blob-2':'blobFloat2 24s ease-in-out infinite',
+            'blob-3':'blobFloat3 22s ease-in-out infinite',
+            'fade-up':'fadeUp 0.65s cubic-bezier(0.16,1,0.3,1) both',
+            'fade-up-d1':'fadeUp 0.65s cubic-bezier(0.16,1,0.3,1) 0.08s both',
+            'fade-up-d2':'fadeUp 0.65s cubic-bezier(0.16,1,0.3,1) 0.16s both',
+            'fade-up-d3':'fadeUp 0.65s cubic-bezier(0.16,1,0.3,1) 0.24s both',
+            'fade-up-d4':'fadeUp 0.65s cubic-bezier(0.16,1,0.3,1) 0.32s both',
+            'scale-in':'scaleIn 0.5s cubic-bezier(0.16,1,0.3,1) both',
+            'toast-in':'toastIn 0.4s cubic-bezier(0.16,1,0.3,1) both',
+            'toast-out':'toastOut 0.3s cubic-bezier(0.4,0,1,1) both',
+            'shake':'fieldShake 0.45s cubic-bezier(0.36,0.07,0.19,0.97) both',
+            'spin-slow':'spin 0.8s linear infinite',
+            'check-draw':'checkDraw 0.4s cubic-bezier(0.16,1,0.3,1) 0.2s both',
+            'circle-draw':'circleDraw 0.5s cubic-bezier(0.16,1,0.3,1) both',
+          },
+          keyframes: {
+            blobFloat1:{ '0%,100%':{transform:'translate(0,0) scale(1)'},'33%':{transform:'translate(50px,-30px) scale(1.08)'},'66%':{transform:'translate(-25px,40px) scale(0.94)'}},
+            blobFloat2:{ '0%,100%':{transform:'translate(0,0) scale(1)'},'33%':{transform:'translate(-40px,25px) scale(1.05)'},'66%':{transform:'translate(35px,-50px) scale(0.96)'}},
+            blobFloat3:{ '0%,100%':{transform:'translate(0,0) scale(1)'},'33%':{transform:'translate(25px,40px) scale(0.95)'},'66%':{transform:'translate(-45px,-15px) scale(1.06)'}},
+            fadeUp:{ '0%':{opacity:'0',transform:'translateY(18px)'},'100%':{opacity:'1',transform:'translateY(0)'}},
+            scaleIn:{ '0%':{opacity:'0',transform:'scale(0.92)'},'100%':{opacity:'1',transform:'scale(1)'}},
+            toastIn:{ '0%':{opacity:'0',transform:'translateY(10px) scale(0.96)'},'100%':{opacity:'1',transform:'translateY(0) scale(1)'}},
+            toastOut:{ '0%':{opacity:'1',transform:'translateY(0) scale(1)'},'100%':{opacity:'0',transform:'translateY(10px) scale(0.96)'}},
+            fieldShake:{ '0%,100%':{transform:'translateX(0)'},'15%':{transform:'translateX(-6px)'},'30%':{transform:'translateX(5px)'},'45%':{transform:'translateX(-4px)'},'60%':{transform:'translateX(3px)'},'75%':{transform:'translateX(-1px)'}},
+            checkDraw:{ '0%':{strokeDashoffset:'40'},'100%':{strokeDashoffset:'0'}},
+            circleDraw:{ '0%':{strokeDashoffset:'166'},'100%':{strokeDashoffset:'0'}},
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+
+    body{font-family:'Inter',system-ui,sans-serif;background:linear-gradient(155deg,#f0f5ff 0%,#ffffff 40%,#f8faff 70%,#eff6ff 100%);min-height:100dvh;overflow-x:hidden}
+
+    body::before{content:'';position:fixed;inset:0;z-index:0;opacity:0.02;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none}
+
+    .blob{position:fixed;border-radius:50%;filter:blur(75px);pointer-events:none;z-index:0}
+
+    .glass-card{background:rgba(255,255,255,0.72);backdrop-filter:blur(24px) saturate(1.4);-webkit-backdrop-filter:blur(24px) saturate(1.4);border:1px solid rgba(255,255,255,0.6);box-shadow:0 0 0 1px rgba(59,130,246,0.03),0 2px 8px rgba(0,0,0,0.02),0 8px 24px rgba(0,0,0,0.035),0 24px 48px rgba(0,0,0,0.03),0 0 80px rgba(59,130,246,0.02)}
+
+    .field-wrap{position:relative}
+    .field-wrap .f-input{width:100%;height:52px;padding:0 16px;border-radius:14px;border:1.5px solid #e2e8f0;background:rgba(248,250,252,0.7);outline:none;font-family:inherit;font-size:14px;font-weight:450;color:#1e293b;transition:all .25s cubic-bezier(.16,1,.3,1)}
+    .field-wrap .f-input::placeholder{color:#b0bec5;font-weight:400}
+    .field-wrap .f-input:hover{border-color:#cbd5e1;background:rgba(255,255,255,0.85)}
+    .field-wrap .f-input:focus{border-color:#3b82f6;background:#fff;box-shadow:0 0 0 3px rgba(59,130,246,0.08),0 0 0 1px rgba(59,130,246,0.06)}
+    .field-wrap .f-input:focus ~ .f-icon{color:#3b82f6}
+
+    .field-wrap.has-error .f-input{border-color:#f87171;background:#fef2f2}
+    .field-wrap.has-error .f-icon{color:#f87171}
+    .field-wrap.shake-it{animation:fieldShake .45s cubic-bezier(.36,.07,.19,.97) both}
+
+    .f-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:#94a3b8;pointer-events:none;transition:color .2s ease;flex-shrink:0}
+    .f-input{padding-left:44px}
+
+    .f-error{font-size:12px;font-weight:500;color:#ef4444;margin:5px 0 0;line-height:1.4;max-height:0;opacity:0;overflow:hidden;transition:all .25s ease}
+    .f-error.visible{max-height:40px;opacity:1;margin-top:6px}
+
+    .pw-toggle{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:40px;height:40px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;color:#94a3b8;cursor:pointer;border-radius:10px;transition:all .2s ease}
+    .pw-toggle:hover{color:#64748b;background:#f8fafc}
+    .pw-toggle:active{transform:translateY(-50%) scale(.9)}
+    .has-pw-toggle{padding-right:50px}
+
+    .btn-primary{position:relative;overflow:hidden;width:100%;height:54px;border:none;border-radius:14px;background:linear-gradient(135deg,#2563eb 0%,#1d4ed8 50%,#1e40af 100%);background-size:200% 200%;color:#fff;font-family:inherit;font-size:15px;font-weight:600;letter-spacing:.01em;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .25s cubic-bezier(.16,1,.3,1);box-shadow:0 4px 14px rgba(37,99,235,0.25),0 8px 24px rgba(37,99,235,0.1)}
+    .btn-primary::before{content:'';position:absolute;inset:0;background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.12) 44%,rgba(255,255,255,.22) 50%,rgba(255,255,255,.12) 56%,transparent 62%);transform:translateX(-120%) skewX(-15deg);transition:transform .6s ease}
+    .btn-primary:hover::before{transform:translateX(120%) skewX(-15deg)}
+    .btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(37,99,235,0.3),0 10px 30px rgba(37,99,235,0.15);background-position:100% 100%}
+    .btn-primary:active{transform:translateY(0) scale(.985);box-shadow:0 2px 8px rgba(37,99,235,0.2);transition-duration:.1s}
+    .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    .btn-primary:disabled::before{display:none}
+
+    .toast-wrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column-reverse;gap:8px;width:calc(100% - 48px);max-width:380px;pointer-events:none}
+    .toast-item{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:14px 18px;border-radius:14px;font-size:13.5px;font-weight:500;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);background:rgba(255,255,255,.94);box-shadow:0 4px 20px rgba(0,0,0,.08),0 0 0 1px rgba(0,0,0,.03);animation:toastIn .4s cubic-bezier(.16,1,.3,1) both}
+    .toast-item.removing{animation:toastOut .3s cubic-bezier(.4,0,1,1) both}
+    .toast-item.success{border:1px solid rgba(34,197,94,.12);color:#166534}
+    .toast-item.error{border:1px solid rgba(239,68,68,.12);color:#991b1b}
+
+    .success-overlay{position:fixed;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+    .success-check-circle{stroke-dasharray:166;stroke-dashoffset:166;animation:circleDraw .5s cubic-bezier(.16,1,.3,1) both}
+    .success-check-mark{stroke-dasharray:40;stroke-dashoffset:40;animation:checkDraw .4s cubic-bezier(.16,1,.3,1) .2s both}
+
+    @media(max-width:640px){.blob{filter:blur(55px);opacity:.35}.glass-card{background:rgba(255,255,255,.8);backdrop-filter:blur(18px) saturate(1.3);-webkit-backdrop-filter:blur(18px) saturate(1.3)}}
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-[100dvh] p-4 sm:p-6 relative">
+
+  <!-- Background orbs -->
+  <div class="blob w-[380px] h-[380px] bg-brand-200 opacity-40 animate-blob-1" style="top:-8%;right:-6%"></div>
+  <div class="blob w-[300px] h-[300px] bg-blue-100 opacity-45 animate-blob-2" style="bottom:5%;left:-5%"></div>
+  <div class="blob w-[220px] h-[220px] bg-indigo-100 opacity-30 animate-blob-3" style="top:45%;right:25%"></div>
+
+  <!-- Toast container -->
+  <div class="toast-wrap" id="toast-wrap"></div>
+
+  <!-- Success overlay -->
+  <div class="success-overlay hidden" id="success-overlay">
+    <div class="flex flex-col items-center gap-5 opacity-0" id="success-content" style="transition:opacity .3s ease .1s">
+      <svg width="76" height="76" viewBox="0 0 52 52" fill="none">
+        <circle class="success-check-circle" cx="26" cy="26" r="24" stroke="#22c55e" stroke-width="2.5" fill="none"/>
+        <path class="success-check-mark" d="M15 27l7 7 15-15" stroke="#22c55e" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="text-center">
+        <p class="text-slate-800 font-semibold text-lg">Admin berhasil ditambahkan</p>
+        <p class="text-slate-400 text-sm mt-1">Mengalihkan kembali...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main card -->
+  <div class="glass-card w-full max-w-[420px] rounded-3xl p-8 sm:p-10 relative z-10 animate-scale-in opacity-0">
+
+    <!-- Header -->
+    <div class="text-center mb-9 opacity-0 animate-fade-up">
+      <div class="inline-flex items-center justify-center w-[68px] h-[68px] rounded-[22px] bg-gradient-to-br from-brand-500 to-brand-700 shadow-lg shadow-brand-500/20 mb-5">
+        <img src="/assets/img/lumora.png" alt="LUMORA" class="w-10 h-10 object-contain">
+      </div>
+      <h1 class="text-[22px] sm:text-[24px] font-extrabold text-slate-800 tracking-tight">Tambah Admin</h1>
+      <p class="text-slate-400 text-sm mt-1.5 font-medium">LUMORA Admin Management</p>
+    </div>
+
+    <!-- Form -->
+    <form id="form-admin" novalidate autocomplete="off" class="space-y-5">
+
+      <!-- Nama -->
+      <div class="opacity-0 animate-fade-up-d1">
+        <label for="name" class="block text-[12.5px] font-semibold text-slate-600 mb-2 tracking-wide">Nama Lengkap</label>
+        <div class="field-wrap" id="wrap-name">
+          <svg class="f-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input type="text" id="name" class="f-input" placeholder="Masukkan nama admin" required>
+        </div>
+        <p class="f-error" id="err-name"></p>
+      </div>
+
+      <!-- Email -->
+      <div class="opacity-0 animate-fade-up-d2">
+        <label for="email" class="block text-[12.5px] font-semibold text-slate-600 mb-2 tracking-wide">Email</label>
+        <div class="field-wrap" id="wrap-email">
+          <svg class="f-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
+          <input type="email" id="email" class="f-input" placeholder="admin@email.com" required>
+        </div>
+        <p class="f-error" id="err-email"></p>
+      </div>
+
+      <!-- Password -->
+      <div class="opacity-0 animate-fade-up-d3">
+        <label for="password" class="block text-[12.5px] font-semibold text-slate-600 mb-2 tracking-wide">Password</label>
+        <div class="field-wrap" id="wrap-password">
+          <svg class="f-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <input type="password" id="password" class="f-input has-pw-toggle" placeholder="Minimal 6 karakter" required>
+          <button type="button" class="pw-toggle" id="pw-toggle" aria-label="Tampilkan password">
+            <svg class="eye-open" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="eye-closed hidden" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+          </button>
+        </div>
+        <p class="f-error" id="err-password"></p>
+      </div>
+
+      <!-- Submit -->
+      <div class="pt-2 opacity-0 animate-fade-up-d4">
+        <button type="submit" class="btn-primary" id="btn-submit">
+          <span id="btn-label">Tambah Admin</span>
+          <svg id="btn-spinner" class="hidden animate-spin-slow" width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,.25)" stroke-width="3"/><path d="M12 2a10 10 0 019.95 9" stroke="#fff" stroke-width="3" stroke-linecap="round"/></svg>
+          <svg id="btn-arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </button>
+      </div>
+    </form>
+
+    <!-- Footer -->
+    <div class="mt-8 text-center opacity-0 animate-fade-up-d4">
+      <div class="w-10 h-px bg-slate-200/70 mx-auto mb-5"></div>
+      <button type="button" id="btn-back" class="inline-flex items-center gap-2 text-[13px] font-medium text-slate-400 hover:text-brand-600 transition-colors duration-200">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Kembali ke Dashboard
+      </button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/js/supabase.js"></script>
+  <script>
+  (function() {
+    'use strict';
+
+    /* ---------- DOM ---------- */
+    const form      = document.getElementById('form-admin');
+    const nameIn    = document.getElementById('name');
+    const emailIn   = document.getElementById('email');
+    const passIn    = document.getElementById('password');
+    const btnSubmit = document.getElementById('btn-submit');
+    const btnLabel  = document.getElementById('btn-label');
+    const btnSpin   = document.getElementById('btn-spinner');
+    const btnArrow  = document.getElementById('btn-arrow');
+    const pwToggle  = document.getElementById('pw-toggle');
+    const btnBack   = document.getElementById('btn-back');
+    const toastWrap = document.getElementById('toast-wrap');
+    const succOvl   = document.getElementById('success-overlay');
+    const succCnt   = document.getElementById('success-content');
+
+    /* ---------- Password Toggle ---------- */
+    pwToggle.addEventListener('click', function() {
+      const show = passIn.type === 'password';
+      passIn.type = show ? 'text' : 'password';
+      pwToggle.querySelector('.eye-open').classList.toggle('hidden', show);
+      pwToggle.querySelector('.eye-closed').classList.toggle('hidden', !show);
+      passIn.focus();
+    });
+
+    /* ---------- Back Button ---------- */
+    btnBack.addEventListener('click', function() {
+      window.location.href = '/admin/index.html';
+    });
+
+    /* ---------- Live Error Clear ---------- */
+    [nameIn, emailIn, passIn].forEach(function(inp) {
+      inp.addEventListener('input', function() {
+        clearError(inp.id);
+      });
+    });
+
+    /* ---------- Validation ---------- */
+    function isValidEmail(e) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e);
+    }
+
+    function showError(fieldId, msg) {
+      var wrap = document.getElementById('wrap-' + fieldId);
+      var err  = document.getElementById('err-' + fieldId);
+      if (wrap) {
+        wrap.classList.add('has-error');
+        wrap.classList.remove('shake-it');
+        void wrap.offsetWidth;
+        wrap.classList.add('shake-it');
+      }
+      if (err) {
+        err.textContent = msg;
+        err.classList.add('visible');
+      }
+    }
+
+    function clearError(fieldId) {
+      var wrap = document.getElementById('wrap-' + fieldId);
+      var err  = document.getElementById('err-' + fieldId);
+      if (wrap) wrap.classList.remove('has-error', 'shake-it');
+      if (err) { err.textContent = ''; err.classList.remove('visible'); }
+    }
+
+    function clearAllErrors() {
+      ['name', 'email', 'password'].forEach(clearError);
+    }
+
+    /* ---------- Loading State ---------- */
+    function setLoading(on) {
+      btnSubmit.disabled = on;
+      btnLabel.textContent = on ? 'Menyimpan...' : 'Tambah Admin';
+      btnSpin.classList.toggle('hidden', !on);
+      btnArrow.classList.toggle('hidden', on);
+    }
+
+    /* ---------- Toast ---------- */
+    function showToast(message, type) {
+      type = type || 'success';
+      var icons = {
+        success: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+        error: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+      };
+      var t = document.createElement('div');
+      t.className = 'toast-item ' + type;
+      t.innerHTML = (icons[type] || icons.success) + '<span>' + message + '</span>';
+      toastWrap.appendChild(t);
+      setTimeout(function() {
+        t.classList.add('removing');
+        t.addEventListener('animationend', function() { t.remove(); });
+      }, 3500);
+    }
+
+    /* ---------- Success Overlay ---------- */
+    function showSuccess() {
+      succOvl.classList.remove('hidden');
+      requestAnimationFrame(function() { succCnt.style.opacity = '1'; });
+    }
+
+    /* ---------- Submit ---------- */
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      clearAllErrors();
+
+      var name     = nameIn.value.trim();
+      var email    = emailIn.value.trim();
+      var password = passIn.value.trim();
+
+      var hasErr = false;
+
+      if (!name) {
+        showError('name', 'Nama lengkap wajib diisi');
+        hasErr = true;
+      } else if (name.length < 2) {
+        showError('name', 'Nama minimal 2 karakter');
+        hasErr = true;
+      }
+
+      if (!email) {
+        showError('email', 'Email wajib diisi');
+        hasErr = true;
+      } else if (!isValidEmail(email)) {
+        showError('email', 'Format email tidak valid');
+        hasErr = true;
+      }
+
+      if (!password) {
+        showError('password', 'Password wajib diisi');
+        hasErr = true;
+      } else if (password.length < 6) {
+        showError('password', 'Password minimal 6 karakter');
+        hasErr = true;
+      }
+
+      if (hasErr) return;
+
+      setLoading(true);
+
+      try {
+        if (!window.supabaseClient) {
+          throw new Error('Koneksi belum tersedia');
+        }
+
+        /* Step 1: Supabase Auth signUp */
+        var { data, error } = await window.supabaseClient.auth.signUp({
+          email: email,
+          password: password
+        });
+
+        if (error) {
+          var msg = error.message;
+          if (msg.includes('already registered')) {
+            showError('email', 'Email sudah terdaftar');
+            return;
+          }
+          if (msg.includes('Password')) {
+            showError('password', 'Password terlalu lemah');
+            return;
+          }
+          throw error;
+        }
+
+        var userId = data.user.id;
+
+        /* Step 2: Insert into admins table */
+        var { error: insertErr } = await window.supabaseClient
+          .from('admins')
+          .insert([{ id: userId, name: name, email: email }]);
+
+        if (insertErr) {
+          throw insertErr;
+        }
+
+        /* Success */
+        setLoading(false);
+        showSuccess();
+
+        setTimeout(function() {
+          window.location.href = '/admin/index.html';
+        }, 1800);
+
+      } catch (err) {
+        console.error(err);
+        setLoading(false);
+        showToast(err.message || 'Terjadi kesalahan', 'error');
+      }
+    });
+
+  })();
+  </script>
+</body>
+</html>
