@@ -38,6 +38,25 @@
     }
 
     function buildProductInput(formData) {
+
+    return {
+
+        name: formData.name,
+
+        price: formData.price,
+
+        stock: formData.stock,
+
+        category: formData.category,
+
+        image: AdminApp.State.pendingImage,
+
+        store_id:
+            document.getElementById(
+                'product-store'
+            ).value
+    };
+} {
         return {
             name: formData.name,
             price: formData.price,
@@ -707,8 +726,6 @@ async function loadStores(){
         .from('stores')
         .select('*')
         .order('name');
-console.log('LOAD STORES');
-console.log(data);
    
    if(error){
 
