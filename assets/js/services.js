@@ -397,7 +397,11 @@ if (!session) {
 
         status:
             'pending',
-
+      store_id:
+    document.getElementById(
+        'store-filter'
+    )?.value
+          
         createdAt:
             Date.now()
     };
