@@ -127,7 +127,49 @@
     .input-wrapper {
       position: relative;
     }
+    /* ICON */
 
+.input-icon{
+
+  position:absolute;
+
+  left:18px;
+  top:50%;
+
+  transform:translateY(-50%);
+
+  color:#94a3b8;
+
+  pointer-events:none;
+
+  transition:
+    color .2s ease;
+
+  z-index:2;
+}
+
+/* INPUT SPACING */
+
+.input-with-icon{
+
+  padding-left:50px !important;
+}
+
+/* LABEL */
+
+.input-label{
+
+  left:50px !important;
+}
+
+/* FOCUS */
+
+.input-wrapper
+.input-field:focus
+~ .input-icon{
+
+  color:#2563eb;
+}
     .input-wrapper .input-field {
       transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       background: rgba(248, 250, 252, 0.8);
@@ -378,40 +420,79 @@
     <form id="login-form" class="space-y-5" autocomplete="on" novalidate>
 
       <!-- Email -->
-      <div class="input-wrapper opacity-0 animate-fade-up-delay">
-        <input
-          type="email"
-          id="email"
-          name="email"
-          class="input-field w-full h-[54px] rounded-xl px-4 pt-2 text-[15px] text-slate-800 font-medium"
-          placeholder="Email"
-          autocomplete="email"
-          required
-          aria-label="Email address"
-        >
-        <label for="email" class="input-label">Email</label>
-      </div>
+     <div class="input-wrapper opacity-0 animate-fade-up-delay">
 
+  <svg
+    class="input-icon"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <rect x="2" y="4" width="20" height="16" rx="2"/>
+    <path d="M22 7l-10 7L2 7"/>
+  </svg>
+
+  <input
+    type="email"
+    id="email"
+    name="email"
+    class="input-field input-with-icon w-full h-[54px] rounded-xl pt-2 text-[15px] text-slate-800 font-medium"
+    placeholder=" "
+    autocomplete="email"
+    required
+    aria-label="Email address"
+  >
+
+  <label for="email" class="input-label">
+    Email
+  </label>
+
+</div>
       <!-- Password -->
-      <div class="input-wrapper opacity-0 animate-fade-up-delay-2">
-        <input
-          type="password"
-          id="password"
-          name="password"
-          class="input-field w-full h-[54px] rounded-xl px-4 pt-2 pr-[52px] text-[15px] text-slate-800 font-medium"
-          placeholder="Password"
-          autocomplete="current-password"
-          required
-          aria-label="Password"
-        >
-        <label for="password" class="input-label">Password</label>
-        <button
-          type="button"
-          class="password-toggle absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-300 p-1.5"
-          id="toggle-password"
-          aria-label="Toggle password visibility"
-          tabindex="0"
-        >
+    <div class="input-wrapper opacity-0 animate-fade-up-delay-2">
+
+  <svg
+    class="input-icon"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <rect x="3" y="11" width="18" height="11" rx="2"/>
+    <path d="M7 11V7a5 5 0 0110 0v4"/>
+  </svg>
+
+  <input
+    type="password"
+    id="password"
+    name="password"
+    class="input-field input-with-icon w-full h-[54px] rounded-xl pt-2 pr-[52px] text-[15px] text-slate-800 font-medium"
+    placeholder=" "
+    autocomplete="current-password"
+    required
+    aria-label="Password"
+  >
+
+  <label for="password" class="input-label">
+    Password
+  </label>
+
+  <button
+    type="button"
+    class="password-toggle absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-300 p-1.5"
+    id="toggle-password"
+    aria-label="Toggle password visibility"
+    tabindex="0"
+  >
           <!-- Eye icon -->
           <svg id="eye-open" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
