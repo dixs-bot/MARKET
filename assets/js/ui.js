@@ -111,20 +111,88 @@ export function renderCard(prod, isSearch) {
 }
 
 export function renderProds() {
-    var PRODS = window.MiniMarket.getProducts();
-    var list  = PRODS;
-    if (state.selCat !== 'all') {
-        list = [];
-        for (var i = 0; i < PRODS.length; i++)
-            if (PRODS[i].category === state.selCat) list.push(PRODS[i]);
+
+    var PRODS =
+        window.MiniMarket.getProducts();
+
+    /* ─────────────────────
+       FILTER STORE
+    ───────────────────── */
+
+    var selectedStoreId =
+
+        document.getElementById(
+            'store-filter'
+        )?.value;
+
+    if(selectedStoreId){
+
+        PRODS = PRODS.filter(
+            product =>
+
+                product.store_id ===
+                selectedStoreId
+        );
     }
-    state.d.pcnt.textContent = list.length + ' item';
+
+    var list = PRODS;
+
+    /* filter kategori */
+    if (state.selCat !== 'all') {
+
+        list = [];
+
+        for (
+            var i = 0;
+            i < PRODS.length;
+            i++
+        ){
+
+            if (
+                PRODS[i].category ===
+                state.selCat
+            ){
+
+                list.push(
+                    PRODS[i]
+                );
+            }
+        }
+    }
+
+    state.d.pcnt.textContent =
+        list.length + ' item';
+
     if (!list.length) {
-        state.d.pgrid.innerHTML = '<div class="col-span-2 text-center py-10"><p class="text-xs text-slate-400">Tidak ada produk</p></div>';
+
+        state.d.pgrid.innerHTML = `
+
+            <div class="col-span-2 text-center py-10">
+
+                <p class="text-xs text-slate-400">
+                    Tidak ada produk
+                </p>
+
+            </div>
+        `;
+
         return;
     }
+
     var h = '';
-    for (var j = 0; j < list.length; j++) h += renderCard(list[j], false);
+
+    for (
+        var j = 0;
+        j < list.length;
+        j++
+    ){
+
+        h += renderCard(
+            list[j],
+            false
+        );
+    }
+
     state.d.pgrid.innerHTML = h;
 }
 
