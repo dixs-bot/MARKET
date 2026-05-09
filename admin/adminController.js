@@ -28,9 +28,29 @@
 
     /* ===== FORM HELPERS ===== */
 
-    function getFormData() {
+  /* ===== FORM HELPERS ===== */
 
-    function buildProductInput(formData) {
+function getFormData() {
+
+    return {
+
+        name: d.fName.value.trim(),
+
+        price: parseInt(
+            d.fPrice.value,
+            10
+        ),
+
+        stock: parseInt(
+            d.fStock.value,
+            10
+        ),
+
+        category: d.fCat.value
+    };
+}
+
+function buildProductInput(formData) {
 
     return {
 
@@ -49,7 +69,7 @@
                 'product-store'
             ).value
     };
-} {
+}
       
 
     function validateEditInput(newName, newPrice, newStock) {
