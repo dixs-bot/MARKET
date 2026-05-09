@@ -50,14 +50,7 @@
             ).value
     };
 } {
-        return {
-            name: formData.name,
-            price: formData.price,
-            stock: formData.stock,
-            category: formData.category,
-            image: AdminApp.State.pendingImage
-        };
-    }
+      
 
     function validateEditInput(newName, newPrice, newStock) {
         newName = newName.trim();
