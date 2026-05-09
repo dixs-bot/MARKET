@@ -311,22 +311,15 @@ h += '<img src="' + (c.image || "/assets/img/kategori.jpeg") + '" alt="' + c.nam
         h += '<div class="prod-card card overflow-hidden' + selCls + '" data-id="' + p.id + '">';
         h += '<div class="relative">';
         h += '<input type="checkbox" class="chk absolute top-2.5 left-2.5 z-10" data-chk="' + p.id + '"' + (isSelected ? ' checked' : '') + '>';
-        h += '<img src="' +
-
+      h += '<img src="' +
 (
-    p.image ||
-    FALLBACK_IMG
+    p.image || FALLBACK_IMG
 ) +
-
 '" alt="' +
-
 p.name +
-
 '" class="w-full aspect-square object-cover bg-slate-100" loading="lazy" onerror="this.onerror=null;this.src=\'' +
-
 FALLBACK_IMG +
-
-'\'">'; alt="' + p.name + '" class="w-full aspect-square object-cover bg-slate-100" loading="lazy" onerror="this.onerror=null;this.src=\'' + FALLBACK_IMG + '\'">';
+'\'">';
         h += '</div>';
         h += '<div class="p-3">';
         h += '<span class="badge mb-1.5">' + catName + '</span>';
