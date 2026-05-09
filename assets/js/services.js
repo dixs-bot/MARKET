@@ -395,15 +395,16 @@ if (!session) {
         notes:
             state.d.innote.value.trim(),
 
-        status:
-            'pending',
-      store_id:
+       status:
+    'pending',
+
+store_id:
     document.getElementById(
         'store-filter'
-    )?.value
-          
-        createdAt:
-            Date.now()
+    )?.value,
+
+createdAt:
+    Date.now()
     };
 
     var orderCheck =
