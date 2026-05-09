@@ -64,10 +64,16 @@ function buildProductInput(formData) {
 
         image: AdminApp.State.pendingImage,
 
-        store_id:
-            document.getElementById(
-                'product-store'
-            ).value
+       store_id:
+
+    window.AdminSession?.role ===
+    'admin'
+
+        ? window.AdminSession.store_id
+
+        : document.getElementById(
+            'product-store'
+          ).value
     };
 }
       
@@ -827,6 +833,38 @@ function renderStoreOptions(stores){
        initEvents();
 
 await loadStores();
+let query =
+    window.supabaseClient
+
+        .from('orders')
+
+        .select('*')
+
+        .order(
+            'created_at',
+            {
+                ascending: false
+            }
+        );
+
+/* admin cabang */
+if(
+    window.AdminSession?.role ===
+    'admin'
+){
+
+    query =
+        query.eq(
+            'store_id',
+            window.AdminSession.store_id
+        );
+}
+
+const {
+    data,
+    error
+} = await query;
+       
 await loadOrders();
     }
 
