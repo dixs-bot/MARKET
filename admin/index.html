@@ -175,10 +175,6 @@ body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#1e293b;min-height:
     0 4px 14px rgba(37,99,235,.22),
     0 10px 30px rgba(59,130,246,.18);
 
-  animation:
-    ordersFloat 3.5s ease-in-out infinite;
-}
-
 /* GLOW */
 .orders-btn::before{
 
@@ -254,6 +250,26 @@ body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#1e293b;min-height:
 
 /* FLOAT */
 @keyframes ordersFloat{
+
+  0%,100%{
+    transform:translateY(0);
+  }
+
+  50%{
+    transform:translateY(-2px);
+  }
+}
+
+@keyframes adminFloat{
+
+  0%,100%{
+    transform:translateY(0);
+  }
+
+  50%{
+    transform:translateY(-2px);
+  }
+}{
 
   0%,100%{
     transform:translateY(0);
