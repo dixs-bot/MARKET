@@ -773,7 +773,6 @@ function renderStoreOptions(stores){
     /* ===== GLOBAL SYNC LISTENERS ===== */
 
     window.addEventListener('productsUpdated', function () {
-        AdminApp.State.products = MM.getProducts();
         UI.renderProducts();
         UI.renderStats();
         renderLowStockPanel();
@@ -821,7 +820,28 @@ function renderStoreOptions(stores){
         AdminApp.State.categories = MM.getCategories();
 
         await MM.syncProductsFromSupabase(); 
-        await MM.syncCategoriesFromSupabase();
+       /* ─────────────────────
+   FILTER ADMIN PRODUCTS
+───────────────────── */
+
+AdminApp.State.products =
+    MM.getProducts();
+
+if(
+    window.AdminSession?.role ===
+    'admin'
+){
+
+    AdminApp.State.products =
+
+        AdminApp.State.products.filter(
+            product =>
+
+                product.store_id ===
+                window.AdminSession.store_id
+        );
+}
+       await MM.syncCategoriesFromSupabase();
        
         UI.renderStats();
         renderLowStockPanel();
