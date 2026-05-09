@@ -144,7 +144,92 @@ body {
   justify-content: center;
   box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
 }
+/* ===== LUMORA BRAND ===== */
 
+.logo-icon{
+
+  width:74px;
+  height:74px;
+
+  border-radius:26px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2563eb 0%,
+      #1d4ed8 45%,
+      #1e40af 100%
+    );
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  box-shadow:
+    0 12px 40px rgba(37,99,235,.24);
+
+  border:
+    1px solid rgba(255,255,255,.45);
+
+  position:relative;
+
+  overflow:hidden;
+}
+
+.logo-icon::before{
+
+  content:'';
+
+  position:absolute;
+
+  inset:0;
+
+  background:
+    linear-gradient(
+      120deg,
+      transparent 30%,
+      rgba(255,255,255,.18),
+      transparent 70%
+    );
+
+  transform:
+    translateX(-120%)
+    skewX(-20deg);
+
+  animation:
+    lumoraShine 4s ease-in-out infinite;
+}
+
+.logo-text{
+
+  letter-spacing:-0.03em;
+}
+
+.hero-subtitle{
+
+  font-size:13px;
+  font-weight:600;
+
+  color:#94a3b8;
+
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+
+@keyframes lumoraShine{
+
+  0%{
+    transform:
+      translateX(-120%)
+      skewX(-20deg);
+  }
+
+  40%,100%{
+    transform:
+      translateX(220%)
+      skewX(-20deg);
+  }
+}
 .logo-text {
   font-size: 22px;
   font-weight: 800;
