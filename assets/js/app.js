@@ -174,23 +174,48 @@ function onProductsUpdated() {
 }
 function renderFilteredProducts(){
 
+    /* selected store */
     const selectedStoreId =
         document.getElementById(
             'store-filter'
         )?.value;
 
+    /* all products */
     let products =
         MM.getProducts();
+
+    /* ─────────────────────
+       FILTER STORE
+    ───────────────────── */
 
     if(selectedStoreId){
 
         products =
             products.filter(product =>
+
                 product.store_id ===
                 selectedStoreId
             );
     }
 
+    /* ─────────────────────
+       FILTER CATEGORY
+    ───────────────────── */
+
+    if(
+        state.selCat &&
+        state.selCat !== 'all'
+    ){
+
+        products =
+            products.filter(product =>
+
+                product.category ===
+                state.selCat
+            );
+    }
+
+    /* render */
     renderProds(products);
 }
 /* ── stores ── */
