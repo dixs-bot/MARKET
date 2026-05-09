@@ -49,15 +49,17 @@
        const { data, error } =
     await window.supabaseClient
         .from('products')
-        .insert([
-            {
-                name: prod.name,
-                price: prod.price,
-                stock: prod.stock,
-                category: prod.category,
-                image: prod.image
-            }
-        ])
+       .insert([
+    {
+        name: prod.name,
+        price: prod.price,
+        stock: prod.stock,
+        category: prod.category,
+        image: prod.image,
+
+        store_id: input.store_id
+    }
+])
         .select()
         .single();
 
