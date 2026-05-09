@@ -168,11 +168,71 @@ state.d.inname.addEventListener(
 
 /* ── respond to product changes ── */
 function onProductsUpdated() {
-    renderProds();
+    renderFilteredProducts();
     if (state.d.csheet.classList.contains('open')) renderCart();
     patchBadge();
 }
+function renderFilteredProducts(){
 
+    const selectedStoreId =
+        document.getElementById(
+            'store-filter'
+        )?.value;
+
+    let products =
+        MM.getProducts();
+
+    if(selectedStoreId){
+
+        products =
+            products.filter(product =>
+                product.store_id ===
+                selectedStoreId
+            );
+    }
+
+    renderProds(products);
+}
+/* ── stores ── */
+
+async function loadStoreFilter(){
+
+    const {
+        data,
+        error
+    } = await window.supabaseClient
+        .from('stores')
+        .select('*')
+        .order('name');
+
+    if(error){
+
+        console.error(error);
+        return;
+    }
+
+    const select =
+        document.getElementById(
+            'store-filter'
+        );
+
+    if(!select) return;
+
+    select.innerHTML = `
+        <option value="">
+            Semua Cabang
+        </option>
+    `;
+
+    data.forEach(store => {
+
+        select.innerHTML += `
+            <option value="${store.id}">
+                ${store.name}
+            </option>
+        `;
+    });
+}
 /* ── init ── */
 async function init() {
 
@@ -191,11 +251,19 @@ state.d.inphone =
     /* 🔥 sync database setelah DOM siap */
     await MM.syncProductsFromSupabase();
     await MM.syncCategoriesFromSupabase();
-
+    await loadStoreFilter();
+    document
+    .getElementById(
+        'store-filter'
+    )
+    ?.addEventListener(
+        'change',
+        renderFilteredProducts
+    );
     initInputListeners();
 
     renderCats();
-    renderProds();
+    renderFilteredProducts();
     patchBadge();
 
     navTo('home');
