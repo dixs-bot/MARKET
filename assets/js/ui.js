@@ -110,55 +110,9 @@ export function renderCard(prod, isSearch) {
            '</div></div>';
 }
 
-export function renderProds() {
+export function renderProds(products) {
 
-    var PRODS =
-        window.MiniMarket.getProducts();
-
-    /* ─────────────────────
-       FILTER STORE
-    ───────────────────── */
-
-    var selectedStoreId =
-
-        document.getElementById(
-            'store-filter'
-        )?.value;
-
-    if(selectedStoreId){
-
-        PRODS = PRODS.filter(
-            product =>
-
-                product.store_id ===
-                selectedStoreId
-        );
-    }
-
-    var list = PRODS;
-
-    /* filter kategori */
-    if (state.selCat !== 'all') {
-
-        list = [];
-
-        for (
-            var i = 0;
-            i < PRODS.length;
-            i++
-        ){
-
-            if (
-                PRODS[i].category ===
-                state.selCat
-            ){
-
-                list.push(
-                    PRODS[i]
-                );
-            }
-        }
-    }
+    var list = products || [];
 
     state.d.pcnt.textContent =
         list.length + ' item';
