@@ -29,13 +29,6 @@
     /* ===== FORM HELPERS ===== */
 
     function getFormData() {
-        return {
-            name: d.fName.value.trim(),
-            price: parseInt(d.fPrice.value, 10),
-            stock: parseInt(d.fStock.value, 10),
-            category: d.fCat.value
-        };
-    }
 
     function buildProductInput(formData) {
 
