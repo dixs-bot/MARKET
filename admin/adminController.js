@@ -707,8 +707,10 @@ async function loadStores(){
         .from('stores')
         .select('*')
         .order('name');
-
-    if(error){
+console.log('LOAD STORES');
+console.log(data);
+   
+   if(error){
 
         console.error(error);
         return;
