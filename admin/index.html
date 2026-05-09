@@ -872,12 +872,64 @@ Hapus Terpilih (<span id="del-count">0</span>)
 <script>
 (async () => {
 
-  const { data } =
-    await window.supabaseClient.auth.getSession();
+  const {
+    data
+  } =
+    await window.supabaseClient
+      .auth
+      .getSession();
 
   if (!data.session) {
-    window.location.href = '/admin/login.html';
+
+    window.location.href =
+      '/admin/login.html';
+
+    return;
   }
+
+  /* ─────────────────────
+     LOAD ADMIN PROFILE
+  ───────────────────── */
+
+  const {
+    data: profile,
+    error
+  } =
+    await window.supabaseClient
+
+      .from('admin_profiles')
+
+      .select(`
+        *,
+        stores(*)
+      `)
+
+      .eq(
+        'id',
+        data.session.user.id
+      )
+
+      .single();
+
+  if(error){
+
+    console.error(error);
+
+    alert(
+      'Admin profile tidak ditemukan'
+    );
+
+    return;
+  }
+
+  /* SAVE GLOBAL SESSION */
+  window.AdminSession =
+    profile;
+
+  console.log(
+    'ADMIN SESSION',
+    profile
+  );
 
 })();
 </script>
