@@ -130,7 +130,7 @@ body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#1e293b;min-height:
   color:#94A3B8;
 }
 
-/* ===== ORDERS BUTTON PREMIUM ===== */
+/* ===== ORDERS BUTTON ===== */
 
 .orders-btn{
   position:relative;
@@ -143,62 +143,38 @@ body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#1e293b;min-height:
   padding:11px 18px;
 
   border:none;
-  outline:none;
-
   border-radius:16px;
 
   overflow:hidden;
-  isolation:isolate;
-
   cursor:pointer;
 
   background:
     linear-gradient(
       135deg,
-      #2563EB 0%,
-      #3B82F6 45%,
-      #60A5FA 100%
+      #2563EB,
+      #3B82F6
     );
 
   color:#fff;
 
   font-size:13px;
   font-weight:700;
-  letter-spacing:.2px;
 
   transition:
-    transform .28s cubic-bezier(.22,1,.36,1),
-    box-shadow .28s cubic-bezier(.22,1,.36,1),
-    filter .28s ease;
+    .25s ease;
 
   box-shadow:
-    0 4px 14px rgba(37,99,235,.22),
-    0 10px 30px rgba(59,130,246,.18);
+    0 4px 14px rgba(37,99,235,.20);
 }
-  
-/* GLOW */
-.orders-btn::before{
 
-  content:'';
+/* HOVER */
+.orders-btn:hover{
 
-  position:absolute;
-  inset:-2px;
+  transform:
+    translateY(-2px);
 
-  border-radius:18px;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(255,255,255,.35),
-      transparent,
-      rgba(255,255,255,.18)
-    );
-
-  opacity:.6;
-
-  z-index:-1;
-
-  filter:blur(10px);
+  box-shadow:
+    0 10px 25px rgba(37,99,235,.25);
 }
 
 /* SHINE */
@@ -208,142 +184,27 @@ body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#1e293b;min-height:
 
   position:absolute;
 
-  top:-120%;
-  left:-40%;
+  top:0;
+  left:-120%;
 
   width:60%;
-  height:320%;
+  height:100%;
 
   background:
     linear-gradient(
       90deg,
       transparent,
-      rgba(255,255,255,.35),
+      rgba(255,255,255,.25),
       transparent
     );
 
-  transform:rotate(25deg);
+  transform:skewX(-20deg);
 
-  animation:
-    ordersShine 4s linear infinite;
+  transition:.7s;
 }
 
-/* HOVER */
-.orders-btn:hover{
-
-  transform:
-    translateY(-3px)
-    scale(1.04);
-
-  filter:brightness(1.05);
-
-  box-shadow:
-    0 10px 25px rgba(37,99,235,.28),
-    0 18px 45px rgba(59,130,246,.22);
-}
-
-/* ACTIVE */
-.orders-btn:active{
-
-  transform:
-    scale(.96);
-}
-
-/* FLOAT */
-@keyframes ordersFloat{
-
-  0%,100%{
-    transform:translateY(0);
-  }
-
-  50%{
-    transform:translateY(-2px);
-  }
-}
-
-@keyframes adminFloat{
-
-  0%,100%{
-    transform:translateY(0);
-  }
-
-  50%{
-    transform:translateY(-2px);
-  }
-}{
-
-  0%,100%{
-    transform:translateY(0);
-  }
-
-  50%{
-    transform:translateY(-2px);
-  }
-}
-
-/* SHINE */
-@keyframes ordersShine{
-
-  0%{
-    left:-60%;
-  }
-
-  100%{
-    left:140%;
-  }
-}
-/* ===== ORDERS BADGE ===== */
-
-.orders-badge{
-
-  position:absolute;
-
-  top:-5px;
-  right:-5px;
-
-  min-width:22px;
-  height:22px;
-
-  padding:0 6px;
-
-  border-radius:999px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #EF4444,
-      #DC2626
-    );
-
-  color:#fff;
-
-  font-size:11px;
-  font-weight:800;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  line-height:1;
-
-  border:2px solid #fff;
-
-  box-shadow:
-    0 4px 14px rgba(239,68,68,.28);
-
-  animation:
-    badgePulse 2.5s ease-in-out infinite;
-}
-
-@keyframes badgePulse{
-
-  0%,100%{
-    transform:scale(1);
-  }
-
-  50%{
-    transform:scale(1.12);
-  }
+.orders-btn:hover::after{
+  left:140%;
 }
 .logout-btn{
   position:relative;
@@ -365,7 +226,7 @@ body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#1e293b;min-height:
     0 4px 18px rgba(239,68,68,.18);
 }
 
- /* ===== ADD ADMIN BUTTON PREMIUM ===== */
+/* ===== ADD ADMIN BUTTON ===== */
 
 .add-admin-btn{
   position:relative;
@@ -378,181 +239,142 @@ body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#1e293b;min-height:
   padding:11px 18px;
 
   border:none;
-  outline:none;
-
   border-radius:16px;
 
   overflow:hidden;
-  isolation:isolate;
-
   cursor:pointer;
 
   background:
     linear-gradient(
       135deg,
-      #10B981 0%,
-      #059669 50%,
-      #34D399 100%
+      #10B981,
+      #059669
     );
 
   color:#fff;
 
   font-size:13px;
   font-weight:700;
-  letter-spacing:.2px;
 
   transition:
-    transform .28s cubic-bezier(.22,1,.36,1),
-    box-shadow .28s cubic-bezier(.22,1,.36,1),
-    filter .28s ease;
+    .25s ease;
 
   box-shadow:
-    0 4px 14px rgba(16,185,129,.22),
-    0 10px 30px rgba(5,150,105,.18);
-
-  animation:
-    adminFloat 3.5s ease-in-out infinite;
+    0 4px 14px rgba(16,185,129,.20);
 }
 
-/* GLOW */
-.add-admin-btn::before{
+.add-admin-btn:hover{
 
-  content:'';
+  transform:
+    translateY(-2px);
 
-  position:absolute;
-  inset:-2px;
-
-  border-radius:18px;
-
-  background:
-    linear-gradient(
-      135deg,
-      rgba(255,255,255,.35),
-      transparent,
-      rgba(255,255,255,.18)
-    );
-
-  opacity:.6;
-
-  z-index:-1;
-
-  filter:blur(10px);
+  box-shadow:
+    0 10px 25px rgba(16,185,129,.25);
 }
 
-/* SHINE EFFECT */
+/* SHINE */
 .add-admin-btn::after{
 
   content:'';
 
   position:absolute;
 
-  top:-120%;
-  left:-40%;
+  top:0;
+  left:-120%;
 
   width:60%;
-  height:320%;
+  height:100%;
 
   background:
     linear-gradient(
       90deg,
       transparent,
-      rgba(255,255,255,.35),
+      rgba(255,255,255,.25),
       transparent
     );
 
-  transform:rotate(25deg);
+  transform:skewX(-20deg);
 
-  animation:
-    shineMove 4s linear infinite;
+  transition:.7s;
 }
 
-/* ICON */
-.add-admin-btn svg{
+.add-admin-btn:hover::after{
+  left:140%;
+}
+/* ===== LOGOUT BUTTON ===== */
 
-  width:16px;
-  height:16px;
+.logout-btn{
+  position:relative;
+
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  padding:11px 18px;
+
+  border:none;
+  border-radius:16px;
+
+  overflow:hidden;
+  cursor:pointer;
+
+  background:
+    linear-gradient(
+      135deg,
+      #EF4444,
+      #DC2626
+    );
+
+  color:#fff;
+
+  font-size:13px;
+  font-weight:700;
 
   transition:
-    transform .25s ease;
-}
-
-/* HOVER */
-.add-admin-btn:hover{
-
-  transform:
-    translateY(-3px)
-    scale(1.04);
-
-  filter:brightness(1.05);
+    .25s ease;
 
   box-shadow:
-    0 10px 25px rgba(16,185,129,.28),
-    0 18px 45px rgba(5,150,105,.22);
+    0 4px 14px rgba(239,68,68,.20);
 }
 
-.add-admin-btn:hover svg{
+.logout-btn:hover{
 
   transform:
-    rotate(8deg)
-    scale(1.08);
-}
+    translateY(-2px);
 
-/* ACTIVE */
-.add-admin-btn:active{
-
-  transform:
-    scale(.96);
-}
-
-/* FLOAT */
-@keyframes adminFloat{
-
-  0%,100%{
-    transform:translateY(0);
-  }
-
-  50%{
-    transform:translateY(-2px);
-  }
+  box-shadow:
+    0 10px 25px rgba(239,68,68,.25);
 }
 
 /* SHINE */
-@keyframes shineMove{
+.logout-btn::after{
 
-  0%{
-    left:-60%;
-  }
+  content:'';
 
-  100%{
-    left:140%;
-  }
+  position:absolute;
+
+  top:0;
+  left:-120%;
+
+  width:60%;
+  height:100%;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(255,255,255,.25),
+      transparent
+    );
+
+  transform:skewX(-20deg);
+
+  transition:.7s;
 }
-.logout-btn:hover{
-  transform:translateY(-2px) scale(1.04);
-  box-shadow:
-    0 10px 30px rgba(239,68,68,.28);
-}
 
-@keyframes floatY{
-  0%,100%{
-    transform:translateY(0);
-  }
-  50%{
-    transform:translateY(-4px);
-  }
-}
-
-@keyframes pulseSoft{
-
-  0%,100%{
-    transform:scale(1);
-    opacity:1;
-  }
-
-  50%{
-    transform:scale(1.06);
-    opacity:.92;
-  }
+.logout-btn:hover::after{
+  left:140%;
 }
 
 </style>
