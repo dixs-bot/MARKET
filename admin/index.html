@@ -706,7 +706,81 @@ Tambah
 <section>
 <div class="flex items-center justify-between mb-4">
 <div class="flex items-center gap-3">
-<h2 class="text-sm font-bold text-slate-800">Daftar Produk</h2>
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+
+  <!-- LEFT -->
+  <div class="flex items-center gap-3">
+
+    <h2 class="text-sm font-bold text-slate-800">
+      Daftar Produk
+    </h2>
+
+    <span
+      id="prod-count"
+      class="text-[10px] bg-slate-100 text-slate-500 font-semibold px-2 py-0.5 rounded-full"
+    >
+      0
+    </span>
+
+  </div>
+
+  <!-- RIGHT -->
+  <div class="flex items-center gap-2">
+
+    <!-- SEARCH -->
+    <div class="relative">
+
+      <svg
+        class="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z"
+        />
+      </svg>
+
+      <input
+        type="text"
+        id="search-product"
+        placeholder="Cari produk..."
+        class="w-[220px] h-10 pl-9 pr-3 rounded-xl border border-slate-200 bg-white text-sm text-slate-700 placeholder:text-slate-400 outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+      >
+
+    </div>
+
+    <!-- DELETE -->
+    <button
+      id="btn-del"
+      class="hidden items-center gap-1.5 px-3.5 py-2 bg-red-500 text-white rounded-xl text-xs font-semibold tap hover:bg-red-600 transition"
+    >
+
+      <svg
+        class="w-3.5 h-3.5"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+        />
+      </svg>
+
+      Hapus Terpilih
+      (<span id="del-count">0</span>)
+
+    </button>
+
+  </div>
+
+</div>
 <span id="prod-count" class="text-[10px] bg-slate-100 text-slate-500 font-semibold px-2 py-0.5 rounded-full">0</span>
 </div>
 <button id="btn-del" class="hidden items-center gap-1.5 px-3.5 py-2 bg-red-500 text-white rounded-xl text-xs font-semibold tap hover:bg-red-600 transition">
@@ -937,6 +1011,44 @@ window.supabaseClient
   )
 
   .subscribe();
+
+</script>
+<script>
+
+const searchInput =
+  document.getElementById(
+    'search-product'
+  );
+
+searchInput.addEventListener(
+  'input',
+  function() {
+
+    const keyword =
+      this.value
+        .toLowerCase()
+        .trim();
+
+    const cards =
+      document.querySelectorAll(
+        '.prod-card'
+      );
+
+    cards.forEach(card => {
+
+      const text =
+        card.textContent
+          .toLowerCase();
+
+      card.style.display =
+        text.includes(keyword)
+          ? ''
+          : 'none';
+
+    });
+
+  }
+);
 
 </script>
 </body>
