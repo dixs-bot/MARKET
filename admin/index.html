@@ -61,7 +61,7 @@ body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#1e293b;min-height:
 .cat-item.drag-over{border-color:#2563eb!important;box-shadow:0 0 0 2px rgba(37,99,235,.12)!important}
 .cat-item.dragging{opacity:.4}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
-<style>
+
 
 /* ===== PREMIUM HEADER ===== */
 
@@ -444,10 +444,11 @@ body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#1e293b;min-height:
 
       </a>
 
-      <!-- ADD ADMIN -->
+   <!-- ADD ADMIN -->
 <button
   id="btn-add-admin"
   class="add-admin-btn"
+  onclick="window.location.href='/admin/add-admin.html'"
 >
 
   <svg
