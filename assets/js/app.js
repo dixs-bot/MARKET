@@ -174,34 +174,48 @@ function onProductsUpdated() {
 }
 function renderFilteredProducts(){
 
-    /* selected store */
     const selectedStoreId =
         document.getElementById(
             'store-filter'
         )?.value;
 
-    /* all products */
+    /* WAJIB PILIH CABANG */
+    if(!selectedStoreId){
+
+        state.d.prodgrid.innerHTML = `
+            <div class="
+                col-span-2
+                text-center
+                py-16
+            ">
+                <p class="
+                    text-sm
+                    text-slate-400
+                    font-medium
+                ">
+                    Pilih cabang terlebih dahulu
+                </p>
+            </div>
+        `;
+
+        state.d.prodcnt.textContent =
+            '0 item';
+
+        return;
+    }
+
     let products =
         MM.getProducts();
 
-    /* ─────────────────────
-       FILTER STORE
-    ───────────────────── */
+    /* FILTER STORE */
+    products =
+        products.filter(product =>
 
-    if(selectedStoreId){
+            product.store_id ===
+            selectedStoreId
+        );
 
-        products =
-            products.filter(product =>
-
-                product.store_id ===
-                selectedStoreId
-            );
-    }
-
-    /* ─────────────────────
-       FILTER CATEGORY
-    ───────────────────── */
-
+    /* FILTER CATEGORY */
     if(
         state.selCat &&
         state.selCat !== 'all'
@@ -215,8 +229,39 @@ function renderFilteredProducts(){
             );
     }
 
-    /* render */
     renderProds(products);
+}
+
+/* ── filtered categories ── */
+
+function renderFilteredCategories(){
+
+    const selectedStoreId =
+        document.getElementById(
+            'store-filter'
+        )?.value;
+
+    /* belum pilih cabang */
+    if(!selectedStoreId){
+
+        state.d.catbar.innerHTML = '';
+
+        return;
+    }
+
+    const allCategories =
+        MM.getCategories();
+
+    const filtered =
+        allCategories.filter(cat =>
+
+            cat.id === 'all' ||
+
+            cat.store_id ===
+            selectedStoreId
+        );
+
+    renderCats(filtered);
 }
 /* ── stores ── */
 
@@ -243,11 +288,11 @@ async function loadStoreFilter(){
 
     if(!select) return;
 
-    select.innerHTML = `
-        <option value="">
-            Semua Cabang
-        </option>
-    `;
+   select.innerHTML = `
+    <option value="">
+        Pilih Cabang
+    </option>
+`;
 
     data.forEach(store => {
 
@@ -287,7 +332,7 @@ state.d.inphone =
     );
     initInputListeners();
 
-    renderCats();
+    renderFilteredCategories();
     renderFilteredProducts();
     patchBadge();
 
