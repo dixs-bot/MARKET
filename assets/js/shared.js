@@ -1,8 +1,30 @@
 (function () {
-  const LS_PRODUCTS = "products";
+ const LS_PRODUCTS =
+
+    window.AdminSession?.role ===
+    'admin'
+
+        ?
+
+        `mm_products_${window.AdminSession.store_id}`
+
+        :
+
+        'mm_products_superadmin';
   const LS_CART     = "mc3";
   const LS_ORDERS   = "mo3";
-  const LS_CATEGORIES = "categories";
+ const LS_CATEGORIES =
+
+    window.AdminSession?.role ===
+    'admin'
+
+        ?
+
+        `mm_categories_${window.AdminSession.store_id}`
+
+        :
+
+        'mm_categories_superadmin';
 
 const FALLBACK_IMG =
 "/assets/img/kategori.jpeg";
