@@ -817,6 +817,124 @@ async function init() {
 
     cache();
 
+    /* ========================================================
+       DOM CACHE
+    ======================================================== */
+
+    state.d.inname =
+        document.getElementById(
+            'inname'
+        );
+
+    state.d.inphone =
+        document.getElementById(
+            'inphone'
+        );
+
+    state.d.inaddr =
+        document.getElementById(
+            'inaddr'
+        );
+
+    state.d.innote =
+        document.getElementById(
+            'innote'
+        );
+
+    state.d.insearch =
+        document.getElementById(
+            'insearch'
+        );
+
+    state.d.pgrid =
+        document.getElementById(
+            'pgrid'
+        );
+
+    state.d.pcnt =
+        document.getElementById(
+            'pcnt'
+        );
+
+    state.d.catbar =
+        document.getElementById(
+            'catbar'
+        );
+
+    state.d.sres =
+        document.getElementById(
+            'sres'
+        );
+
+    state.d.csheet =
+        document.getElementById(
+            'csheet'
+        );
+
+    state.d.dim =
+        document.getElementById(
+            'dim'
+        );
+
+    state.d.pgco =
+        document.getElementById(
+            'pgco'
+        );
+
+    state.d.pginv =
+        document.getElementById(
+            'pginv'
+        );
+
+    state.d.mconf =
+        document.getElementById(
+            'mconf'
+        );
+
+    state.d.mload =
+        document.getElementById(
+            'mload'
+        );
+
+    state.d.coscroll =
+        document.getElementById(
+            'coscroll'
+        );
+
+    state.d.border =
+        document.getElementById(
+            'btn-order'
+        );
+
+    state.d.hint =
+        document.getElementById(
+            'checkout-hint'
+        );
+
+    state.d.vlbl =
+        document.getElementById(
+            'voucher-label'
+        );
+
+    state.d.eaddr =
+        document.getElementById(
+            'eaddr'
+        );
+
+    state.d.eship =
+        document.getElementById(
+            'eship'
+        );
+
+    state.d.epay =
+        document.getElementById(
+            'epay'
+        );
+
+    /* ========================================================
+       INITIAL LOAD
+    ======================================================== */
+
     await MM.syncProductsFromSupabase();
 
     await MM.syncCategoriesFromSupabase();
@@ -848,8 +966,6 @@ async function init() {
     state.currentPage =
         'home';
 }
-
-
 /* ============================================================
    AUTO INIT
 ============================================================ */
