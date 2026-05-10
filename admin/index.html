@@ -1087,14 +1087,36 @@ async function updateOrdersBadge() {
 
     if (!badge) return;
 
-    const { count, error } =
-      await window.supabaseClient
+    let query =
+      window.supabaseClient
         .from('orders')
         .select('*', {
           count: 'exact',
           head: true
         })
-        .eq('status', 'pending');
+        .eq(
+          'status',
+          'pending'
+        );
+
+    /* ADMIN CABANG */
+    if (
+      window.AdminSession?.role ===
+      'admin'
+    ) {
+
+      query =
+        query.eq(
+          'store_id',
+          window.AdminSession.store_id
+        );
+    }
+
+    const {
+      count,
+      error
+    } =
+    await query;
 
     if (error) {
 
@@ -1119,7 +1141,6 @@ async function updateOrdersBadge() {
     );
   }
 }
-
 /* load awal */
 updateOrdersBadge();
 
