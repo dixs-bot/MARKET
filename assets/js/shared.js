@@ -65,7 +65,9 @@ const FALLBACK_CAT_IMG =
   store_id:
     p.store_id || null
 };
-
+    
+}
+  
 function getProducts() {
   const raw = localStorage.getItem(LS_PRODUCTS);
   const data = safeParse(raw, []);
@@ -455,7 +457,6 @@ window.supabaseClient
     }
   )
 
-  .subscribe();
   .subscribe();
   window.MiniMarket = {
    
