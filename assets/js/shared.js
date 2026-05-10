@@ -62,6 +62,30 @@ function safeParse(
     }
 }
 
+function getCurrentStoreId() {
+
+    return (
+        window.AdminSession?.store_id ||
+        null
+    );
+}
+
+function isAdminCabang() {
+
+    return (
+        window.AdminSession?.role ===
+        'admin'
+    );
+}
+
+function isSuperAdmin() {
+
+    return (
+        window.AdminSession?.role ===
+        'super_admin'
+    );
+}
+
 
 /* ============================================================
    PRODUCTS
@@ -189,13 +213,29 @@ async function syncProductsFromSupabase() {
 
     try {
 
+        let query =
+            window.supabaseClient
+                .from('products')
+                .select('*');
+
+        const storeId =
+            getCurrentStoreId();
+
+        if (
+            isAdminCabang() &&
+            storeId
+        ) {
+
+            query = query.eq(
+                'store_id',
+                storeId
+            );
+        }
+
         const {
             data,
             error
-        } =
-        await window.supabaseClient
-            .from('products')
-            .select('*');
+        } = await query;
 
         if (error) {
 
@@ -206,7 +246,7 @@ async function syncProductsFromSupabase() {
 
         localStorage.setItem(
             LS_PRODUCTS,
-            JSON.stringify(data)
+            JSON.stringify(data || [])
         );
 
         window.dispatchEvent(
@@ -215,7 +255,7 @@ async function syncProductsFromSupabase() {
             )
         );
 
-        return data;
+        return data || [];
 
     } catch (err) {
 
@@ -341,13 +381,29 @@ async function syncCategoriesFromSupabase() {
 
     try {
 
+        let query =
+            window.supabaseClient
+                .from('categories')
+                .select('*');
+
+        const storeId =
+            getCurrentStoreId();
+
+        if (
+            isAdminCabang() &&
+            storeId
+        ) {
+
+            query = query.eq(
+                'store_id',
+                storeId
+            );
+        }
+
         const {
             data,
             error
-        } =
-        await window.supabaseClient
-            .from('categories')
-            .select('*');
+        } = await query;
 
         if (error) {
 
@@ -358,7 +414,7 @@ async function syncCategoriesFromSupabase() {
 
         localStorage.setItem(
             LS_CATEGORIES,
-            JSON.stringify(data)
+            JSON.stringify(data || [])
         );
 
         window.dispatchEvent(
@@ -367,7 +423,7 @@ async function syncCategoriesFromSupabase() {
             )
         );
 
-        return data;
+        return data || [];
 
     } catch (err) {
 
@@ -771,32 +827,98 @@ function validateOrder(o) {
    REALTIME
 ============================================================ */
 
-window.supabaseClient
+(function initRealtimeSync() {
 
-    .channel(
-        'products-realtime'
-    )
+    const storeId =
+        getCurrentStoreId();
 
-    .on(
-        'postgres_changes',
+    let productFilter = '';
 
-        {
-            event: '*',
-            schema: 'public',
-            table: 'products'
-        },
+    let categoryFilter = '';
 
-        async () => {
+    if (
+        isAdminCabang() &&
+        storeId
+    ) {
 
-            console.log(
-                'Realtime products update'
-            );
+        productFilter =
+            `store_id=eq.${storeId}`;
 
-            await syncProductsFromSupabase();
-        }
-    )
+        categoryFilter =
+            `store_id=eq.${storeId}`;
+    }
 
-    .subscribe();
+    /* PRODUCTS */
+
+    window.supabaseClient
+
+        .channel(
+            `products-realtime-${storeId || 'global'}`
+        )
+
+        .on(
+
+            'postgres_changes',
+
+            {
+                event: '*',
+
+                schema: 'public',
+
+                table: 'products',
+
+                filter:
+                    productFilter
+            },
+
+            async () => {
+
+                console.log(
+                    'Realtime products update'
+                );
+
+                await syncProductsFromSupabase();
+            }
+        )
+
+        .subscribe();
+
+    /* CATEGORIES */
+
+    window.supabaseClient
+
+        .channel(
+            `categories-realtime-${storeId || 'global'}`
+        )
+
+        .on(
+
+            'postgres_changes',
+
+            {
+                event: '*',
+
+                schema: 'public',
+
+                table: 'categories',
+
+                filter:
+                    categoryFilter
+            },
+
+            async () => {
+
+                console.log(
+                    'Realtime categories update'
+                );
+
+                await syncCategoriesFromSupabase();
+            }
+        )
+
+        .subscribe();
+
+})();
 
 
 /* ============================================================
