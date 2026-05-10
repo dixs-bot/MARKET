@@ -904,10 +904,10 @@ Hapus Terpilih (<span id="del-count">0</span>)
         stores(*)
       `)
 
-      .eq(
-        'id',
-        data.session.user.id
-      )
+     .eq(
+  'user_id',
+  data.session.user.id
+)
 
       .single();
 
