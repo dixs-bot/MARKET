@@ -252,7 +252,170 @@ function cleanupInvalidCartItems() {
     save();
 }
 
+/* ============================================================
+   CART RECONCILIATION
+============================================================ */
 
+export function cleanupDeletedProducts() {
+
+    const products =
+        MM.getProducts();
+
+    const validIds =
+        new Set();
+
+    for (
+        let i = 0;
+        i < products.length;
+        i++
+    ) {
+
+        validIds.add(
+            products[i].id
+        );
+    }
+
+    const before =
+        state.cart.length;
+
+    state.cart =
+        state.cart.filter(item =>
+
+            validIds.has(item.id)
+        );
+
+    const changed =
+        before !==
+        state.cart.length;
+
+    if (changed) {
+
+        save();
+    }
+
+    return changed;
+}
+
+export function normalizeCartQty() {
+
+    const products =
+        MM.getProducts();
+
+    const map = {};
+
+    for (
+        let i = 0;
+        i < products.length;
+        i++
+    ) {
+
+        map[
+            products[i].id
+        ] = products[i];
+    }
+
+    let changed =
+        false;
+
+    for (
+        let j = 0;
+        j < state.cart.length;
+        j++
+    ) {
+
+        const item =
+            state.cart[j];
+
+        const live =
+            map[item.id];
+
+        if (!live)
+            continue;
+
+        const stock =
+            Number(
+                live.stock || 0
+            );
+
+        if (stock <= 0) {
+
+            item.qty = 0;
+
+            changed = true;
+
+            continue;
+        }
+
+        if (
+            item.qty > stock
+        ) {
+
+            item.qty = stock;
+
+            changed = true;
+        }
+
+        item.price =
+            live.price;
+
+        item.image =
+            live.image;
+    }
+
+    state.cart =
+        state.cart.filter(item =>
+
+            item.qty > 0
+        );
+
+    if (changed) {
+
+        save();
+    }
+
+    return changed;
+}
+
+export function syncCartWithProducts() {
+
+    const removed =
+        cleanupDeletedProducts();
+
+    const normalized =
+        normalizeCartQty();
+
+    return (
+        removed ||
+        normalized
+    );
+}
+
+export function reconcileCart() {
+
+    try {
+
+        const changed =
+            syncCartWithProducts();
+
+        if (!changed)
+            return false;
+
+        renderCart();
+
+        patchBadge();
+
+        return true;
+
+    } catch (err) {
+
+        console.error(
+            'Cart reconciliation error:',
+            err
+        );
+
+        return false;
+    }
+}
 /* ============================================================
    CART
 ============================================================ */
