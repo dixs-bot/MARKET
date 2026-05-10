@@ -1,92 +1,411 @@
-import { state, findCart, findProd, SHIPS, PAYS, VOUS, FREE_SHIP_MIN, MAX_CART } from './utils.js';
-import { notify, patchQty, patchBadge, renderCart, renderShips, renderPays, renderSummary, renderInv, renderProds, closeCart, closeVou, animateIn, lock } from './ui.js';
+import {
+    state,
+    findCart,
+    findProd,
+    SHIPS,
+    PAYS,
+    VOUS,
+    FREE_SHIP_MIN,
+    MAX_CART
+} from './utils.js';
 
-/* ── storage ── */
+import {
+    notify,
+    patchQty,
+    patchBadge,
+    renderCart,
+    renderShips,
+    renderPays,
+    renderSummary,
+    renderInv,
+    renderProds,
+    closeCart,
+    closeVou,
+    animateIn
+} from './ui.js';
+
+
+/* ============================================================
+   STORAGE
+============================================================ */
+
 export function load() {
+
     try {
-        var c = localStorage.getItem(window.MiniMarket.LS_CART);
-        var o = localStorage.getItem(window.MiniMarket.LS_ORDERS);
-        state.cart   = c ? JSON.parse(c) : [];
-        state.orders = o ? JSON.parse(o) : [];
+
+        var c =
+            localStorage.getItem(
+                window.MiniMarket.LS_CART
+            );
+
+        var o =
+            localStorage.getItem(
+                window.MiniMarket.LS_ORDERS
+            );
+
+        state.cart =
+            c ? JSON.parse(c) : [];
+
+        state.orders =
+            o ? JSON.parse(o) : [];
+
     } catch (e) {
-        console.error('Storage corrupt, reset:', e);
-        state.cart = []; state.orders = [];
-        try { localStorage.removeItem(window.MiniMarket.LS_CART); localStorage.removeItem(window.MiniMarket.LS_ORDERS); } catch (x) {}
+
+        console.error(
+            'Storage corrupt, reset:',
+            e
+        );
+
+        state.cart = [];
+        state.orders = [];
+
+        try {
+
+            localStorage.removeItem(
+                window.MiniMarket.LS_CART
+            );
+
+            localStorage.removeItem(
+                window.MiniMarket.LS_ORDERS
+            );
+
+        } catch {}
     }
 }
 
 export function save() {
+
     try {
-        localStorage.setItem(window.MiniMarket.LS_CART,   JSON.stringify(state.cart));
-        localStorage.setItem(window.MiniMarket.LS_ORDERS, JSON.stringify(state.orders));
-    } catch (e) { console.error('save() failed:', e); }
+
+        localStorage.setItem(
+            window.MiniMarket.LS_CART,
+            JSON.stringify(state.cart)
+        );
+
+        localStorage.setItem(
+            window.MiniMarket.LS_ORDERS,
+            JSON.stringify(state.orders)
+        );
+
+    } catch (e) {
+
+        console.error(
+            'save() failed:',
+            e
+        );
+    }
 }
 
-/* ── subTotal ── */
+
+/* ============================================================
+   SUBTOTAL
+============================================================ */
+
 export function subTotal() {
-    var prods   = window.MiniMarket.getProducts();
+
+    var prods =
+        window.MiniMarket
+            .getProducts();
+
     var prodMap = {};
-    for (var i = 0; i < prods.length; i++) prodMap[prods[i].id] = prods[i];
+
+    for (
+        var i = 0;
+        i < prods.length;
+        i++
+    ) {
+
+        prodMap[
+            prods[i].id
+        ] = prods[i];
+    }
 
     var t = 0;
-    for (var j = 0; j < state.cart.length; j++) {
-        var it   = state.cart[j];
-        var live = prodMap[it.id];
-        var price = live ? live.price : it.price;
+
+    for (
+        var j = 0;
+        j < state.cart.length;
+        j++
+    ) {
+
+        var it =
+            state.cart[j];
+
+        var live =
+            prodMap[it.id];
+
+        var price =
+            live
+                ? live.price
+                : it.price;
+
         it.price = price;
-        t += price * it.qty;
+
+        t +=
+            price * it.qty;
     }
+
     return t;
 }
 
-/* ── cart mutation ── */
-export function addCart(pid, delta) {
-    if (state.cart.length >= MAX_CART) { notify('Keranjang penuh (maks ' + MAX_CART + ' item)'); return; }
 
-    var prod = findProd(pid);
-    if (!prod) return;
+/* ============================================================
+   CART
+============================================================ */
 
-    var f   = findCart(pid);
-    var cur = f ? f.it.qty : 0;
+export function addCart(
+    pid,
+    delta
+) {
+
+    if (
+        state.cart.length >=
+        MAX_CART
+    ) {
+
+        notify(
+            'Keranjang penuh (maks ' +
+            MAX_CART +
+            ' item)'
+        );
+
+        return;
+    }
+
+    var prod =
+        findProd(pid);
+
+    if (!prod)
+        return;
+
+    /* 🔥 HARD STORE ISOLATION */
+    if (
+        state.cart.length
+    ) {
+
+        const cartStoreId =
+
+            state.cart[0]
+                .store_id;
+
+        if (
+            cartStoreId !==
+            prod.store_id
+        ) {
+
+            notify(
+                'Keranjang hanya bisa berisi produk dari cabang yang sama'
+            );
+
+            return;
+        }
+    }
+
+    var f =
+        findCart(pid);
+
+    var cur =
+        f
+            ? f.it.qty
+            : 0;
 
     if (delta > 0) {
-        if (cur >= prod.stock) { notify('Stok habis'); return; }
+
+        if (
+            cur >= prod.stock
+        ) {
+
+            notify(
+                'Stok habis'
+            );
+
+            return;
+        }
     }
 
     if (f) {
-        f.it.qty  += delta;
-        f.it.price = prod.price;
-        f.it.image = prod.image;
-        if (f.it.qty <= 0) state.cart.splice(f.i, 1);
+
+        f.it.qty += delta;
+
+        f.it.price =
+            prod.price;
+
+        f.it.image =
+            prod.image;
+
+        if (
+            f.it.qty <= 0
+        ) {
+
+            state.cart.splice(
+                f.i,
+                1
+            );
+        }
+
     } else if (delta > 0) {
-        state.cart.push({ id: prod.id, name: prod.name, price: prod.price, image: prod.image, qty: 1 });
+
+        state.cart.push({
+
+            id:
+                prod.id,
+
+            name:
+                prod.name,
+
+            price:
+                prod.price,
+
+            image:
+                prod.image,
+
+            qty:
+                1,
+
+            store_id:
+                prod.store_id
+        });
     }
 
     save();
-    patchQty(pid, false);
-    patchQty(pid, true);
-    if (state.d.csheet.classList.contains('open')) renderCart();
+
+    patchQty(
+        pid,
+        false
+    );
+
+    patchQty(
+        pid,
+        true
+    );
+
+    if (
+        state.d.csheet
+            .classList
+            .contains('open')
+    ) {
+
+        renderCart();
+    }
+
     patchBadge();
 }
 
 export function delCart(pid) {
-    var f = findCart(pid);
-    if (f) state.cart.splice(f.i, 1);
-    save(); renderCart(); patchQty(pid, false); patchBadge();
-    if (!state.cart.length) closeCart();
+
+    var f =
+        findCart(pid);
+
+    if (f) {
+
+        state.cart.splice(
+            f.i,
+            1
+        );
+    }
+
+    save();
+
+    renderCart();
+
+    patchQty(
+        pid,
+        false
+    );
+
+    patchBadge();
+
+    if (
+        !state.cart.length
+    ) {
+
+        closeCart();
+    }
 }
 
-/* ── checkout state helpers ── */
-export function selShip(id) { state.co.ship = id; renderShips(); validate(false); renderSummary(); }
-export function selPay(id)  { state.co.pay  = id; renderPays();  validate(false); }
+
+/* ============================================================
+   CHECKOUT STATE
+============================================================ */
+
+export function selShip(id) {
+
+    state.co.ship = id;
+
+    renderShips();
+
+    validate(false);
+
+    renderSummary();
+}
+
+export function selPay(id) {
+
+    state.co.pay = id;
+
+    renderPays();
+
+    validate(false);
+}
 
 export function selVou(vid) {
+
     var v = null;
-    for (var i = 0; i < VOUS.length; i++) if (VOUS[i].id === vid) { v = VOUS[i]; break; }
-    if (state.co.vou && state.co.vou.id === vid) { state.co.vou = null; state.d.vlbl.textContent = 'Opsional'; }
-    else { state.co.vou = v; if (v) state.d.vlbl.textContent = v.code + ' (-' + window.MiniMarket.fmt(v.disc) + ')'; }
-    closeVou(); renderSummary();
+
+    for (
+        var i = 0;
+        i < VOUS.length;
+        i++
+    ) {
+
+        if (
+            VOUS[i].id === vid
+        ) {
+
+            v = VOUS[i];
+
+            break;
+        }
+    }
+
+    if (
+        state.co.vou &&
+        state.co.vou.id === vid
+    ) {
+
+        state.co.vou = null;
+
+        state.d.vlbl.textContent =
+            'Opsional';
+
+    } else {
+
+        state.co.vou = v;
+
+        if (v) {
+
+            state.d.vlbl.textContent =
+
+                v.code +
+
+                ' (-' +
+
+                window.MiniMarket
+                    .fmt(v.disc) +
+
+                ')';
+        }
+    }
+
+    closeVou();
+
+    renderSummary();
 }
+
+
+/* ============================================================
+   VALIDATE
+============================================================ */
 
 export function validate(showErr) {
 
@@ -116,7 +435,8 @@ export function validate(showErr) {
 
     if (ok) {
 
-        state.d.border.disabled = false;
+        state.d.border.disabled =
+            false;
 
         state.d.border.classList.remove(
             'btn-off'
@@ -131,7 +451,8 @@ export function validate(showErr) {
 
     } else {
 
-        state.d.border.disabled = true;
+        state.d.border.disabled =
+            true;
 
         state.d.border.classList.add(
             'btn-off'
@@ -180,11 +501,19 @@ export function validate(showErr) {
 
     return ok;
 }
+
 export function resetCO() {
+
     state.co.ship = '';
     state.co.pay = '';
     state.co.vou = null;
 }
+
+
+/* ============================================================
+   CANCEL ORDER
+============================================================ */
+
 export async function cancelOrder(
     orderId
 ) {
@@ -198,7 +527,6 @@ export async function cancelOrder(
                 .from('orders')
 
                 .update({
-
                     status:
                         'cancelled'
                 })
@@ -228,319 +556,455 @@ export async function cancelOrder(
     }
 }
 
-/* ── place order ── */
+
+/* ============================================================
+   PLACE ORDER
+============================================================ */
+
 export async function goToInvoice() {
-    if (state.isProcessing)      return;
-    if (state.d.border.disabled) return;
-    state.isProcessing = true;
 
-    state.d.mconf.classList.add('hidden');
-    state.d.mload.classList.remove('hidden');
-const {
-
-    data: { session }
-
-} = await window.supabaseClient
-    .auth
-    .getSession();
-
-if (!session) {
-
-    notify(
-        'Silakan login terlebih dahulu'
-    );
-
-    window.location.href =
-        '/auth.html';
-
-    state.isProcessing = false;
-
-    return;
-}
-  try {
-
-    var sm = null;
-    var pm = null;
-
-    for (var i = 0; i < SHIPS.length; i++) {
-        if (SHIPS[i].id === state.co.ship) {
-            sm = SHIPS[i];
-            break;
-        }
-    }
-
-    for (var j = 0; j < PAYS.length; j++) {
-        if (PAYS[j].id === state.co.pay) {
-            pm = PAYS[j];
-            break;
-        }
-    }
-
-    if (!sm || !pm) {
-
-        notify('Pilih pengiriman dan pembayaran');
-
-        state.d.mload.classList.add('hidden');
-
-        state.isProcessing = false;
-
+    if (state.isProcessing)
         return;
-    }
-
-   var stockResult =
-    await window.MiniMarket.atomicDeductStock(
-        state.cart
-    );
-
-    if (!stockResult.ok) {
-
-        notify(
-            'Stok tidak cukup: ' +
-            stockResult.errors.join(', ')
-        );
-
-        state.d.mload.classList.add('hidden');
-
-        state.d.pgco.classList.remove('hidden');
-
-        renderShips();
-        renderPays();
-        renderSummary();
-
-        validate(false);
-
-        state.currentPage = 'checkout';
-
-        state.isProcessing = false;
-
-        return;
-    }
-
-    var sub = subTotal();
-
-    var autoFree =
-        sub >= FREE_SHIP_MIN;
-
-    var baseShip =
-        sm.price;
-
-    var finalShip =
-        autoFree ? 0 : baseShip;
-
-    var disc = 0;
 
     if (
-        state.co.vou &&
-        sub >= state.co.vou.min
-    ) {
-        disc = state.co.vou.disc;
+        state.d.border.disabled
+    )
+        return;
+
+    state.isProcessing = true;
+
+    state.d.mconf.classList.add(
+        'hidden'
+    );
+
+    state.d.mload.classList.remove(
+        'hidden'
+    );
+
+    const {
+
+        data: { session }
+
+    } =
+    await window.supabaseClient
+        .auth
+        .getSession();
+
+    if (!session) {
+
+        notify(
+            'Silakan login terlebih dahulu'
+        );
+
+        window.location.href =
+            '/auth.html';
+
+        state.isProcessing = false;
+
+        return;
     }
 
-    var total =
-        Math.max(
-            0,
-            sub + finalShip - disc
+    try {
+
+        const selectedStoreId =
+            document.getElementById(
+                'store-filter'
+            )?.value;
+
+        if (!selectedStoreId) {
+
+            notify(
+                'Pilih cabang terlebih dahulu'
+            );
+
+            state.isProcessing = false;
+
+            state.d.mload.classList.add(
+                'hidden'
+            );
+
+            return;
+        }
+
+        var sm = null;
+        var pm = null;
+
+        for (
+            var i = 0;
+            i < SHIPS.length;
+            i++
+        ) {
+
+            if (
+                SHIPS[i].id ===
+                state.co.ship
+            ) {
+
+                sm = SHIPS[i];
+
+                break;
+            }
+        }
+
+        for (
+            var j = 0;
+            j < PAYS.length;
+            j++
+        ) {
+
+            if (
+                PAYS[j].id ===
+                state.co.pay
+            ) {
+
+                pm = PAYS[j];
+
+                break;
+            }
+        }
+
+        if (!sm || !pm) {
+
+            notify(
+                'Pilih pengiriman dan pembayaran'
+            );
+
+            state.d.mload.classList.add(
+                'hidden'
+            );
+
+            state.isProcessing = false;
+
+            return;
+        }
+
+        /* 🔥 VALIDATE CROSS STORE */
+        const storeMap = {};
+
+        for (
+            let i = 0;
+            i < state.cart.length;
+            i++
+        ) {
+
+            storeMap[
+                state.cart[i].store_id
+            ] = true;
+        }
+
+        if (
+            Object.keys(storeMap)
+                .length > 1
+        ) {
+
+            notify(
+                'Keranjang tidak boleh campur cabang'
+            );
+
+            state.isProcessing = false;
+
+            state.d.mload.classList.add(
+                'hidden'
+            );
+
+            return;
+        }
+
+        var stockResult =
+
+            await window.MiniMarket
+                .atomicDeductStock(
+                    state.cart
+                );
+
+        if (!stockResult.ok) {
+
+            notify(
+                'Stok tidak cukup: ' +
+                stockResult.errors.join(', ')
+            );
+
+            state.d.mload.classList.add(
+                'hidden'
+            );
+
+            state.d.pgco.classList.remove(
+                'hidden'
+            );
+
+            renderShips();
+            renderPays();
+            renderSummary();
+
+            validate(false);
+
+            state.currentPage =
+                'checkout';
+
+            state.isProcessing = false;
+
+            return;
+        }
+
+        var sub =
+            subTotal();
+
+        var autoFree =
+            sub >= FREE_SHIP_MIN;
+
+        var baseShip =
+            sm.price;
+
+        var finalShip =
+            autoFree
+                ? 0
+                : baseShip;
+
+        var disc = 0;
+
+        if (
+            state.co.vou &&
+            sub >= state.co.vou.min
+        ) {
+
+            disc =
+                state.co.vou.disc;
+        }
+
+        var total =
+            Math.max(
+                0,
+                sub +
+                finalShip -
+                disc
+            );
+
+        var newOrder = {
+
+            id:
+                'ord_' +
+                Date.now() +
+                '_' +
+                Math.random()
+                    .toString(36)
+                    .substr(2, 5),
+
+            items:
+                state.cart.map(item => ({
+
+                    id:
+                        item.id,
+
+                    name:
+                        item.name,
+
+                    qty:
+                        item.qty,
+
+                    price:
+                        item.price,
+
+                    image:
+                        item.image ||
+                        '/assets/img/kategori.jpeg',
+
+                    store_id:
+                        item.store_id
+                })),
+
+            address:
+                state.d.inaddr.value
+                    .trim(),
+
+            shipping:
+                sm,
+
+            payment:
+                pm,
+
+            subtotal:
+                sub,
+
+            shipPrice:
+                finalShip,
+
+            discount:
+                disc,
+
+            total:
+                total,
+
+            notes:
+                state.d.innote.value
+                    .trim(),
+
+            status:
+                'pending',
+
+            store_id:
+                selectedStoreId,
+
+            createdAt:
+                Date.now()
+        };
+
+        var orderCheck =
+
+            window.MiniMarket
+                .validateOrder(
+                    newOrder
+                );
+
+        if (!orderCheck.ok) {
+
+            console.error(
+                '[MiniMarket] order validation failed:',
+                orderCheck.reason
+            );
+
+            notify(
+                'Gagal memproses pesanan (' +
+                orderCheck.reason +
+                ')'
+            );
+
+            state.d.mload.classList.add(
+                'hidden'
+            );
+
+            state.isProcessing = false;
+
+            return;
+        }
+
+        const { error } =
+
+            await window.supabaseClient
+
+                .from('orders')
+
+                .insert([
+                    {
+                        id:
+                            newOrder.id,
+
+                        user_id:
+                            session.user.id,
+
+                        customer_name:
+                            state.d.inname.value.trim(),
+
+                        phone:
+                            state.d.inphone.value.trim(),
+
+                        address:
+                            newOrder.address,
+
+                        items:
+                            newOrder.items,
+
+                        subtotal:
+                            newOrder.subtotal,
+
+                        shipping_cost:
+                            newOrder.shipPrice,
+
+                        discount:
+                            newOrder.discount,
+
+                        total:
+                            newOrder.total,
+
+                        payment_method:
+                            newOrder.payment.name,
+
+                        shipping_method:
+                            newOrder.shipping.name,
+
+                        store_id:
+                            newOrder.store_id,
+
+                        status:
+                            'pending'
+                    }
+                ]);
+
+        if (error) {
+
+            console.error(error);
+
+            notify(
+                'Gagal menyimpan order'
+            );
+
+            state.d.mload.classList.add(
+                'hidden'
+            );
+
+            state.isProcessing = false;
+
+            return;
+        }
+
+        state.curOrder =
+            newOrder;
+
+        state.orders.push(
+            state.curOrder
         );
 
-    var newOrder = {
+        state.cart = [];
 
-        id:
-            'ord_' +
-            Date.now() +
-            '_' +
-            Math.random()
-                .toString(36)
-                .substr(2, 5),
+        resetCO();
 
-       items:
-    state.cart.map(item => ({
+        save();
 
-        id:
-            item.id,
+        renderCart();
 
-        name:
-            item.name,
+        renderProds();
 
-        qty:
-            item.qty,
+        patchBadge();
 
-        price:
-            item.price,
-
-        image:
-            item.image ||
-            '/assets/img/kategori.jpeg'
-    })),
-        address:
-            state.d.inaddr.value.trim(),
-
-        shipping:
-            sm,
-
-        payment:
-            pm,
-
-        subtotal:
-            sub,
-
-        shipPrice:
-            finalShip,
-
-        discount:
-            disc,
-
-        total:
-            total,
-
-        notes:
-            state.d.innote.value.trim(),
-
-       status:
-    'pending',
-
-store_id:
-    document.getElementById(
-        'store-filter'
-    )?.value,
-
-createdAt:
-    Date.now()
-    };
-
-    var orderCheck =
-        window.MiniMarket.validateOrder(
-            newOrder
+        state.d.mload.classList.add(
+            'hidden'
         );
 
-    if (!orderCheck.ok) {
+        state.d.pgco.classList.add(
+            'hidden'
+        );
+
+        renderInv();
+
+        state.d.pginv.classList.remove(
+            'hidden'
+        );
+
+        state.d.pginv.scrollTop = 0;
+
+        animateIn(
+            state.d.pginv
+        );
+
+        state.currentPage =
+            'invoice';
+
+    } catch (err) {
 
         console.error(
-            '[MiniMarket] order validation failed:',
-            orderCheck.reason
+            'Order error:',
+            err
+        );
+
+        state.d.mload.classList.add(
+            'hidden'
         );
 
         notify(
-            'Gagal memproses pesanan (' +
-            orderCheck.reason +
-            ')'
+            'Gagal memproses pesanan'
         );
 
-        state.d.mload.classList.add('hidden');
+    } finally {
 
         state.isProcessing = false;
-
-        return;
     }
-
-    /* 🔥 INSERT ORDER KE SUPABASE */
-    const { error } =
-        await window.supabaseClient
-            .from('orders')
-            .insert([
-                {
-                    id: newOrder.id,
-                   
-                    user_id:
-                      session.user.id,
-                     
-                    customer_name:
-                     state.d.inname.value.trim(),
-
-                     phone:
-                       state.d.inphone.value.trim(),
-                    address:
-                        newOrder.address,
-
-                    items:
-                        newOrder.items,
-
-                    subtotal:
-                        newOrder.subtotal,
-
-                    shipping_cost:
-                        newOrder.shipPrice,
-
-                    discount:
-                        newOrder.discount,
-
-                    total:
-                        newOrder.total,
-
-                    payment_method:
-                        newOrder.payment.name,
-
-                    shipping_method:
-                        newOrder.shipping.name,
-
-                    status:
-                        'pending'
-                }
-            ]);
-
-    if (error) {
-
-        console.error(error);
-
-        notify(
-            'Gagal menyimpan order'
-        );
-
-        state.d.mload.classList.add('hidden');
-
-        state.isProcessing = false;
-
-        return;
-    }
-    
-      state.curOrder = newOrder;
-   
-      state.orders.push(
-        state.curOrder
-    );
-
-    state.cart = [];
-
-    resetCO();
-
-    save();
-
-    renderCart();
-
-    renderProds();
-
-    patchBadge();
-
-    state.d.mload.classList.add('hidden');
-
-    state.d.pgco.classList.add('hidden');
-
-    renderInv();
-
-    state.d.pginv.classList.remove('hidden');
-
-    state.d.pginv.scrollTop = 0;
-
-    animateIn(state.d.pginv);
-
-    state.currentPage = 'invoice';
-
-} catch (err) {
-
-    console.error(
-        'Order error:',
-        err
-    );
-
-    state.d.mload.classList.add('hidden');
-
-    notify(
-        'Gagal memproses pesanan'
-    );
-
-} finally {
-
-    state.isProcessing = false;
-}
-
-
 }
