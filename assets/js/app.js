@@ -1,5 +1,5 @@
 import { state, WA, fmt } from './utils.js';
-import { addCart, delCart, selShip, selPay, selVou, validate, resetCO, goToInvoice, cancelOrder, load } from './services.js';
+import { addCart, delCart, selShip, selPay, selVou, validate, resetCO, goToInvoice, cancelOrder, load, save } from './services.js';
 import {
     cache,
     notify,
@@ -102,24 +102,112 @@ function sendWA() {
 }
 
 function doSearch(q) {
-    var PRODS = window.MiniMarket.getProducts();
-    q = q.toLowerCase().trim();
+
+    const selectedStoreId =
+        document.getElementById(
+            'store-filter'
+        )?.value;
+
+    if (!selectedStoreId) {
+
+        state.d.sres.innerHTML = `
+            <div class="col-span-2 text-center py-10">
+                <p class="text-xs text-slate-400">
+                    Pilih cabang dulu
+                </p>
+            </div>
+        `;
+
+        return;
+    }
+
+    var PRODS =
+        window.MiniMarket
+            .getProducts();
+
+    q =
+        q.toLowerCase().trim();
+
     if (!q) {
-        state.d.sres.innerHTML = '<div class="col-span-2 text-center py-10"><p class="text-xs text-slate-400">Ketik untuk cari</p></div>';
+
+        state.d.sres.innerHTML = `
+            <div class="col-span-2 text-center py-10">
+                <p class="text-xs text-slate-400">
+                    Ketik untuk cari
+                </p>
+            </div>
+        `;
+
         return;
     }
+
     var res = [];
-    for (var i = 0; i < PRODS.length; i++)
-        if (PRODS[i].name.toLowerCase().indexOf(q) !== -1) res.push(PRODS[i]);
-    if (!res.length) {
-        state.d.sres.innerHTML = '<div class="col-span-2 text-center py-10"><p class="text-xs text-slate-400">Tidak ditemukan</p></div>';
-        return;
+
+   for (
+    var i = 0;
+    i < PRODS.length;
+    i++
+) {
+
+    /* isolate store */
+    if (
+        PRODS[i].store_id !==
+        selectedStoreId
+    ) {
+
+        continue;
     }
-    var h = '';
-    for (var j = 0; j < res.length; j++) h += renderCard(res[j], true);
-    state.d.sres.innerHTML = h;
+
+    /* isolate category */
+    if (
+        state.selCat &&
+        PRODS[i].category !==
+        state.selCat
+    ) {
+
+        continue;
+    }
+
+    if (
+        PRODS[i]
+            .name
+            .toLowerCase()
+            .indexOf(q) !== -1
+    ) {
+
+        res.push(PRODS[i]);
+    }
 }
 
+    if (!res.length) {
+
+        state.d.sres.innerHTML = `
+            <div class="col-span-2 text-center py-10">
+                <p class="text-xs text-slate-400">
+                    Tidak ditemukan
+                </p>
+            </div>
+        `;
+
+        return;
+    }
+
+    var h = '';
+
+    for (
+        var j = 0;
+        j < res.length;
+        j++
+    ) {
+
+        h += renderCard(
+            res[j],
+            true
+        );
+    }
+
+    state.d.sres.innerHTML = h;
+}
 function viewDetail(oid) {
     var o = null;
     for (var i = 0; i < state.orders.length; i++)
@@ -216,10 +304,8 @@ function renderFilteredProducts(){
         );
 
     /* FILTER CATEGORY */
-    if(
-        state.selCat &&
-        state.selCat !== 'all'
-    ){
+    if(state.selCat)
+    {
 
         products =
             products.filter(product =>
@@ -252,29 +338,14 @@ function renderFilteredCategories(){
     const allCategories =
         MM.getCategories();
 
-    const filtered =
-        allCategories.filter(cat =>
+ const filtered =
+    allCategories.filter(cat =>
 
-            cat.id === 'all' ||
+        cat.store_id ===
+        selectedStoreId
+    );
 
-            cat.store_id ===
-            selectedStoreId
-        );
-console.log(
-    'ALL CATEGORIES:',
-    allCategories
-);
-
-console.log(
-    'SELECTED STORE:',
-    selectedStoreId
-);
-
-console.log(
-    'FILTERED CATEGORIES:',
-    filtered
-);
-    renderCats(filtered);
+renderCats(filtered);
 }
 /* ── stores ── */
 
@@ -335,13 +406,37 @@ state.d.inphone =
     await MM.syncProductsFromSupabase();
     await MM.syncCategoriesFromSupabase();
     await loadStoreFilter();
-    document
+   document
     .getElementById(
         'store-filter'
     )
     ?.addEventListener(
+
         'change',
-        renderFilteredProducts
+
+      function(){
+
+    /* reset category */
+    state.selCat = '';
+
+    /* reset cart */
+    state.cart = [];
+
+    /* reset search */
+    state.d.insearch.value = '';
+
+    state.d.sres.innerHTML = '';
+
+    renderCart();
+
+    save();
+
+    patchBadge();
+
+    renderFilteredCategories();
+
+    renderFilteredProducts();
+}
     );
     initInputListeners();
 
@@ -370,7 +465,7 @@ setInterval(function () {
 /* Cross-tab sync */
 window.addEventListener('storage', function (e) {
     if (e.key === window.MiniMarket.LS_PRODUCTS) onProductsUpdated();
-    if (e.key === window.MiniMarket.LS_CATEGORIES) renderCats();
+    if (e.key === window.MiniMarket.LS_CATEGORIES) renderFilteredCategories();
 });
 /* Same-tab sync */
 window.addEventListener('productsUpdated', onProductsUpdated);
