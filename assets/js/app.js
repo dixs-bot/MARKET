@@ -1,4 +1,4 @@
-import { state, WA, fmt } from './utils.js';
+import { state } from './utils.js';
 
 import {
 
@@ -11,8 +11,7 @@ import {
     resetCO,
     goToInvoice,
     cancelOrder,
-    load,
-    save
+    reconcileCart
 
 } from './services.js';
 
@@ -22,7 +21,6 @@ import {
     notify,
     patchBadge,
     renderCats,
-    renderCard,
     renderProds,
     renderCart,
     renderShips,
@@ -34,15 +32,80 @@ import {
     closeCart,
     openVou,
     closeVou,
-    openSearch,
-    closeSearch,
     lock,
     unlock,
     animateIn
 
 } from './ui.js';
 
-const MM = window.MiniMarket;
+const MM =
+    window.MiniMarket;
+
+
+/* ============================================================
+   PERFORMANCE STATE
+============================================================ */
+
+const PAGE_SIZE =
+    20;
+
+let renderQueue =
+    false;
+
+let currentPage =
+    1;
+
+let filteredProducts =
+    [];
+
+let searchTimer =
+    null;
+
+
+/* ============================================================
+   HELPERS
+============================================================ */
+
+function getSelectedStoreId() {
+
+    return (
+        document.getElementById(
+            'store-filter'
+        )?.value || null
+    );
+}
+
+function getPaginatedProducts() {
+
+    const end =
+        currentPage *
+        PAGE_SIZE;
+
+    return filteredProducts.slice(
+        0,
+        end
+    );
+}
+
+function queueRender(callback) {
+
+    if (renderQueue)
+        return;
+
+    renderQueue = true;
+
+    requestAnimationFrame(() => {
+
+        try {
+
+            callback();
+
+        } finally {
+
+            renderQueue = false;
+        }
+    });
+}
 
 
 /* ============================================================
@@ -52,11 +115,15 @@ const MM = window.MiniMarket;
 function navTo(pageName) {
 
     const pages =
-        document.querySelectorAll('.page');
+        document.querySelectorAll(
+            '.page'
+        );
 
     pages.forEach(page => {
 
-        page.classList.remove('on');
+        page.classList.remove(
+            'on'
+        );
     });
 
     const page =
@@ -66,7 +133,9 @@ function navTo(pageName) {
 
     if (page) {
 
-        page.classList.add('on');
+        page.classList.add(
+            'on'
+        );
     }
 
     const navButtons =
@@ -93,7 +162,10 @@ function navTo(pageName) {
         );
     });
 
-    if (pageName === 'history') {
+    if (
+        pageName ===
+        'history'
+    ) {
 
         renderOrders();
     }
@@ -125,14 +197,6 @@ function goToHome() {
 
 function goToCart() {
 
-    state.d.pgco.classList.add(
-        'hidden'
-    );
-
-    state.d.mconf.classList.add(
-        'hidden'
-    );
-
     renderCart();
 
     state.d.csheet.classList.add(
@@ -148,6 +212,8 @@ function goToCart() {
 }
 
 function goToCheckout() {
+
+    reconcileCart();
 
     if (!state.cart.length) {
 
@@ -166,40 +232,11 @@ function goToCheckout() {
         'on'
     );
 
-    if (state.lockCnt === 0) {
-
-        lock();
-    }
-
     if (
-        state.currentPage !==
-        'confirm'
+        state.lockCnt === 0
     ) {
 
-        resetCO();
-
-        state.d.inaddr.value = '';
-
-        state.d.innote.value = '';
-
-        state.d.vlbl.textContent =
-            'Opsional';
-
-        state.d.eaddr.classList.add(
-            'hidden'
-        );
-
-        state.d.eship.classList.add(
-            'hidden'
-        );
-
-        state.d.epay.classList.add(
-            'hidden'
-        );
-
-        state.d.inaddr.classList.remove(
-            'err-input'
-        );
+        lock();
     }
 
     renderShips();
@@ -214,14 +251,9 @@ function goToCheckout() {
         'hidden'
     );
 
-    if (state.d.coscroll) {
-
-        state.d.coscroll.scrollTop = 0;
-
-        animateIn(
-            state.d.coscroll
-        );
-    }
+    animateIn(
+        state.d.pgco
+    );
 
     state.currentPage =
         'checkout';
@@ -229,7 +261,9 @@ function goToCheckout() {
 
 function goToConfirm() {
 
-    if (!validate(true)) {
+    if (
+        !validate(true)
+    ) {
 
         notify(
             'Lengkapi data!'
@@ -246,176 +280,19 @@ function goToConfirm() {
         'confirm';
 }
 
-function backToCheckout() {
-
-    state.d.mconf.classList.add(
-        'hidden'
-    );
-
-    state.currentPage =
-        'checkout';
-}
-
 
 /* ============================================================
-   STORE HELPERS
+   PRODUCT FILTERING
 ============================================================ */
 
-function getSelectedStoreId() {
-
-    return (
-        document.getElementById(
-            'store-filter'
-        )?.value || null
-    );
-}
-
-function loadStoreCart(storeId) {
-
-    try {
-
-        const cartKey =
-            MM.getCartStorageKey(
-                storeId
-            );
-
-        const savedCart =
-            localStorage.getItem(
-                cartKey
-            );
-
-        state.cart =
-            savedCart
-                ? JSON.parse(savedCart)
-                : [];
-
-    } catch {
-
-        state.cart = [];
-    }
-
-    renderCart();
-
-    patchBadge();
-}
-
-
-/* ============================================================
-   SEARCH
-============================================================ */
-
-function doSearch(query) {
+function buildFilteredProducts() {
 
     const selectedStoreId =
         getSelectedStoreId();
 
     if (!selectedStoreId) {
 
-        state.d.sres.innerHTML = `
-            <div class="col-span-2 text-center py-10">
-                <p class="text-xs text-slate-400">
-                    Pilih cabang dulu
-                </p>
-            </div>
-        `;
-
-        return;
-    }
-
-    query =
-        query
-            .toLowerCase()
-            .trim();
-
-    if (!query) {
-
-        state.d.sres.innerHTML = `
-            <div class="col-span-2 text-center py-10">
-                <p class="text-xs text-slate-400">
-                    Ketik untuk cari
-                </p>
-            </div>
-        `;
-
-        return;
-    }
-
-    const products =
-        MM.getProducts();
-
-    const results =
-        products.filter(product => {
-
-            if (
-                product.store_id !==
-                selectedStoreId
-            ) {
-
-                return false;
-            }
-
-            if (
-                state.selCat &&
-                product.category !==
-                state.selCat
-            ) {
-
-                return false;
-            }
-
-            return (
-                product.name
-                    .toLowerCase()
-                    .includes(query)
-            );
-        });
-
-    if (!results.length) {
-
-        state.d.sres.innerHTML = `
-            <div class="col-span-2 text-center py-10">
-                <p class="text-xs text-slate-400">
-                    Tidak ditemukan
-                </p>
-            </div>
-        `;
-
-        return;
-    }
-
-    state.d.sres.innerHTML =
-        results
-            .map(product =>
-                renderCard(
-                    product,
-                    true
-                )
-            )
-            .join('');
-}
-
-
-/* ============================================================
-   FILTERED PRODUCTS
-============================================================ */
-
-function renderFilteredProducts() {
-
-    const selectedStoreId =
-        getSelectedStoreId();
-
-    if (!selectedStoreId) {
-
-        state.d.pgrid.innerHTML = `
-            <div class="col-span-2 text-center py-16">
-                <p class="text-sm text-slate-400 font-medium">
-                    Pilih cabang terlebih dahulu
-                </p>
-            </div>
-        `;
-
-        state.d.pcnt.textContent =
-            '0 item';
+        filteredProducts = [];
 
         return;
     }
@@ -440,12 +317,110 @@ function renderFilteredProducts() {
             );
     }
 
-    renderProds(products);
+    const keyword =
+        state.d.insearch.value
+            .trim()
+            .toLowerCase();
+
+    if (keyword) {
+
+        products =
+            products.filter(product =>
+
+                product.name
+                    .toLowerCase()
+                    .includes(keyword)
+            );
+    }
+
+    filteredProducts =
+        products;
 }
 
 
 /* ============================================================
-   FILTERED CATEGORIES
+   PRODUCT RENDER
+============================================================ */
+
+function renderFilteredProducts(
+    resetPage = false
+) {
+
+    if (resetPage) {
+
+        currentPage = 1;
+    }
+
+    buildFilteredProducts();
+
+    queueRender(() => {
+
+        const selectedStoreId =
+            getSelectedStoreId();
+
+        if (!selectedStoreId) {
+
+            state.d.pgrid.innerHTML = `
+
+                <div class="
+                    col-span-2
+                    text-center
+                    py-16
+                ">
+
+                    <p class="
+                        text-sm
+                        text-slate-400
+                        font-medium
+                    ">
+                        Pilih cabang terlebih dahulu
+                    </p>
+
+                </div>
+            `;
+
+            state.d.pcnt.textContent =
+                '0 item';
+
+            return;
+        }
+
+        const visible =
+            getPaginatedProducts();
+
+        renderProds(visible);
+    });
+}
+
+
+/* ============================================================
+   LOAD MORE
+============================================================ */
+
+function loadMoreProducts() {
+
+    const total =
+        filteredProducts.length;
+
+    const visible =
+        currentPage *
+        PAGE_SIZE;
+
+    if (
+        visible >= total
+    ) {
+
+        return;
+    }
+
+    currentPage++;
+
+    renderFilteredProducts();
+}
+
+
+/* ============================================================
+   CATEGORY RENDER
 ============================================================ */
 
 function renderFilteredCategories() {
@@ -482,9 +457,13 @@ function renderFilteredCategories() {
 async function loadStoreFilter() {
 
     const {
+
         data,
         error
-    } = await window.supabaseClient
+
+    } =
+
+    await window.supabaseClient
 
         .from('stores')
 
@@ -504,9 +483,11 @@ async function loadStoreFilter() {
             'store-filter'
         );
 
-    if (!select) return;
+    if (!select)
+        return;
 
     select.innerHTML = `
+
         <option value="">
             Pilih Cabang
         </option>
@@ -515,6 +496,7 @@ async function loadStoreFilter() {
     data.forEach(store => {
 
         select.innerHTML += `
+
             <option value="${store.id}">
                 ${store.name}
             </option>
@@ -575,22 +557,9 @@ function initInputListeners() {
 
             function () {
 
-                state.d.eaddr
-                    .classList.add(
-                        'hidden'
-                    );
-
-                state.d.inaddr
-                    .classList.remove(
-                        'err-input'
-                    );
-
                 validate(false);
             }
         );
-
-    let searchTimer =
-        null;
 
     state.d.insearch
         .addEventListener(
@@ -603,16 +572,13 @@ function initInputListeners() {
                     searchTimer
                 );
 
-                const value =
-                    this.value;
-
                 searchTimer =
                     setTimeout(
 
                         function () {
 
-                            doSearch(
-                                value
+                            renderFilteredProducts(
+                                true
                             );
 
                         },
@@ -635,10 +601,8 @@ function initStoreSwitch() {
             'store-filter'
         );
 
-    if (!storeSelect) {
-
+    if (!storeSelect)
         return;
-    }
 
     storeSelect.addEventListener(
 
@@ -646,37 +610,62 @@ function initStoreSwitch() {
 
         function () {
 
-            const selectedStoreId =
-                this.value;
-
             localStorage.setItem(
 
                 'lumora_selected_store',
 
-                selectedStoreId
+                this.value
             );
 
             state.selCat = '';
 
-            state.d.insearch.value = '';
-
-            state.d.sres.innerHTML =
-                '';
-
-            loadStoreCart(
-                selectedStoreId
-            );
+            reconcileCart();
 
             renderFilteredCategories();
 
-            renderFilteredProducts();
+            renderFilteredProducts(
+                true
+            );
+
+            renderCart();
+
+            patchBadge();
         }
     );
 }
 
 
 /* ============================================================
-   GLOBAL CLICK HANDLER
+   SCROLL PAGINATION
+============================================================ */
+
+function initInfiniteScroll() {
+
+    window.addEventListener(
+
+        'scroll',
+
+        function () {
+
+            const nearBottom =
+
+                window.innerHeight +
+
+                window.scrollY >=
+
+                document.body.offsetHeight - 600;
+
+            if (nearBottom) {
+
+                loadMoreProducts();
+            }
+        }
+    );
+}
+
+
+/* ============================================================
+   GLOBAL CLICK
 ============================================================ */
 
 function initGlobalClicks() {
@@ -689,112 +678,82 @@ function initGlobalClicks() {
 
             let el;
 
-            /* cancel order */
+            el = e.target.closest(
+                '[data-a]'
+            );
 
-            const cancelBtn =
-                e.target.closest(
-                    '[data-cancel]'
+            if (el) {
+
+                addCart(
+                    el.dataset.a,
+                    1
                 );
 
-            if (cancelBtn) {
+                return;
+            }
 
-                const id =
-                    cancelBtn.dataset.cancel;
+            el = e.target.closest(
+                '[data-m]'
+            );
 
-                const ok =
-                    confirm(
-                        'Batalkan pesanan ini?'
-                    );
+            if (el) {
 
-                if (!ok) return;
-
-                const success =
-                    await cancelOrder(id);
-
-                if (!success) {
-
-                    notify(
-                        'Gagal membatalkan pesanan'
-                    );
-
-                    return;
-                }
-
-                state.orders.forEach(order => {
-
-                    if (
-                        String(order.id) ===
-                        String(id)
-                    ) {
-
-                        order.status =
-                            'cancelled';
-                    }
-                });
-
-                notify(
-                    'Pesanan dibatalkan'
+                addCart(
+                    el.dataset.m,
+                    -1
                 );
 
-                renderOrders();
-
                 return;
             }
 
-            if (
-                e.target.closest(
-                    "[data-act='checkout']"
-                )
-            ) {
+            el = e.target.closest(
+                '[data-cr]'
+            );
 
-                goToCheckout();
-
-                return;
-            }
-
-            el = e.target.closest('[data-a]');
             if (el) {
-                addCart(el.dataset.a, 1);
+
+                delCart(
+                    el.dataset.cr
+                );
+
                 return;
             }
 
-            el = e.target.closest('[data-m]');
-            if (el) {
-                addCart(el.dataset.m, -1);
-                return;
-            }
-
-            el = e.target.closest('[data-cr]');
-            if (el) {
-                delCart(el.dataset.cr);
-                return;
-            }
-
-            el = e.target.closest('[data-cat]');
+            el = e.target.closest(
+                '[data-cat]'
+            );
 
             if (el) {
 
                 state.selCat =
                     el.dataset.cat;
 
-                renderFilteredCategories();
+                renderFilteredProducts(
+                    true
+                );
 
-                renderFilteredProducts();
+                renderFilteredCategories();
 
                 return;
             }
 
-            el = e.target.closest('[data-nav]');
+            el = e.target.closest(
+                '[data-nav]'
+            );
 
             if (el) {
 
-                navTo(el.dataset.nav);
+                navTo(
+                    el.dataset.nav
+                );
 
                 return;
             }
 
             if (
-                e.target.closest('#fab-cart')
+                e.target.closest(
+                    '#fab-cart'
+                )
             ) {
 
                 openCart();
@@ -815,89 +774,22 @@ function initGlobalClicks() {
 
             if (
                 e.target.closest(
-                    "[data-act='back-to-cart']"
+                    "[data-act='checkout']"
                 )
             ) {
 
-                goToCart();
-
-                return;
-            }
-
-            el = e.target.closest('[data-ship]');
-
-            if (el) {
-
-                selShip(
-                    el.dataset.ship
-                );
-
-                return;
-            }
-
-            el = e.target.closest('[data-pay]');
-
-            if (el) {
-
-                selPay(
-                    el.dataset.pay
-                );
+                goToCheckout();
 
                 return;
             }
 
             if (
                 e.target.closest(
-                    "[data-act='open-vou']"
+                    '#btn-order'
                 )
-            ) {
-
-                openVou();
-
-                return;
-            }
-
-            if (
-                e.target.closest(
-                    "[data-act='close-vou']"
-                )
-            ) {
-
-                closeVou();
-
-                return;
-            }
-
-            el = e.target.closest('[data-vou]');
-
-            if (el) {
-
-                selVou(
-                    parseInt(
-                        el.dataset.vou,
-                        10
-                    )
-                );
-
-                return;
-            }
-
-            if (
-                e.target.closest('#btn-order')
             ) {
 
                 goToConfirm();
-
-                return;
-            }
-
-            if (
-                e.target.closest(
-                    "[data-act='edit-order']"
-                )
-            ) {
-
-                backToCheckout();
 
                 return;
             }
@@ -909,15 +801,6 @@ function initGlobalClicks() {
             ) {
 
                 goToInvoice();
-
-                return;
-            }
-
-            if (
-                e.target.closest('#btn-wa')
-            ) {
-
-                sendWA();
 
                 return;
             }
@@ -934,16 +817,6 @@ async function init() {
 
     cache();
 
-    state.d.inname =
-        document.getElementById(
-            'inname'
-        );
-
-    state.d.inphone =
-        document.getElementById(
-            'inphone'
-        );
-
     await MM.syncProductsFromSupabase();
 
     await MM.syncCategoriesFromSupabase();
@@ -954,21 +827,17 @@ async function init() {
 
     initStoreSwitch();
 
+    initInfiniteScroll();
+
     initGlobalClicks();
 
-    const selectedStoreId =
-        getSelectedStoreId();
-
-    if (selectedStoreId) {
-
-        loadStoreCart(
-            selectedStoreId
-        );
-    }
+    reconcileCart();
 
     renderFilteredCategories();
 
-    renderFilteredProducts();
+    renderFilteredProducts(
+        true
+    );
 
     renderCart();
 
