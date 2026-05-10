@@ -928,39 +928,50 @@ await window.supabaseClient
     profile
   );
 
-  /* HIDE STORE SELECT
-     UNTUK ADMIN CABANG */
+const storeSelect =
+  document.getElementById(
+    'product-store'
+  );
 
+if (storeSelect) {
+
+  const wrapper =
+    storeSelect.parentElement;
+
+  /* ADMIN CABANG */
   if (
     profile.role === 'admin'
   ) {
 
-    const storeSelect =
-      document.getElementById(
-        'product-store'
-      );
+    storeSelect.value =
+      profile.store_id;
 
-    if (storeSelect) {
+    storeSelect.disabled =
+      true;
 
-      /* otomatis set store */
-      storeSelect.value =
-        profile.store_id;
+    if (wrapper) {
 
-      /* disable select */
-      storeSelect.disabled =
-        true;
-
-      /* sembunyikan wrapper */
-      const wrapper =
-        storeSelect.parentElement;
-
-      if (wrapper) {
-
-        wrapper.style.display =
-          'none';
-      }
+      wrapper.style.display =
+        'none';
     }
   }
+
+  /* SUPER ADMIN */
+  else if (
+    profile.role ===
+    'super_admin'
+  ) {
+
+    storeSelect.disabled =
+      false;
+
+    if (wrapper) {
+
+      wrapper.style.display =
+        'block';
+    }
+  }
+}
 
 })();
 </script>
