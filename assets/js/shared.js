@@ -237,22 +237,6 @@ async function syncCategoriesFromSupabase() {
     }
 }
 
-    if (error) {
-        console.error(error);
-        return [];
-    }
-
-    localStorage.setItem(
-        LS_CATEGORIES,
-        JSON.stringify(data)
-    );
-
-    window.dispatchEvent(
-        new Event('categoriesUpdated')
-    );
-
-    return data;
-}
 async function atomicDeductStock(cart){
 
   try {
