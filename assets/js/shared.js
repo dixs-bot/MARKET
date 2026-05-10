@@ -9,14 +9,45 @@
 const LS_PRODUCTS =
     'mm_products_customer';
 
-const LS_CART =
-    'mc3';
-
-const LS_ORDERS =
-    'mo3';
-
 const LS_CATEGORIES =
     'mm_categories_customer';
+
+
+/* ============================================================
+   MULTISTORE STORAGE HELPERS
+============================================================ */
+
+function getCartStorageKey(storeId) {
+
+    return (
+        'lumora_cart_' +
+        String(storeId || 'global')
+    );
+}
+
+function getOrderStorageKey(storeId) {
+
+    return (
+        'lumora_orders_' +
+        String(storeId || 'global')
+    );
+}
+
+function getSelectedCustomerStoreId() {
+
+    try {
+
+        return (
+            localStorage.getItem(
+                'lumora_selected_store'
+            ) || null
+        );
+
+    } catch {
+
+        return null;
+    }
+}
 
 
 /* ============================================================
@@ -626,9 +657,19 @@ function loadOrders() {
 
     try {
 
+        const storeId =
+
+            getSelectedCustomerStoreId() ||
+
+            getCurrentStoreId() ||
+
+            'global';
+
         const raw =
             localStorage.getItem(
-                LS_ORDERS
+                getOrderStorageKey(
+                    storeId
+                )
             );
 
         const data =
@@ -929,9 +970,11 @@ window.MiniMarket = {
 
     /* storage */
     LS_PRODUCTS,
-    LS_CART,
-    LS_ORDERS,
     LS_CATEGORIES,
+
+    getCartStorageKey,
+    getOrderStorageKey,
+    getSelectedCustomerStoreId,
 
     /* utils */
     fmt,
