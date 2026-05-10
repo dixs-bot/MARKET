@@ -178,7 +178,7 @@ async function syncProductsFromSupabase() {
     return [];
   }
 }
- async function syncCategoriesFromSupabase() {
+async function syncCategoriesFromSupabase() {
 
     try {
 
@@ -206,7 +206,27 @@ async function syncProductsFromSupabase() {
         } =
         await query;
 
-      catch (err) {
+        if (error) {
+
+            console.error(error);
+
+            return [];
+        }
+
+        localStorage.setItem(
+            LS_CATEGORIES,
+            JSON.stringify(data)
+        );
+
+        window.dispatchEvent(
+            new Event(
+                'categoriesUpdated'
+            )
+        );
+
+        return data;
+
+    } catch (err) {
 
         console.error(
             'Sync categories error:',
