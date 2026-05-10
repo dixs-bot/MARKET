@@ -919,6 +919,7 @@ await window.supabaseClient
   }
 
   /* SAVE GLOBAL SESSION */
+   /* SAVE GLOBAL SESSION */
   window.AdminSession =
     profile;
 
@@ -926,6 +927,40 @@ await window.supabaseClient
     'ADMIN SESSION',
     profile
   );
+
+  /* HIDE STORE SELECT
+     UNTUK ADMIN CABANG */
+
+  if (
+    profile.role === 'admin'
+  ) {
+
+    const storeSelect =
+      document.getElementById(
+        'product-store'
+      );
+
+    if (storeSelect) {
+
+      /* otomatis set store */
+      storeSelect.value =
+        profile.store_id;
+
+      /* disable select */
+      storeSelect.disabled =
+        true;
+
+      /* sembunyikan wrapper */
+      const wrapper =
+        storeSelect.parentElement;
+
+      if (wrapper) {
+
+        wrapper.style.display =
+          'none';
+      }
+    }
+  }
 
 })();
 </script>
