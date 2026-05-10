@@ -450,8 +450,19 @@ if (cancelBtn) {
     el = e.target.closest('[data-cm]');  if (el) { addCart(el.dataset.cm, -1);  return; }
     el = e.target.closest('[data-cr]');  if (el) { delCart(el.dataset.cr);       return; }
 
-    el = e.target.closest('[data-cat]');
-    if (el) { state.selCat = el.dataset.cat; renderCats(); renderFilteredProducts(); return; }
+  el = e.target.closest('[data-cat]');
+
+if (el) {
+
+    state.selCat =
+        el.dataset.cat;
+
+    renderFilteredCategories();
+
+    renderFilteredProducts();
+
+    return;
+}
 
     el = e.target.closest('[data-nav]');
     if (el) { navTo(el.dataset.nav); return; }
