@@ -73,7 +73,55 @@ function getProducts() {
   const data = safeParse(raw, []);
   return data.map(normalizeProduct).filter(p => p);
 }
+function saveProducts(products) {
 
+  if (!Array.isArray(products))
+    return false;
+
+  const map = {};
+  const clean = [];
+
+  for (
+    let i = 0;
+    i < products.length;
+    i++
+  ) {
+
+    const p =
+      normalizeProduct(
+        products[i]
+      );
+
+    if (!p) continue;
+
+    if (map[p.id])
+      continue;
+
+    map[p.id] = true;
+
+    clean.push(p);
+  }
+
+  try {
+
+    localStorage.setItem(
+      LS_PRODUCTS,
+      JSON.stringify(clean)
+    );
+
+    window.dispatchEvent(
+      new Event(
+        'productsUpdated'
+      )
+    );
+
+    return true;
+
+  } catch {
+
+    return false;
+  }
+}
 async function syncProductsFromSupabase() {
 
   try {
@@ -130,12 +178,44 @@ async function syncProductsFromSupabase() {
     return [];
   }
 }
-  async function syncCategoriesFromSupabase() {
+ async function syncCategoriesFromSupabase() {
 
-    const { data, error } =
-        await window.supabaseClient
-            .from('categories')
-            .select('*');
+    try {
+
+        let query =
+            window.supabaseClient
+                .from('categories')
+                .select('*');
+
+        /* ADMIN CABANG */
+        if (
+            window.AdminSession?.role ===
+            'admin'
+        ) {
+
+            query =
+                query.eq(
+                    'store_id',
+                    window.AdminSession.store_id
+                );
+        }
+
+        const {
+            data,
+            error
+        } =
+        await query;
+
+      catch (err) {
+
+        console.error(
+            'Sync categories error:',
+            err
+        );
+
+        return [];
+    }
+}
 
     if (error) {
         console.error(error);
@@ -284,10 +364,19 @@ async function atomicDeductStock(cart){
     if (!name) return null; 
 
     return {
-      id: String(c.id),
-      name: name,
-      image: String(c.image || FALLBACK_CAT_IMG)
-    };
+  id: String(c.id),
+
+  name: name,
+
+  image: String(
+    c.image ||
+    FALLBACK_CAT_IMG
+  ),
+
+  /* 🔥 MULTISTORE */
+  store_id:
+    c.store_id || null
+};
   }
 
   function getCategories() {
