@@ -182,7 +182,7 @@ function renderFilteredProducts(){
     /* WAJIB PILIH CABANG */
     if(!selectedStoreId){
 
-        state.d.prodgrid.innerHTML = `
+        state.d.pgrid.innerHTML = `
             <div class="
                 col-span-2
                 text-center
@@ -198,7 +198,7 @@ function renderFilteredProducts(){
             </div>
         `;
 
-        state.d.prodcnt.textContent =
+        state.d.pcnt.textContent =
             '0 item';
 
         return;
