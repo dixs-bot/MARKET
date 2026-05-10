@@ -102,6 +102,10 @@ export function load() {
             state.orders = [];
         }
 
+        /* 🔥 reconcile realtime */
+
+        reconcileCart();
+
     } catch (err) {
 
         console.error(
@@ -114,30 +118,6 @@ export function load() {
         state.orders = [];
     }
 }
-
-export function save() {
-
-    try {
-
-        localStorage.setItem(
-            getCartKey(),
-            JSON.stringify(state.cart)
-        );
-
-        localStorage.setItem(
-            getOrderKey(),
-            JSON.stringify(state.orders)
-        );
-
-    } catch (err) {
-
-        console.error(
-            'Storage save error:',
-            err
-        );
-    }
-}
-
 
 /* ============================================================
    SUBTOTAL
