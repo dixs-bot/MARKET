@@ -10,38 +10,104 @@ import {
     SVG_TR,
     fmt,
     findCart,
-    cartQty
+    cartQty,
+    FREE_SHIP_MIN
 
 } from './utils.js';
 
 import {
 
-    subTotal
+    subTotal,
+    cleanupInvalidCartItems
 
 } from './services.js';
+
+
+/* ============================================================
+   INTERNAL
+============================================================ */
+
+let renderLock =
+    false;
+
+const rapidMap =
+    new Map();
 
 
 /* ============================================================
    HELPERS
 ============================================================ */
 
+function isRapidClick(id) {
+
+    const now =
+        Date.now();
+
+    const last =
+        rapidMap.get(id) || 0;
+
+    if (
+        now - last < 180
+    ) {
+
+        return true;
+    }
+
+    rapidMap.set(id, now);
+
+    return false;
+}
+
+function getLiveProductMap() {
+
+    const products =
+        window.MiniMarket
+            .getProducts();
+
+    const map = {};
+
+    for (
+        let i = 0;
+        i < products.length;
+        i++
+    ) {
+
+        map[
+            products[i].id
+        ] = products[i];
+    }
+
+    return map;
+}
+
+function getLiveCart() {
+
+    cleanupInvalidCartItems();
+
+    return state.cart;
+}
+
 function qtyHTML(
     pid,
     qty,
-    isSearch
+    isSearch,
+    stock
 ) {
 
-    var addAttr =
+    const disabled =
+        stock <= 0;
+
+    const addAttr =
         isSearch
             ? 'data-sa'
             : 'data-a';
 
-    var minusAttr =
+    const minusAttr =
         isSearch
             ? 'data-sm'
             : 'data-m';
 
-    var plusAttr =
+    const plusAttr =
         isSearch
             ? 'data-sp'
             : 'data-p';
@@ -61,6 +127,7 @@ function qtyHTML(
 
                 <button
                     ${minusAttr}="${pid}"
+
                     class="
                         w-8
                         h-8
@@ -87,6 +154,13 @@ function qtyHTML(
 
                 <button
                     ${plusAttr}="${pid}"
+
+                    ${
+                        disabled
+                            ? 'disabled'
+                            : ''
+                    }
+
                     class="
                         w-8
                         h-8
@@ -97,6 +171,7 @@ function qtyHTML(
                         items-center
                         justify-center
                         tap
+                        disabled:opacity-50
                     "
                 >
                     ${SVG_PL}
@@ -110,18 +185,38 @@ function qtyHTML(
 
         <button
             ${addAttr}="${pid}"
+
+            ${
+                disabled
+                    ? 'disabled'
+                    : ''
+            }
+
             class="
                 w-full
                 py-2
-                bg-blue-600
-                text-white
+                ${
+                    disabled
+
+                        ?
+
+                    'bg-slate-200 text-slate-400 cursor-not-allowed'
+
+                        :
+
+                    'bg-blue-600 text-white'
+                }
                 rounded-xl
                 text-xs
                 font-semibold
                 tap
             "
         >
-            + Tambah
+            ${
+                disabled
+                    ? 'Stok Habis'
+                    : '+ Tambah'
+            }
         </button>
     `;
 }
@@ -133,13 +228,13 @@ function qtyHTML(
 
 export function renderCats(categories) {
 
-    var bar =
+    const bar =
         state.d.catbar;
 
     if (!bar)
         return;
 
-    var cats =
+    const cats =
         categories || [];
 
     if (!cats.length) {
@@ -149,18 +244,18 @@ export function renderCats(categories) {
         return;
     }
 
-    var html = '';
+    let html = '';
 
     for (
-        var i = 0;
+        let i = 0;
         i < cats.length;
         i++
     ) {
 
-        var category =
+        const category =
             cats[i];
 
-        var active =
+        const active =
 
             state.selCat ===
             category.id;
@@ -169,6 +264,7 @@ export function renderCats(categories) {
 
             <div
                 data-cat="${category.id}"
+
                 class="
                     flex
                     flex-col
@@ -177,6 +273,7 @@ export function renderCats(categories) {
                     flex-shrink-0
                     cursor-pointer
                 "
+
                 style="min-width:56px"
             >
 
@@ -190,6 +287,7 @@ export function renderCats(categories) {
                             : 'border-slate-100'
                     }
                 "
+
                 style="
                     width:52px;
                     height:52px;
@@ -243,21 +341,34 @@ export function renderCard(
     isSearch
 ) {
 
-    var prefix =
-        isSearch
-            ? 'sq'
-            : 'pq';
+    const liveMap =
+        getLiveProductMap();
 
-    var found =
+    const live =
+        liveMap[product.id] ||
+        product;
+
+    const found =
         findCart(product.id);
 
-    var qty =
+    let qty =
         found
             ? found.it.qty
             : 0;
 
-    var outOfStock =
-        Number(product.stock || 0) <= 0;
+    if (
+        qty > live.stock
+    ) {
+
+        qty = live.stock;
+    }
+
+    const outOfStock =
+        Number(live.stock || 0) <= 0;
+
+    const lowStock =
+        live.stock > 0 &&
+        live.stock <= 5;
 
     return `
 
@@ -277,8 +388,9 @@ export function renderCard(
             ">
 
                 <img
-                    src="${product.image}"
-                    alt="${product.name}"
+                    src="${live.image}"
+
+                    alt="${live.name}"
 
                     class="
                         w-full
@@ -296,31 +408,69 @@ export function renderCard(
 
                 ${
                     outOfStock
-                        ? `
-                            <div class="
-                                absolute
-                                inset-0
-                                bg-black/40
-                                flex
-                                items-center
-                                justify-center
+
+                        ?
+
+                    `
+                        <div class="
+                            absolute
+                            inset-0
+                            bg-black/40
+                            flex
+                            items-center
+                            justify-center
+                        ">
+
+                            <span class="
+                                bg-red-500
+                                text-white
+                                text-xs
+                                font-bold
+                                px-3
+                                py-1
+                                rounded-full
                             ">
+                                Stok Habis
+                            </span>
 
-                                <span class="
-                                    bg-red-500
-                                    text-white
-                                    text-xs
-                                    font-bold
-                                    px-3
-                                    py-1
-                                    rounded-full
-                                ">
-                                    Stok Habis
-                                </span>
+                        </div>
+                    `
 
-                            </div>
-                        `
-                        : ''
+                        :
+
+                    ''
+                }
+
+                ${
+                    lowStock
+
+                        ?
+
+                    `
+                        <div class="
+                            absolute
+                            top-2
+                            left-2
+                        ">
+
+                            <span class="
+                                bg-yellow-400
+                                text-slate-900
+                                text-[10px]
+                                font-bold
+                                px-2
+                                py-1
+                                rounded-full
+                            ">
+                                Sisa ${live.stock}
+                            </span>
+
+                        </div>
+                    `
+
+                        :
+
+                    ''
                 }
 
             </div>
@@ -335,7 +485,7 @@ export function renderCard(
                     min-h-[32px]
                     leading-snug
                 ">
-                    ${product.name}
+                    ${live.name}
                 </h3>
 
                 <div class="
@@ -350,7 +500,7 @@ export function renderCard(
                         font-bold
                         text-xs
                     ">
-                        ${fmt(product.price)}
+                        ${fmt(live.price)}
                     </p>
 
                     <span class="
@@ -358,53 +508,30 @@ export function renderCard(
                         ${
                             outOfStock
                                 ? 'text-red-500'
-                                : 'text-slate-400'
+                                : lowStock
+                                    ? 'text-yellow-600'
+                                    : 'text-slate-400'
                         }
                     ">
 
                         Stock:
-                        ${product.stock}
+                        ${live.stock}
 
                     </span>
 
                 </div>
 
                 <div
-                    id="${prefix}-${product.id}"
+                    id="pq-${live.id}"
                     class="mt-1.5"
                 >
 
-                    ${
-                        outOfStock
-
-                            ?
-
-                        `
-                            <button
-                                disabled
-                                class="
-                                    w-full
-                                    py-2
-                                    bg-slate-200
-                                    text-slate-400
-                                    rounded-xl
-                                    text-xs
-                                    font-semibold
-                                    cursor-not-allowed
-                                "
-                            >
-                                Stok Habis
-                            </button>
-                        `
-
-                            :
-
-                        qtyHTML(
-                            product.id,
-                            qty,
-                            isSearch
-                        )
-                    }
+                    ${qtyHTML(
+                        live.id,
+                        qty,
+                        isSearch,
+                        live.stock
+                    )}
 
                 </div>
 
@@ -421,51 +548,63 @@ export function renderCard(
 
 export function renderProds(products) {
 
-    var list =
-        products || [];
-
-    state.d.pcnt.textContent =
-        list.length + ' item';
-
-    if (!list.length) {
-
-        state.d.pgrid.innerHTML = `
-
-            <div class="
-                col-span-2
-                text-center
-                py-10
-            ">
-
-                <p class="
-                    text-xs
-                    text-slate-400
-                ">
-                    Tidak ada produk
-                </p>
-
-            </div>
-        `;
-
+    if (renderLock)
         return;
+
+    renderLock = true;
+
+    try {
+
+        const list =
+            products || [];
+
+        state.d.pcnt.textContent =
+            list.length + ' item';
+
+        if (!list.length) {
+
+            state.d.pgrid.innerHTML = `
+
+                <div class="
+                    col-span-2
+                    text-center
+                    py-10
+                ">
+
+                    <p class="
+                        text-xs
+                        text-slate-400
+                    ">
+                        Tidak ada produk
+                    </p>
+
+                </div>
+            `;
+
+            return;
+        }
+
+        let html = '';
+
+        for (
+            let i = 0;
+            i < list.length;
+            i++
+        ) {
+
+            html += renderCard(
+                list[i],
+                false
+            );
+        }
+
+        state.d.pgrid.innerHTML =
+            html;
+
+    } finally {
+
+        renderLock = false;
     }
-
-    var html = '';
-
-    for (
-        var i = 0;
-        i < list.length;
-        i++
-    ) {
-
-        html += renderCard(
-            list[i],
-            false
-        );
-    }
-
-    state.d.pgrid.innerHTML =
-        html;
 }
 
 
@@ -475,13 +614,21 @@ export function renderProds(products) {
 
 export function renderCart() {
 
-    var count =
+    cleanupInvalidCartItems();
+
+    const liveMap =
+        getLiveProductMap();
+
+    const cart =
+        getLiveCart();
+
+    const count =
         cartQty();
 
     state.d.ccnt.textContent =
         count + ' item';
 
-    if (!state.cart.length) {
+    if (!cart.length) {
 
         state.d.clist.classList.add(
             'hidden'
@@ -510,53 +657,33 @@ export function renderCart() {
         'hidden'
     );
 
-    var liveProducts =
-        window.MiniMarket
-            .getProducts();
-
-    var liveMap = {};
+    let html = '';
 
     for (
-        var i = 0;
-        i < liveProducts.length;
+        let i = 0;
+        i < cart.length;
         i++
     ) {
 
-        liveMap[
-            liveProducts[i].id
-        ] = liveProducts[i];
-    }
+        const item =
+            cart[i];
 
-    var html = '';
-
-    for (
-        var j = 0;
-        j < state.cart.length;
-        j++
-    ) {
-
-        var item =
-            state.cart[j];
-
-        var live =
+        const live =
             liveMap[item.id];
 
-        var image =
-            live
-                ? live.image
-                : item.image;
+        if (!live)
+            continue;
 
-        var price =
-            live
-                ? live.price
-                : item.price;
+        const stock =
+            Number(live.stock || 0);
 
-        var stock =
-            live
-                ? live.stock
-                : 0;
+        const qty =
+            Math.min(
+                item.qty,
+                stock
+            );
 
-        var disabled =
+        const outOfStock =
             stock <= 0;
 
         html += `
@@ -572,7 +699,7 @@ export function renderCart() {
             ">
 
                 <img
-                    src="${image}"
+                    src="${live.image}"
 
                     class="
                         w-14
@@ -601,7 +728,7 @@ export function renderCart() {
                         text-slate-800
                         line-clamp-2
                     ">
-                        ${item.name}
+                        ${live.name}
                     </p>
 
                     <p class="
@@ -610,8 +737,29 @@ export function renderCart() {
                         text-xs
                         mt-0.5
                     ">
-                        ${fmt(price)}
+                        ${fmt(live.price)}
                     </p>
+
+                    ${
+                        outOfStock
+
+                            ?
+
+                        `
+                            <p class="
+                                text-[10px]
+                                text-red-500
+                                mt-1
+                                font-semibold
+                            ">
+                                Produk habis
+                            </p>
+                        `
+
+                            :
+
+                        ''
+                    }
 
                     <div class="
                         flex
@@ -621,10 +769,10 @@ export function renderCart() {
                     ">
 
                         <button
-                            data-cm="${item.id}"
+                            data-cm="${live.id}"
 
                             ${
-                                disabled
+                                outOfStock
                                     ? 'disabled'
                                     : ''
                             }
@@ -652,14 +800,15 @@ export function renderCart() {
                             text-center
                             text-slate-800
                         ">
-                            ${item.qty}
+                            ${qty}
                         </span>
 
                         <button
-                            data-cp="${item.id}"
+                            data-cp="${live.id}"
 
                             ${
-                                disabled
+                                outOfStock ||
+                                qty >= stock
                                     ? 'disabled'
                                     : ''
                             }
@@ -674,6 +823,7 @@ export function renderCart() {
                                 items-center
                                 justify-center
                                 tap
+                                disabled:opacity-50
                             "
                         >
                             ${SVG_PL}
@@ -684,7 +834,7 @@ export function renderCart() {
                 </div>
 
                 <button
-                    data-cr="${item.id}"
+                    data-cr="${live.id}"
 
                     class="
                         text-red-300
@@ -709,11 +859,113 @@ export function renderCart() {
 
 
 /* ============================================================
-   EXPORT PLACEHOLDER
+   SHIPPING
 ============================================================ */
 
-/* next:
-renderShips
+export function renderShips() {
+
+    let html = '';
+
+    const subtotal =
+        subTotal();
+
+    for (
+        let i = 0;
+        i < SHIPS.length;
+        i++
+    ) {
+
+        const ship =
+            SHIPS[i];
+
+        const active =
+
+            state.co.ship ===
+            ship.id;
+
+        const free =
+
+            subtotal >=
+            FREE_SHIP_MIN;
+
+        html += `
+
+            <button
+                data-ship="${ship.id}"
+
+                class="
+                    w-full
+                    p-3
+                    rounded-2xl
+                    border
+                    text-left
+                    transition
+                    ${
+                        active
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-slate-200'
+                    }
+                "
+            >
+
+                <div class="
+                    flex
+                    items-center
+                    justify-between
+                ">
+
+                    <div>
+
+                        <p class="
+                            font-semibold
+                            text-sm
+                        ">
+                            ${ship.name}
+                        </p>
+
+                        <p class="
+                            text-xs
+                            text-slate-400
+                        ">
+                            ${ship.est}
+                        </p>
+
+                    </div>
+
+                    <div class="
+                        text-sm
+                        font-bold
+                        ${
+                            free
+                                ? 'text-green-600'
+                                : 'text-blue-600'
+                        }
+                    ">
+
+                        ${
+                            free
+                                ? 'GRATIS'
+                                : fmt(ship.price)
+                        }
+
+                    </div>
+
+                </div>
+
+            </button>
+        `;
+    }
+
+    state.d.shiplist.innerHTML =
+        html;
+}
+
+
+/* ============================================================
+   NEXT SPLIT
+============================================================ */
+
+/*
 renderPays
 renderSummary
 renderVou
