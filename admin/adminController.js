@@ -148,6 +148,15 @@ function buildProductInput(formData) {
         var formData = getFormData();
         var input = buildProductInput(formData);
 
+       if (!input.store_id) {
+
+    UI.notify(
+        'Store tidak valid',
+        'error'
+    );
+
+    return;
+}
         var result = await ProdService.createProduct(input);
 
         if (!result.ok) {
