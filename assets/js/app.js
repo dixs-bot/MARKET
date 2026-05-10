@@ -260,7 +260,20 @@ function renderFilteredCategories(){
             cat.store_id ===
             selectedStoreId
         );
+console.log(
+    'ALL CATEGORIES:',
+    allCategories
+);
 
+console.log(
+    'SELECTED STORE:',
+    selectedStoreId
+);
+
+console.log(
+    'FILTERED CATEGORIES:',
+    filtered
+);
     renderCats(filtered);
 }
 /* ── stores ── */
