@@ -76,28 +76,97 @@ export function patchBadge() {
 }
 
 /* ── renderers ── */
-export function renderCats() {
-    var bar = state.d.catbar;
+export function renderCats(categories) {
+
+    var bar =
+        state.d.catbar;
+
     if (!bar) return;
 
-    var cats = window.MiniMarket.getCategories();
+    var cats =
+
+        categories ||
+
+        window.MiniMarket
+            .getCategories();
+
     var h = '';
 
-    for (var i = 0; i < cats.length; i++) {
-        var c  = cats[i];
-        var on = state.selCat === c.id;
+    for (
+        var i = 0;
+        i < cats.length;
+        i++
+    ) {
 
-        h += '<div data-cat="' + c.id + '" class="flex flex-col items-center gap-1 flex-shrink-0 cursor-pointer" style="min-width:56px">' +
-             '<div class="rounded-full overflow-hidden border-2 ' + (on ? 'border-blue-500' : 'border-slate-100') + '" style="width:52px;height:52px">' +
-             '<img src="' + (c.image || window.MiniMarket.FALLBACK_CAT_IMG) + '" class="w-full h-full object-cover">' +
-             '</div>' +
-             '<span class="text-[10px] font-semibold ' + (on ? 'text-blue-600' : 'text-slate-400') + '">' + c.name + '</span>' +
-             '</div>';
+        var c =
+            cats[i];
+
+        var on =
+            state.selCat ===
+            c.id;
+
+        h +=
+
+            '<div data-cat="' +
+
+            c.id +
+
+            '" class="flex flex-col items-center gap-1 flex-shrink-0 cursor-pointer" style="min-width:56px">' +
+
+            '<div class="rounded-full overflow-hidden border-2 ' +
+
+            (
+                on
+
+                    ?
+
+                    'border-blue-500'
+
+                    :
+
+                    'border-slate-100'
+            ) +
+
+            '" style="width:52px;height:52px">' +
+
+            '<img src="' +
+
+            (
+                c.image ||
+
+                window.MiniMarket
+                    .FALLBACK_CAT_IMG
+            ) +
+
+            '" class="w-full h-full object-cover">' +
+
+            '</div>' +
+
+            '<span class="text-[10px] font-semibold ' +
+
+            (
+                on
+
+                    ?
+
+                    'text-blue-600'
+
+                    :
+
+                    'text-slate-400'
+            ) +
+
+            '">' +
+
+            c.name +
+
+            '</span>' +
+
+            '</div>';
     }
 
     bar.innerHTML = h;
 }
-
 export function renderCard(prod, isSearch) {
     var pre = isSearch ? 'sq' : 'pq';
     var f   = findCart(prod.id);
