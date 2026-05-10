@@ -1,228 +1,353 @@
 (function () {
+
+'use strict';
+
+/* ============================================================
+   STORAGE
+============================================================ */
+
 const LS_PRODUCTS =
     'mm_products_customer';
 
-        ?
+const LS_CART =
+    'mc3';
 
-        `mm_products_${window.AdminSession.store_id}`
+const LS_ORDERS =
+    'mo3';
 
-        :
-
-        'mm_products_superadmin';
-  const LS_CART     = "mc3";
-  const LS_ORDERS   = "mo3";
 const LS_CATEGORIES =
     'mm_categories_customer';
 
-        ?
 
-        `mm_categories_${window.AdminSession.store_id}`
-
-        :
-
-        'mm_categories_superadmin';
+/* ============================================================
+   FALLBACK
+============================================================ */
 
 const FALLBACK_IMG =
-"/assets/img/kategori.jpeg";
+    '/assets/img/kategori.jpeg';
 
 const FALLBACK_CAT_IMG =
-"/assets/img/kategori.jpeg";
+    '/assets/img/kategori.jpeg';
 
-  function fmt(n){
-    return "Rp " + (n || 0).toLocaleString("id-ID");
-  }
 
-  function safeParse(str, fallback) {
+/* ============================================================
+   HELPERS
+============================================================ */
+
+function fmt(n) {
+
+    return (
+        'Rp ' +
+        (n || 0).toLocaleString('id-ID')
+    );
+}
+
+function safeParse(
+    str,
+    fallback
+) {
+
     try {
-      const parsed = JSON.parse(str);
-      return Array.isArray(parsed) ? parsed : fallback;
+
+        const parsed =
+            JSON.parse(str);
+
+        return Array.isArray(parsed)
+            ? parsed
+            : fallback;
+
     } catch {
-      return fallback;
+
+        return fallback;
     }
-  }
-
-  function normalizeProduct(p) {
-    if (!p || typeof p !== "object") return null;
-    if (!p.id) return null;
-
-  return {
-  id: String(p.id),
-
-  name:
-    String(
-      p.name || ""
-    ).trim(),
-
-  price:
-    Math.max(
-      0,
-      Number(p.price) || 0
-    ),
-
-  category:
-    String(
-      p.category ||
-      p.cat ||
-      ""
-    ),
-
-  stock:
-    Math.max(
-      0,
-      Number(p.stock) || 0
-    ),
-
-  image:
-    String(
-      p.image ||
-      p.img ||
-      FALLBACK_IMG
-    ),
-
-  /* 🔥 PENTING */
-  store_id:
-    p.store_id || null
-};
-    
 }
-  
+
+
+/* ============================================================
+   PRODUCTS
+============================================================ */
+
+function normalizeProduct(p) {
+
+    if (
+        !p ||
+        typeof p !== 'object'
+    ) return null;
+
+    if (!p.id)
+        return null;
+
+    return {
+
+        id:
+            String(p.id),
+
+        name:
+            String(
+                p.name || ''
+            ).trim(),
+
+        price:
+            Math.max(
+                0,
+                Number(p.price) || 0
+            ),
+
+        category:
+            String(
+                p.category ||
+                p.cat ||
+                ''
+            ),
+
+        stock:
+            Math.max(
+                0,
+                Number(p.stock) || 0
+            ),
+
+        image:
+            String(
+                p.image ||
+                p.img ||
+                FALLBACK_IMG
+            ),
+
+        store_id:
+            p.store_id || null
+    };
+}
+
 function getProducts() {
-  const raw = localStorage.getItem(LS_PRODUCTS);
-  const data = safeParse(raw, []);
-  return data.map(normalizeProduct).filter(p => p);
+
+    const raw =
+        localStorage.getItem(
+            LS_PRODUCTS
+        );
+
+    const data =
+        safeParse(raw, []);
+
+    return data
+        .map(normalizeProduct)
+        .filter(p => p);
 }
+
 function saveProducts(products) {
 
-  if (!Array.isArray(products))
-    return false;
+    if (!Array.isArray(products))
+        return false;
 
-  const map = {};
-  const clean = [];
+    const map = {};
 
-  for (
-    let i = 0;
-    i < products.length;
-    i++
-  ) {
+    const clean = [];
 
-    const p =
-      normalizeProduct(
-        products[i]
-      );
-
-    if (!p) continue;
-
-    if (map[p.id])
-      continue;
-
-    map[p.id] = true;
-
-    clean.push(p);
-  }
-
-  try {
-
-    localStorage.setItem(
-      LS_PRODUCTS,
-      JSON.stringify(clean)
-    );
-
-    window.dispatchEvent(
-      new Event(
-        'productsUpdated'
-      )
-    );
-
-    return true;
-
-  } catch {
-
-    return false;
-  }
-}
-async function syncProductsFromSupabase() {
-
-  try {
-
-    let query =
-      window.supabaseClient
-        .from('products')
-        .select('*');
-
-    /* ADMIN CABANG */
-    if (
-      window.AdminSession?.role ===
-      'admin'
+    for (
+        let i = 0;
+        i < products.length;
+        i++
     ) {
 
-      query =
-        query.eq(
-          'store_id',
-          window.AdminSession.store_id
-        );
+        const p =
+            normalizeProduct(
+                products[i]
+            );
+
+        if (!p)
+            continue;
+
+        if (map[p.id])
+            continue;
+
+        map[p.id] = true;
+
+        clean.push(p);
     }
-
-    const {
-      data,
-      error
-    } =
-    await query;
-
-    if (error) {
-
-      console.error(error);
-
-      return [];
-    }
-
-    localStorage.setItem(
-      LS_PRODUCTS,
-      JSON.stringify(data)
-    );
-
-    window.dispatchEvent(
-      new Event('productsUpdated')
-    );
-
-    return data;
-
-  } catch (err) {
-
-    console.error(
-      'Sync products error:',
-      err
-    );
-
-    return [];
-  }
-}
-async function syncCategoriesFromSupabase() {
 
     try {
 
-        let query =
-            window.supabaseClient
-                .from('categories')
-                .select('*');
+        localStorage.setItem(
+            LS_PRODUCTS,
+            JSON.stringify(clean)
+        );
 
-        /* ADMIN CABANG */
-        if (
-            window.AdminSession?.role ===
-            'admin'
-        ) {
+        window.dispatchEvent(
+            new Event(
+                'productsUpdated'
+            )
+        );
 
-            query =
-                query.eq(
-                    'store_id',
-                    window.AdminSession.store_id
-                );
-        }
+        return true;
+
+    } catch {
+
+        return false;
+    }
+}
+
+async function syncProductsFromSupabase() {
+
+    try {
 
         const {
             data,
             error
         } =
-        await query;
+        await window.supabaseClient
+            .from('products')
+            .select('*');
+
+        if (error) {
+
+            console.error(error);
+
+            return [];
+        }
+
+        localStorage.setItem(
+            LS_PRODUCTS,
+            JSON.stringify(data)
+        );
+
+        window.dispatchEvent(
+            new Event(
+                'productsUpdated'
+            )
+        );
+
+        return data;
+
+    } catch (err) {
+
+        console.error(
+            'Sync products error:',
+            err
+        );
+
+        return [];
+    }
+}
+
+
+/* ============================================================
+   CATEGORIES
+============================================================ */
+
+function normalizeCategory(c) {
+
+    if (
+        !c ||
+        typeof c !== 'object'
+    ) return null;
+
+    if (!c.id)
+        return null;
+
+    const name =
+        String(
+            c.name || ''
+        ).trim();
+
+    if (!name)
+        return null;
+
+    return {
+
+        id:
+            String(c.id),
+
+        name:
+            name,
+
+        image:
+            String(
+                c.image ||
+                FALLBACK_CAT_IMG
+            ),
+
+        store_id:
+            c.store_id || null
+    };
+}
+
+function getCategories() {
+
+    const raw =
+        localStorage.getItem(
+            LS_CATEGORIES
+        );
+
+    const data =
+        safeParse(raw, []);
+
+    return data
+        .map(normalizeCategory)
+        .filter(c => c);
+}
+
+function saveCategories(categories) {
+
+    if (!Array.isArray(categories))
+        return false;
+
+    const map = {};
+
+    const clean = [];
+
+    for (
+        let i = 0;
+        i < categories.length;
+        i++
+    ) {
+
+        const c =
+            normalizeCategory(
+                categories[i]
+            );
+
+        if (!c)
+            continue;
+
+        if (map[c.id])
+            continue;
+
+        map[c.id] = true;
+
+        clean.push(c);
+    }
+
+    try {
+
+        localStorage.setItem(
+            LS_CATEGORIES,
+            JSON.stringify(clean)
+        );
+
+        window.dispatchEvent(
+            new Event(
+                'categoriesUpdated'
+            )
+        );
+
+        return true;
+
+    } catch {
+
+        return false;
+    }
+}
+
+async function syncCategoriesFromSupabase() {
+
+    try {
+
+        const {
+            data,
+            error
+        } =
+        await window.supabaseClient
+            .from('categories')
+            .select('*');
 
         if (error) {
 
@@ -255,339 +380,449 @@ async function syncCategoriesFromSupabase() {
     }
 }
 
-async function atomicDeductStock(cart){
+function editCategory(
+    id,
+    newName,
+    newImage
+) {
 
-  try {
+    if (!id)
+        return false;
 
-    const prods = getProducts();
+    const cats =
+        getCategories();
 
-    const map = {};
+    let target =
+        null;
 
-    for(let i=0;i<prods.length;i++){
+    for (
+        let i = 0;
+        i < cats.length;
+        i++
+    ) {
 
-      map[prods[i].id] =
-        prods[i];
-    }
+        if (
+            cats[i].id === id
+        ) {
 
-    const errors = [];
+            target =
+                cats[i];
 
-    /* VALIDASI STOCK */
-    for(let i=0;i<cart.length;i++){
-
-      const it = cart[i];
-
-      const p =
-        map[it.id];
-
-      if(!p){
-
-        errors.push(it.name);
-
-        continue;
-      }
-
-      if(p.stock < it.qty){
-
-        errors.push(it.name);
-      }
-    }
-
-    if(errors.length){
-
-      return {
-        ok:false,
-        errors
-      };
-    }
-
-    /* DEDUCT STOCK */
-    for(let i=0;i<cart.length;i++){
-
-      const it = cart[i];
-
-      const p =
-        map[it.id];
-
-      const newStock =
-        p.stock - it.qty;
-
-      p.stock = newStock;
-
-      /* sync cart snapshot */
-      it.price = p.price;
-      it.image = p.image;
-
-      /* 🔥 UPDATE SUPABASE */
-      const { error } =
-        await window.supabaseClient
-          .from('products')
-          .update({
-            stock:newStock
-          })
-          .eq('id', p.id);
-
-      if(error){
-
-        console.error(error);
-
-        return {
-          ok:false,
-          errors:[
-            'Gagal update stock realtime'
-          ]
-        };
-      }
-    }
-
-    /* SAVE LOCAL CACHE */
-    saveProducts(prods);
-
-    return {
-      ok:true
-    };
-
-  } catch(err){
-
-    console.error(err);
-
-    return {
-      ok:false,
-      errors:[
-        'Terjadi kesalahan stock'
-      ]
-    };
-  }
-}
-  // 🔥 VALIDATE ORDER (DIPAKAI APP.JS)
-  function validateOrder(o){
-    if(!o) return { ok:false, reason:"empty order" };
-    if(!o.items || !o.items.length) return { ok:false, reason:"no items" };
-    if(!o.address) return { ok:false, reason:"no address" };
-    if(!o.total) return { ok:false, reason:"invalid total" };
-
-    return { ok:true };
-  }
-
-  function loadOrders() {
-    try {
-      const raw = localStorage.getItem(LS_ORDERS);
-      const data = raw ? JSON.parse(raw) : [];
-      return Array.isArray(data) ? data : [];
-    } catch {
-      return [];
-    }
-  }
-
-  function normalizeCategory(c) {
-    if (!c || typeof c !== "object") return null;
-    if (!c.id) return null;
-    
-    const name = String(c.name || "").trim();
-    if (!name) return null; 
-
-    return {
-  id: String(c.id),
-
-  name: name,
-
-  image: String(
-    c.image ||
-    FALLBACK_CAT_IMG
-  ),
-
-  /* 🔥 MULTISTORE */
-  store_id:
-    c.store_id || null
-};
-  }
-
-  function getCategories() {
-    const raw = localStorage.getItem(LS_CATEGORIES);
-    const data = safeParse(raw, []);
-    const clean = data.map(normalizeCategory).filter(c => c);
-
-    const hasAll = clean.some(c => c.id === "all");
-    if (!hasAll) {
-      clean.unshift({ id: "all", name: "Semua", image: FALLBACK_CAT_IMG });
-    }
-
-    return clean.length > 0 ? clean : [{ id: "all", name: "Semua", image: FALLBACK_CAT_IMG }];
-  }
-
-  function saveCategories(categories) {
-    if (!Array.isArray(categories)) return false;
-
-    const map = {};
-    const clean = [];
-
-    for (let i = 0; i < categories.length; i++) {
-      const c = normalizeCategory(categories[i]);
-      if (!c) continue;
-      if (map[c.id]) continue;
-
-      map[c.id] = true;
-      clean.push(c);
-    }
-
-    try {
-      localStorage.setItem(LS_CATEGORIES, JSON.stringify(clean));
-      window.dispatchEvent(new Event("categoriesUpdated"));
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  function editCategory(id, newName, newImage) {
-    if (!id || id === "all") return false;
-    
-    const cats = getCategories();
-    let target = null;
-    
-    for (let i = 0; i < cats.length; i++) {
-      if (cats[i].id === id) {
-        target = cats[i];
-        break;
-      }
-    }
-    
-    if (!target) return false;
-
-    if (typeof newName === "string") {
-      const trimmed = newName.trim();
-      if (!trimmed) return false;
-      
-      const lowerNew = trimmed.toLowerCase();
-      for (let i = 0; i < cats.length; i++) {
-        if (cats[i].id !== id && cats[i].name.toLowerCase() === lowerNew) {
-          return false; 
+            break;
         }
-      }
-      target.name = trimmed;
     }
 
-    if (typeof newImage === "string") {
-      const trimmed = newImage.trim();
-      if (trimmed) target.image = trimmed;
+    if (!target)
+        return false;
+
+    if (
+        typeof newName ===
+        'string'
+    ) {
+
+        const trimmed =
+            newName.trim();
+
+        if (!trimmed)
+            return false;
+
+        target.name =
+            trimmed;
+    }
+
+    if (
+        typeof newImage ===
+        'string'
+    ) {
+
+        const trimmed =
+            newImage.trim();
+
+        if (trimmed)
+            target.image =
+                trimmed;
     }
 
     return saveCategories(cats);
-  }
+}
 
-  function deleteCategory(id) {
-    if (!id || id === "all") return false;
-    
-    const cats = getCategories();
-    const exists = cats.some(c => c.id === id);
-    if (!exists) return false;
+function deleteCategory(id) {
 
-    const prods = getProducts();
-    let changed = false;
-    
-    for (let i = 0; i < prods.length; i++) {
-      if (prods[i].category === id) {
-        prods[i].category = "all";
-        changed = true;
-      }
+    if (!id)
+        return false;
+
+    const cats =
+        getCategories();
+
+    const exists =
+        cats.some(
+            c => c.id === id
+        );
+
+    if (!exists)
+        return false;
+
+    const prods =
+        getProducts();
+
+    let changed =
+        false;
+
+    for (
+        let i = 0;
+        i < prods.length;
+        i++
+    ) {
+
+        if (
+            prods[i].category ===
+            id
+        ) {
+
+            prods[i].category =
+                '';
+
+            changed = true;
+        }
     }
-    
-    if (changed) saveProducts(prods);
 
-    const updated = cats.filter(c => c.id !== id);
+    if (changed)
+        saveProducts(prods);
+
+    const updated =
+        cats.filter(
+            c => c.id !== id
+        );
+
     return saveCategories(updated);
-  }
+}
 
-  function reorderCategories(newOrder) {
-    if (!Array.isArray(newOrder)) return false;
-    
-    const cats = getCategories();
+function reorderCategories(newOrder) {
+
+    if (
+        !Array.isArray(
+            newOrder
+        )
+    ) return false;
+
+    const cats =
+        getCategories();
+
     const map = {};
-    
-    for (let i = 0; i < cats.length; i++) {
-      map[cats[i].id] = cats[i];
+
+    for (
+        let i = 0;
+        i < cats.length;
+        i++
+    ) {
+
+        map[
+            cats[i].id
+        ] = cats[i];
     }
 
-    const allCat = map["all"];
-    const ordered = allCat ? [allCat] : [];
+    const ordered = [];
 
-    for (let i = 0; i < newOrder.length; i++) {
-      const id = newOrder[i];
-      if (id === "all") continue;
-      if (map[id]) {
-        ordered.push(map[id]);
-        delete map[id]; 
-      }
+    for (
+        let i = 0;
+        i < newOrder.length;
+        i++
+    ) {
+
+        const id =
+            newOrder[i];
+
+        if (map[id]) {
+
+            ordered.push(
+                map[id]
+            );
+
+            delete map[id];
+        }
     }
 
     for (let key in map) {
-      if (map.hasOwnProperty(key)) {
-        ordered.push(map[key]);
-      }
+
+        if (
+            map.hasOwnProperty(
+                key
+            )
+        ) {
+
+            ordered.push(
+                map[key]
+            );
+        }
     }
 
-    return saveCategories(ordered);
-  }
-/* 🔥 REALTIME PRODUCTS */
-
-let productRealtimeFilter = '';
-
-/* ADMIN CABANG */
-if (
-  window.AdminSession?.role ===
-  'admin'
-) {
-
-  productRealtimeFilter =
-    `store_id=eq.${window.AdminSession.store_id}`;
+    return saveCategories(
+        ordered
+    );
 }
+
+
+/* ============================================================
+   ORDERS
+============================================================ */
+
+function loadOrders() {
+
+    try {
+
+        const raw =
+            localStorage.getItem(
+                LS_ORDERS
+            );
+
+        const data =
+            raw
+                ? JSON.parse(raw)
+                : [];
+
+        return Array.isArray(data)
+            ? data
+            : [];
+
+    } catch {
+
+        return [];
+    }
+}
+
+
+/* ============================================================
+   STOCK
+============================================================ */
+
+async function atomicDeductStock(cart) {
+
+    try {
+
+        const prods =
+            getProducts();
+
+        const map = {};
+
+        for (
+            let i = 0;
+            i < prods.length;
+            i++
+        ) {
+
+            map[
+                prods[i].id
+            ] = prods[i];
+        }
+
+        const errors = [];
+
+        for (
+            let i = 0;
+            i < cart.length;
+            i++
+        ) {
+
+            const it =
+                cart[i];
+
+            const p =
+                map[it.id];
+
+            if (!p) {
+
+                errors.push(
+                    it.name
+                );
+
+                continue;
+            }
+
+            if (
+                p.stock < it.qty
+            ) {
+
+                errors.push(
+                    it.name
+                );
+            }
+        }
+
+        if (errors.length) {
+
+            return {
+                ok: false,
+                errors
+            };
+        }
+
+        for (
+            let i = 0;
+            i < cart.length;
+            i++
+        ) {
+
+            const it =
+                cart[i];
+
+            const p =
+                map[it.id];
+
+            const newStock =
+                p.stock - it.qty;
+
+            p.stock =
+                newStock;
+
+            it.price =
+                p.price;
+
+            it.image =
+                p.image;
+
+            const { error } =
+                await window
+                    .supabaseClient
+                    .from('products')
+                    .update({
+                        stock:
+                            newStock
+                    })
+                    .eq(
+                        'id',
+                        p.id
+                    );
+
+            if (error) {
+
+                console.error(
+                    error
+                );
+
+                return {
+                    ok: false,
+                    errors: [
+                        'Gagal update stock realtime'
+                    ]
+                };
+            }
+        }
+
+        saveProducts(prods);
+
+        return {
+            ok: true
+        };
+
+    } catch (err) {
+
+        console.error(err);
+
+        return {
+            ok: false,
+            errors: [
+                'Terjadi kesalahan stock'
+            ]
+        };
+    }
+}
+
+
+/* ============================================================
+   VALIDATE ORDER
+============================================================ */
+
+function validateOrder(o) {
+
+    if (!o)
+        return {
+            ok: false,
+            reason: 'empty order'
+        };
+
+    if (
+        !o.items ||
+        !o.items.length
+    )
+        return {
+            ok: false,
+            reason: 'no items'
+        };
+
+    if (!o.address)
+        return {
+            ok: false,
+            reason: 'no address'
+        };
+
+    if (!o.total)
+        return {
+            ok: false,
+            reason: 'invalid total'
+        };
+
+    return {
+        ok: true
+    };
+}
+
+
+/* ============================================================
+   REALTIME
+============================================================ */
 
 window.supabaseClient
 
-  .channel('products-realtime')
+    .channel(
+        'products-realtime'
+    )
 
-  .on(
-    'postgres_changes',
+    .on(
+        'postgres_changes',
 
-    {
-      event: '*',
-      schema: 'public',
-      table: 'products',
+        {
+            event: '*',
+            schema: 'public',
+            table: 'products'
+        },
 
-      /* FILTER REALTIME */
-      filter:
-        productRealtimeFilter
-    },
+        async () => {
 
-    async () => {
+            console.log(
+                'Realtime products update'
+            );
 
-      console.log(
-        'Realtime products update'
-      );
+            await syncProductsFromSupabase();
+        }
+    )
 
-      await syncProductsFromSupabase();
-    }
-  )
+    .subscribe();
 
-  .subscribe();
-  window.MiniMarket = {
-   
-    // storage
+
+/* ============================================================
+   EXPORT
+============================================================ */
+
+window.MiniMarket = {
+
+    /* storage */
     LS_PRODUCTS,
     LS_CART,
     LS_ORDERS,
     LS_CATEGORIES,
 
-    // utils
+    /* utils */
     fmt,
     FALLBACK_IMG,
     FALLBACK_CAT_IMG,
 
-    // products
+    /* products */
     getProducts,
     saveProducts,
     normalizeProduct,
-    syncProductsFromSupabase, 
-    // categories
+    syncProductsFromSupabase,
+
+    /* categories */
     normalizeCategory,
     getCategories,
     saveCategories,
@@ -595,11 +830,13 @@ window.supabaseClient
     deleteCategory,
     reorderCategories,
     syncCategoriesFromSupabase,
-    // orders
+
+    /* orders */
     loadOrders,
 
-    // advanced
+    /* advanced */
     atomicDeductStock,
     validateOrder
-  };
+};
+
 })();
