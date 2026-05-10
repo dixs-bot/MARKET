@@ -1,8 +1,6 @@
 (function () {
- const LS_PRODUCTS =
-
-    window.AdminSession?.role ===
-    'admin'
+const LS_PRODUCTS =
+    'mm_products_customer';
 
         ?
 
@@ -13,10 +11,8 @@
         'mm_products_superadmin';
   const LS_CART     = "mc3";
   const LS_ORDERS   = "mo3";
- const LS_CATEGORIES =
-
-    window.AdminSession?.role ===
-    'admin'
+const LS_CATEGORIES =
+    'mm_categories_customer';
 
         ?
 
