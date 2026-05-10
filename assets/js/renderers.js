@@ -558,8 +558,28 @@ export function renderProds(products) {
         const list =
             products || [];
 
-        state.d.pcnt.textContent =
-            list.length + ' item';
+        /* ====================================================
+           SAFE DOM
+        ==================================================== */
+
+        if (state.d.pcnt) {
+
+            state.d.pcnt.textContent =
+                list.length + ' item';
+        }
+
+        if (!state.d.pgrid) {
+
+            console.warn(
+                'pgrid not found'
+            );
+
+            return;
+        }
+
+        /* ====================================================
+           EMPTY
+        ==================================================== */
 
         if (!list.length) {
 
@@ -584,6 +604,10 @@ export function renderProds(products) {
             return;
         }
 
+        /* ====================================================
+           RENDER
+        ==================================================== */
+
         let html = '';
 
         for (
@@ -601,13 +625,18 @@ export function renderProds(products) {
         state.d.pgrid.innerHTML =
             html;
 
+    } catch (err) {
+
+        console.error(
+            'Render products error:',
+            err
+        );
+
     } finally {
 
         renderLock = false;
     }
 }
-
-
 /* ============================================================
    CART
 ============================================================ */
