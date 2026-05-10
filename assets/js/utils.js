@@ -34,7 +34,7 @@ export var SVG_TR = '<svg class="w-4 h-4"                     fill="none" stroke
 export var state = {
     cart: [],
     orders: [],
-    selCat: 'all',
+    selCat: '',
     co: { ship: '', pay: '', vou: null },
     curOrder: null,
     lockCnt: 0,
