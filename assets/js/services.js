@@ -102,9 +102,9 @@ export function load() {
             state.orders = [];
         }
 
-        /* 🔥 reconcile realtime */
-
-        reconcileCart();
+        reconcileCart({
+            silent: true
+        });
 
     } catch (err) {
 
@@ -118,6 +118,30 @@ export function load() {
         state.orders = [];
     }
 }
+
+export function save() {
+
+    try {
+
+        localStorage.setItem(
+            getCartKey(),
+            JSON.stringify(state.cart)
+        );
+
+        localStorage.setItem(
+            getOrderKey(),
+            JSON.stringify(state.orders)
+        );
+
+    } catch (err) {
+
+        console.error(
+            'Storage save error:',
+            err
+        );
+    }
+}
+
 
 /* ============================================================
    SUBTOTAL
@@ -175,7 +199,7 @@ export function subTotal() {
    CART CLEANUP
 ============================================================ */
 
-function cleanupInvalidCartItems() {
+export function cleanupInvalidCartItems() {
 
     const products =
         MM.getProducts();
@@ -193,18 +217,27 @@ function cleanupInvalidCartItems() {
         ] = products[i];
     }
 
+    let changed =
+        false;
+
     state.cart =
         state.cart.filter(item => {
 
             const live =
                 map[item.id];
 
-            if (!live)
+            if (!live) {
+
+                changed = true;
+
                 return false;
+            }
 
             if (
                 live.stock <= 0
             ) {
+
+                changed = true;
 
                 return false;
             }
@@ -213,6 +246,8 @@ function cleanupInvalidCartItems() {
                 live.store_id !==
                 item.store_id
             ) {
+
+                changed = true;
 
                 return false;
             }
@@ -224,13 +259,27 @@ function cleanupInvalidCartItems() {
 
                 item.qty =
                     live.stock;
+
+                changed = true;
             }
+
+            item.price =
+                live.price;
+
+            item.image =
+                live.image;
 
             return true;
         });
 
-    save();
+    if (changed) {
+
+        save();
+    }
+
+    return changed;
 }
+
 
 /* ============================================================
    CART RECONCILIATION
@@ -364,15 +413,30 @@ export function syncCartWithProducts() {
     const normalized =
         normalizeCartQty();
 
+    const cleaned =
+        cleanupInvalidCartItems();
+
     return (
+
         removed ||
-        normalized
+
+        normalized ||
+
+        cleaned
     );
 }
 
-export function reconcileCart() {
+export function reconcileCart(
+    options = {}
+) {
 
     try {
+
+        const {
+
+            silent = false
+
+        } = options;
 
         const changed =
             syncCartWithProducts();
@@ -380,9 +444,12 @@ export function reconcileCart() {
         if (!changed)
             return false;
 
-        renderCart();
+        if (!silent) {
 
-        patchBadge();
+            renderCart();
+
+            patchBadge();
+        }
 
         return true;
 
@@ -396,6 +463,8 @@ export function reconcileCart() {
         return false;
     }
 }
+
+
 /* ============================================================
    CART
 ============================================================ */
@@ -405,7 +474,9 @@ export function addCart(
     delta
 ) {
 
-    cleanupInvalidCartItems();
+    reconcileCart({
+        silent: true
+    });
 
     const product =
         findProd(pid);
@@ -711,39 +782,6 @@ export function validate(showErr) {
             ? 'Siap pesan'
             : 'Lengkapi semua data';
 
-    if (showErr === true) {
-
-        state.d.eaddr.classList.toggle(
-            'hidden',
-            addressValid
-        );
-
-        state.d.eship.classList.toggle(
-            'hidden',
-            shipValid
-        );
-
-        state.d.epay.classList.toggle(
-            'hidden',
-            payValid
-        );
-
-        state.d.inaddr.classList.toggle(
-            'err-input',
-            !addressValid
-        );
-
-        state.d.inname.classList.toggle(
-            'err-input',
-            !nameValid
-        );
-
-        state.d.inphone.classList.toggle(
-            'err-input',
-            !phoneValid
-        );
-    }
-
     return ok;
 }
 
@@ -816,7 +854,16 @@ export async function goToInvoice() {
     )
         return;
 
-    cleanupInvalidCartItems();
+    reconcileCart();
+
+    if (!state.cart.length) {
+
+        notify(
+            'Keranjang tidak valid'
+        );
+
+        return;
+    }
 
     state.isProcessing = true;
 
@@ -901,6 +948,8 @@ export async function goToInvoice() {
             notify(
                 'Stock berubah, silakan cek kembali'
             );
+
+            reconcileCart();
 
             return;
         }
@@ -1025,13 +1074,15 @@ export async function goToInvoice() {
                     .trim(),
 
             items:
-                state.cart,
+                [...state.cart],
 
             subtotal,
+
             shipping_cost:
                 shippingCost,
 
             discount,
+
             total,
 
             shipping_method:
@@ -1043,8 +1094,8 @@ export async function goToInvoice() {
             status:
                 'pending',
 
-            createdAt:
-                Date.now()
+            created_at:
+                new Date().toISOString()
         };
 
         const validation =
@@ -1139,6 +1190,8 @@ export async function goToInvoice() {
             false;
     }
 }
+
+
 /* ============================================================
    CROSS TAB STORAGE SYNC
 ============================================================ */
@@ -1149,18 +1202,15 @@ window.addEventListener(
 
     function (event) {
 
-        if (
-            !event.key
-        ) {
-
+        if (!event.key)
             return;
-        }
 
         const cartKey =
             getCartKey();
 
         if (
-            event.key !== cartKey
+            event.key !==
+            cartKey
         ) {
 
             return;
@@ -1180,7 +1230,13 @@ window.addEventListener(
                     ? latest
                     : [];
 
-            reconcileCart();
+            reconcileCart({
+                silent: true
+            });
+
+            renderCart();
+
+            patchBadge();
 
         } catch (err) {
 
