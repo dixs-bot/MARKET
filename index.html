@@ -463,6 +463,485 @@ tailwind.config = {
 
 
 <!-- =========================================================
+     CHECKOUT PAGE (OVERLAY)
+========================================================= -->
+
+<div
+    id="pgco"
+
+    class="
+        fixed
+        inset-0
+        bg-white
+        z-50
+        hidden
+    "
+>
+
+    <!-- HEADER -->
+
+    <header class="
+        sticky
+        top-0
+        bg-white
+        z-10
+        border-b
+        border-slate-100
+    ">
+
+        <div class="
+            flex
+            items-center
+            justify-between
+            px-4
+            h-14
+        ">
+
+            <button
+                data-act="back-to-cart"
+
+                class="
+                    text-sm
+                    text-slate-500
+                "
+            >
+                Kembali
+            </button>
+
+            <h1 class="
+                text-sm
+                font-bold
+                text-slate-800
+            ">
+                Checkout
+            </h1>
+
+            <div class="w-16"></div>
+
+        </div>
+
+    </header>
+
+
+    <!-- SCROLL -->
+
+    <div
+        id="coscroll"
+
+        class="
+            p-4
+            space-y-4
+            pb-40
+        "
+    >
+
+        <!-- NAME -->
+
+        <input
+            id="inname"
+            type="text"
+            placeholder="Nama lengkap"
+
+            class="
+                w-full
+                h-11
+                px-4
+                rounded-xl
+                border
+                border-slate-200
+                text-sm
+            "
+        >
+
+        <!-- PHONE -->
+
+        <input
+            id="inphone"
+            type="tel"
+            placeholder="Nomor HP"
+
+            class="
+                w-full
+                h-11
+                px-4
+                rounded-xl
+                border
+                border-slate-200
+                text-sm
+            "
+        >
+
+        <!-- ADDRESS -->
+
+        <textarea
+            id="inaddr"
+
+            rows="3"
+
+            placeholder="Alamat lengkap"
+
+            class="
+                w-full
+                p-3
+                border
+                border-slate-200
+                rounded-xl
+                resize-none
+                text-sm
+            "
+        ></textarea>
+
+
+        <!-- SHIPPING -->
+
+        <div>
+
+            <p class="
+                text-sm
+                font-semibold
+                mb-2
+            ">
+                Pengiriman
+            </p>
+
+            <div
+                id="shiplist"
+
+                class="space-y-2"
+            ></div>
+
+        </div>
+
+
+        <!-- PAYMENT -->
+
+        <div>
+
+            <p class="
+                text-sm
+                font-semibold
+                mb-2
+            ">
+                Pembayaran
+            </p>
+
+            <div
+                id="paylist"
+
+                class="space-y-2"
+            ></div>
+
+        </div>
+
+
+        <!-- VOUCHER -->
+
+        <div class="
+            flex
+            items-center
+            justify-between
+            p-4
+            rounded-2xl
+            bg-slate-50
+        ">
+
+            <div>
+
+                <p class="
+                    text-sm
+                    font-semibold
+                ">
+                    Voucher
+                </p>
+
+                <p
+                    id="vlbl"
+
+                    class="
+                        text-xs
+                        text-slate-400
+                    "
+                >
+                    Opsional
+                </p>
+
+            </div>
+
+            <button
+                data-act="open-vou"
+
+                class="
+                    text-blue-600
+                    text-sm
+                    font-semibold
+                "
+            >
+                Pilih
+            </button>
+
+        </div>
+
+
+        <!-- SUMMARY -->
+
+        <div class="
+            p-4
+            rounded-2xl
+            bg-slate-50
+        ">
+
+            <div
+                id="co-items"
+
+                class="
+                    space-y-2
+                    mb-4
+                "
+            ></div>
+
+            <div class="
+                space-y-2
+                text-sm
+            ">
+
+                <div class="
+                    flex
+                    justify-between
+                ">
+                    <span>Subtotal</span>
+                    <span id="s-sub">Rp 0</span>
+                </div>
+
+                <div class="
+                    flex
+                    justify-between
+                ">
+                    <span>Ongkir</span>
+                    <span id="s-ship">Rp 0</span>
+                </div>
+
+                <div
+                    id="s-disc-row"
+
+                    class="
+                        hidden
+                        justify-between
+                    "
+                >
+                    <span>Diskon</span>
+                    <span id="s-disc">
+                        -Rp 0
+                    </span>
+                </div>
+
+                <div class="
+                    flex
+                    justify-between
+                    font-bold
+                    pt-2
+                    border-t
+                ">
+                    <span>Total</span>
+                    <span id="s-total">
+                        Rp 0
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- NOTES -->
+
+        <textarea
+            id="innote"
+
+            rows="2"
+
+            placeholder="Catatan tambahan"
+
+            class="
+                w-full
+                p-3
+                border
+                border-slate-200
+                rounded-xl
+                resize-none
+                text-sm
+            "
+        ></textarea>
+
+    </div>
+
+
+    <!-- FOOTER -->
+
+    <div
+        id="checkout-footer"
+
+        class="
+            fixed
+            bottom-0
+            left-0
+            right-0
+            bg-white
+            border-t
+            border-slate-100
+            p-4
+            safe-b
+        "
+    >
+
+        <button
+            id="btn-order"
+
+            class="
+                w-full
+                py-3.5
+                rounded-xl
+                font-bold
+                text-sm
+                bg-blue-600
+                text-white
+            "
+
+            disabled
+        >
+            Pesan Sekarang
+        </button>
+
+        <p
+            id="hint"
+
+            class="
+                text-center
+                text-[10px]
+                text-slate-400
+                mt-2
+            "
+        >
+            Lengkapi semua data
+        </p>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     SEARCH PAGE (OVERLAY)
+========================================================= -->
+
+<div
+    id="pg-search"
+
+    class="
+        fixed
+        inset-0
+        bg-white
+        z-50
+        hidden
+    "
+>
+
+    <header class="
+        sticky
+        top-0
+        bg-white
+        border-b
+        border-slate-100
+        z-10
+    ">
+
+        <div class="
+            flex
+            items-center
+            gap-2
+            px-4
+            h-14
+        ">
+
+            <button
+                data-act="close-search"
+
+                class="
+                    text-sm
+                    text-slate-500
+                "
+            >
+                Kembali
+            </button>
+
+            <input
+                id="insearch"
+                type="text"
+                placeholder="Cari produk..."
+
+                class="
+                    flex-1
+                    h-10
+                    px-4
+                    rounded-xl
+                    bg-slate-100
+                    text-sm
+                    outline-none
+                "
+            >
+
+        </div>
+
+    </header>
+
+    <div
+        id="sres"
+
+        class="
+            p-4
+            grid
+            grid-cols-2
+            gap-2.5
+        "
+    ></div>
+
+</div>
+
+
+<!-- =========================================================
+     INVOICE PAGE (OVERLAY)
+========================================================= -->
+
+<div
+    id="pginv"
+
+    class="
+        fixed
+        inset-0
+        bg-white
+        z-50
+        hidden
+        overflow-y-auto
+    "
+>
+
+    <div class="p-4">
+
+        <div
+            id="inv-body"
+
+            class="
+                bg-slate-50
+                rounded-2xl
+                p-4
+            "
+        ></div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
      BOTTOM NAV
 ========================================================= -->
 
@@ -686,9 +1165,7 @@ tailwind.config = {
 
         class="
             hidden
-            flex-col
-            items-center
-            justify-center
+            text-center
             p-8
         "
     >
@@ -763,6 +1240,142 @@ tailwind.config = {
 
 
 <!-- =========================================================
+     CONFIRM MODAL
+========================================================= -->
+
+<div
+    id="mconf"
+
+    class="
+        fixed
+        inset-0
+        bg-black/30
+        z-[70]
+        hidden
+        p-4
+    "
+>
+    <!-- PERBAIKAN BUG: Ditambahkan wrapper flex agar konten selalu tepat di tengah -->
+    <div class="flex items-center justify-center h-full w-full">
+
+        <div class="
+            bg-white
+            rounded-2xl
+            p-5
+            w-full
+            max-w-xs
+        ">
+
+            <h3 class="
+                text-base
+                font-bold
+                text-center
+                mb-2
+            ">
+                Konfirmasi Pesanan?
+            </h3>
+
+            <p class="
+                text-xs
+                text-slate-400
+                text-center
+                mb-4
+            ">
+                Pastikan data sudah benar
+            </p>
+
+            <div class="
+                flex
+                gap-2
+            ">
+
+                <button
+                    data-act="edit-order"
+
+                    class="
+                        flex-1
+                        py-2.5
+                        rounded-xl
+                        bg-slate-100
+                        text-slate-600
+                        text-sm
+                        font-semibold
+                    "
+                >
+                    Edit
+                </button>
+
+                <button
+                    data-act="do-co"
+
+                    class="
+                        flex-1
+                        py-2.5
+                        rounded-xl
+                        bg-blue-600
+                        text-white
+                        text-sm
+                        font-semibold
+                    "
+                >
+                    Pesan
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+<!-- =========================================================
+     LOADING MODAL
+========================================================= -->
+
+<div
+    id="mload"
+
+    class="
+        fixed
+        inset-0
+        bg-white/90
+        z-[80]
+        hidden
+    "
+>
+    <!-- PERBAIKAN BUG: Ditambahkan wrapper flex agar konten selalu tepat di tengah -->
+    <div class="flex items-center justify-center h-full w-full">
+
+        <div class="text-center">
+
+            <div class="
+                w-10
+                h-10
+                border-4
+                border-blue-100
+                border-t-blue-600
+                rounded-full
+                spin
+                mx-auto
+                mb-3
+            "></div>
+
+            <p class="
+                text-xs
+                text-slate-500
+                font-medium
+            ">
+                Memproses...
+            </p>
+
+        </div>
+
+    </div>
+</div>
+
+
+<!-- =========================================================
      SCRIPTS
 ========================================================= -->
 
@@ -775,4 +1388,5 @@ tailwind.config = {
 <script type="module" src="/assets/js/app.js"></script>
 
 </body>
+
 </html>
