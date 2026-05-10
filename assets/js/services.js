@@ -1139,3 +1139,55 @@ export async function goToInvoice() {
             false;
     }
 }
+/* ============================================================
+   CROSS TAB STORAGE SYNC
+============================================================ */
+
+window.addEventListener(
+
+    'storage',
+
+    function (event) {
+
+        if (
+            !event.key
+        ) {
+
+            return;
+        }
+
+        const cartKey =
+            getCartKey();
+
+        if (
+            event.key !== cartKey
+        ) {
+
+            return;
+        }
+
+        try {
+
+            const latest =
+                event.newValue
+                    ? JSON.parse(
+                        event.newValue
+                    )
+                    : [];
+
+            state.cart =
+                Array.isArray(latest)
+                    ? latest
+                    : [];
+
+            reconcileCart();
+
+        } catch (err) {
+
+            console.error(
+                'Cross-tab sync error:',
+                err
+            );
+        }
+    }
+);
