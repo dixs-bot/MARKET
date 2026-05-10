@@ -900,10 +900,10 @@ await window.supabaseClient
     stores(*)
   `)
 
-  .eq(
-    'user_id',
-    data.session.user.id
-  )
+ .eq(
+  'id',
+  data.session.user.id
+)
 
   .single();
 
