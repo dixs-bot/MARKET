@@ -1144,27 +1144,46 @@ async function updateOrdersBadge() {
 /* load awal */
 updateOrdersBadge();
 
-/* realtime */
-window.supabaseClient
-  .channel('orders-badge-realtime')
+/* REALTIME ORDERS */
 
-  .on(
-    'postgres_changes',
+let realtimeFilter = '';
 
-    {
-      event: '*',
-      schema: 'public',
-      table: 'orders'
-    },
+/* ADMIN CABANG */
+if (
+  window.AdminSession?.role ===
+  'admin'
+) {
 
-    async () => {
+  realtimeFilter =
+    `store_id=eq.${window.AdminSession.store_id}`;
+}
 
-      await updateOrdersBadge();
-    }
-  )
+const ordersChannel =
+  window.supabaseClient
+    .channel(
+      'orders-badge-realtime'
+    )
 
-  .subscribe();
+    .on(
+      'postgres_changes',
 
+      {
+        event: '*',
+        schema: 'public',
+        table: 'orders',
+
+        /* FILTER REALTIME */
+        filter:
+          realtimeFilter
+      },
+
+      async () => {
+
+        await updateOrdersBadge();
+      }
+    )
+
+    .subscribe();
 </script>
 <script>
 
