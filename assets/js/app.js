@@ -1,9 +1,25 @@
 import { state, WA, fmt } from './utils.js';
-import { addCart, delCart, selShip, selPay, selVou, validate, resetCO, goToInvoice, cancelOrder, load, save } from './services.js';
+
 import {
+
+    addCart,
+    delCart,
+    selShip,
+    selPay,
+    selVou,
+    validate,
+    resetCO,
+    goToInvoice,
+    cancelOrder,
+    load,
+    save
+
+} from './services.js';
+
+import {
+
     cache,
     notify,
-    patchQty,
     patchBadge,
     renderCats,
     renderCard,
@@ -23,90 +39,275 @@ import {
     lock,
     unlock,
     animateIn
+
 } from './ui.js';
+
 const MM = window.MiniMarket;
 
-/* ── navigation & flow ── */
-function navTo(name) {
-    var pages = document.querySelectorAll('.page');
-    for (var i = 0; i < pages.length; i++) pages[i].classList.remove('on');
-    var el = document.getElementById('pg-' + name);
-    if (el) el.classList.add('on');
-    var btns = document.querySelectorAll('[data-nav]');
-    for (var j = 0; j < btns.length; j++) {
-        var on = btns[j].getAttribute('data-nav') === name;
-        btns[j].classList.toggle('text-blue-600', on);
-        btns[j].classList.toggle('text-slate-400', !on);
+
+/* ============================================================
+   NAVIGATION
+============================================================ */
+
+function navTo(pageName) {
+
+    const pages =
+        document.querySelectorAll('.page');
+
+    pages.forEach(page => {
+
+        page.classList.remove('on');
+    });
+
+    const page =
+        document.getElementById(
+            'pg-' + pageName
+        );
+
+    if (page) {
+
+        page.classList.add('on');
     }
-    if (name === 'history') renderOrders();
+
+    const navButtons =
+        document.querySelectorAll(
+            '[data-nav]'
+        );
+
+    navButtons.forEach(button => {
+
+        const active =
+
+            button.getAttribute(
+                'data-nav'
+            ) === pageName;
+
+        button.classList.toggle(
+            'text-blue-600',
+            active
+        );
+
+        button.classList.toggle(
+            'text-slate-400',
+            !active
+        );
+    });
+
+    if (pageName === 'history') {
+
+        renderOrders();
+    }
+
     window.scrollTo(0, 0);
 }
 
+
+/* ============================================================
+   PAGE FLOW
+============================================================ */
+
 function goToHome() {
-    state.d.pginv.classList.add('hidden'); unlock();
-    state.currentPage = 'home'; state.curOrder = null; navTo('home');
+
+    state.d.pginv.classList.add(
+        'hidden'
+    );
+
+    unlock();
+
+    state.currentPage =
+        'home';
+
+    state.curOrder =
+        null;
+
+    navTo('home');
 }
 
 function goToCart() {
-    state.d.pgco.classList.add('hidden'); state.d.mconf.classList.add('hidden');
-    renderCart(); state.d.csheet.classList.add('open'); state.d.dim.classList.add('on');
-    state.currentPage = 'cart';
+
+    state.d.pgco.classList.add(
+        'hidden'
+    );
+
+    state.d.mconf.classList.add(
+        'hidden'
+    );
+
+    renderCart();
+
+    state.d.csheet.classList.add(
+        'open'
+    );
+
+    state.d.dim.classList.add(
+        'on'
+    );
+
+    state.currentPage =
+        'cart';
 }
 
 function goToCheckout() {
-    if (!state.cart.length) { notify('Keranjang kosong'); return; }
-    state.d.csheet.classList.remove('open'); state.d.dim.classList.remove('on');
-    if (state.lockCnt === 0) lock();
-    if (state.currentPage !== 'confirm') {
-        resetCO(); state.d.inaddr.value = ''; state.d.innote.value = ''; state.d.vlbl.textContent = 'Opsional';
-        state.d.eaddr.classList.add('hidden'); state.d.eship.classList.add('hidden'); state.d.epay.classList.add('hidden');
-        state.d.inaddr.classList.remove('err-input');
+
+    if (!state.cart.length) {
+
+        notify(
+            'Keranjang kosong'
+        );
+
+        return;
     }
-    renderShips(); renderPays(); renderSummary(); validate(false);
-    state.d.pgco.classList.remove('hidden');
-    if (state.d.coscroll) { state.d.coscroll.scrollTop = 0; animateIn(state.d.coscroll); }
-    state.currentPage = 'checkout';
+
+    state.d.csheet.classList.remove(
+        'open'
+    );
+
+    state.d.dim.classList.remove(
+        'on'
+    );
+
+    if (state.lockCnt === 0) {
+
+        lock();
+    }
+
+    if (
+        state.currentPage !==
+        'confirm'
+    ) {
+
+        resetCO();
+
+        state.d.inaddr.value = '';
+
+        state.d.innote.value = '';
+
+        state.d.vlbl.textContent =
+            'Opsional';
+
+        state.d.eaddr.classList.add(
+            'hidden'
+        );
+
+        state.d.eship.classList.add(
+            'hidden'
+        );
+
+        state.d.epay.classList.add(
+            'hidden'
+        );
+
+        state.d.inaddr.classList.remove(
+            'err-input'
+        );
+    }
+
+    renderShips();
+
+    renderPays();
+
+    renderSummary();
+
+    validate(false);
+
+    state.d.pgco.classList.remove(
+        'hidden'
+    );
+
+    if (state.d.coscroll) {
+
+        state.d.coscroll.scrollTop = 0;
+
+        animateIn(
+            state.d.coscroll
+        );
+    }
+
+    state.currentPage =
+        'checkout';
 }
 
 function goToConfirm() {
-    if (!validate(true)) { notify('Lengkapi data!'); return; }
-    state.d.mconf.classList.remove('hidden'); state.currentPage = 'confirm';
-}
 
-function backToCheckout() { state.d.mconf.classList.add('hidden'); state.currentPage = 'checkout'; }
+    if (!validate(true)) {
 
-function sendWA() {
-    if (!state.curOrder) { notify('Pesanan tidak ditemukan'); return; }
+        notify(
+            'Lengkapi data!'
+        );
 
-    var o = state.curOrder;
-    var t = 'Halo, saya ingin pesan:\n\n';
-
-    for (var i = 0; i < o.items.length; i++) {
-        var it = o.items[i];
-        t += '- ' + it.name + ' x' + it.qty + ' - ' + fmt(it.price) + '\n';
+        return;
     }
 
-    t += '\nAlamat:\n' + o.address + '\n\nPengiriman:\n' + o.shipping.name + '\n';
+    state.d.mconf.classList.remove(
+        'hidden'
+    );
 
-    if (o.discount > 0) t += 'Diskon: ' + fmt(o.discount) + '\n';
-
-    t += '\nTotal:\n' + fmt(o.total);
-
-    var url = 'https://wa.me/' + WA + '?text=' + encodeURIComponent(t);
-
-    if (/Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-        window.location.href = url;
-    } else {
-        window.open(url, '_blank');
-    }
+    state.currentPage =
+        'confirm';
 }
 
-function doSearch(q) {
+function backToCheckout() {
 
-    const selectedStoreId =
+    state.d.mconf.classList.add(
+        'hidden'
+    );
+
+    state.currentPage =
+        'checkout';
+}
+
+
+/* ============================================================
+   STORE HELPERS
+============================================================ */
+
+function getSelectedStoreId() {
+
+    return (
         document.getElementById(
             'store-filter'
-        )?.value;
+        )?.value || null
+    );
+}
+
+function loadStoreCart(storeId) {
+
+    try {
+
+        const cartKey =
+            MM.getCartStorageKey(
+                storeId
+            );
+
+        const savedCart =
+            localStorage.getItem(
+                cartKey
+            );
+
+        state.cart =
+            savedCart
+                ? JSON.parse(savedCart)
+                : [];
+
+    } catch {
+
+        state.cart = [];
+    }
+
+    renderCart();
+
+    patchBadge();
+}
+
+
+/* ============================================================
+   SEARCH
+============================================================ */
+
+function doSearch(query) {
+
+    const selectedStoreId =
+        getSelectedStoreId();
 
     if (!selectedStoreId) {
 
@@ -121,14 +322,12 @@ function doSearch(q) {
         return;
     }
 
-    var PRODS =
-        window.MiniMarket
-            .getProducts();
+    query =
+        query
+            .toLowerCase()
+            .trim();
 
-    q =
-        q.toLowerCase().trim();
-
-    if (!q) {
+    if (!query) {
 
         state.d.sres.innerHTML = `
             <div class="col-span-2 text-center py-10">
@@ -141,45 +340,37 @@ function doSearch(q) {
         return;
     }
 
-    var res = [];
+    const products =
+        MM.getProducts();
 
-   for (
-    var i = 0;
-    i < PRODS.length;
-    i++
-) {
+    const results =
+        products.filter(product => {
 
-    /* isolate store */
-    if (
-        PRODS[i].store_id !==
-        selectedStoreId
-    ) {
+            if (
+                product.store_id !==
+                selectedStoreId
+            ) {
 
-        continue;
-    }
+                return false;
+            }
 
-    /* isolate category */
-    if (
-        state.selCat &&
-        PRODS[i].category !==
-        state.selCat
-    ) {
+            if (
+                state.selCat &&
+                product.category !==
+                state.selCat
+            ) {
 
-        continue;
-    }
+                return false;
+            }
 
-    if (
-        PRODS[i]
-            .name
-            .toLowerCase()
-            .indexOf(q) !== -1
-    ) {
+            return (
+                product.name
+                    .toLowerCase()
+                    .includes(query)
+            );
+        });
 
-        res.push(PRODS[i]);
-    }
-}
-
-    if (!res.length) {
+    if (!results.length) {
 
         state.d.sres.innerHTML = `
             <div class="col-span-2 text-center py-10">
@@ -192,95 +383,32 @@ function doSearch(q) {
         return;
     }
 
-    var h = '';
-
-    for (
-        var j = 0;
-        j < res.length;
-        j++
-    ) {
-
-        h += renderCard(
-            res[j],
-            true
-        );
-    }
-
-    state.d.sres.innerHTML = h;
-}
-function viewDetail(oid) {
-    var o = null;
-    for (var i = 0; i < state.orders.length; i++)
-        if (String(state.orders[i].id) === String(oid)) { o = state.orders[i]; break; }
-    if (!o) { notify('Tidak ditemukan'); return; }
-    state.curOrder = o; renderInv();
-    state.d.pginv.classList.remove('hidden'); state.d.pginv.scrollTop = 0;
-    lock(); animateIn(state.d.pginv); state.currentPage = 'invoice';
+    state.d.sres.innerHTML =
+        results
+            .map(product =>
+                renderCard(
+                    product,
+                    true
+                )
+            )
+            .join('');
 }
 
-/* ── input listeners ── */
-function initInputListeners() {
-state.d.inphone.addEventListener(
-    'input',
-    function () {
 
-        this.value =
-            this.value.replace(
-                /[^0-9]/g,
-                ''
-            );
+/* ============================================================
+   FILTERED PRODUCTS
+============================================================ */
 
-        validate(false);
-    }
-);
-
-state.d.inname.addEventListener(
-    'input',
-    function () {
-
-        validate(false);
-    }
-);
-
-    state.d.inaddr.addEventListener('input', function () {
-        state.d.eaddr.classList.add('hidden'); state.d.inaddr.classList.remove('err-input'); validate(false);
-    });
-
-    var searchTimer = null;
-    state.d.insearch.addEventListener('input', function () {
-        clearTimeout(searchTimer);
-        var val = this.value;
-        searchTimer = setTimeout(function () { doSearch(val); }, 250);
-    });
-}
-
-/* ── respond to product changes ── */
-function onProductsUpdated() {
-    renderFilteredProducts();
-    if (state.d.csheet.classList.contains('open')) renderCart();
-    patchBadge();
-}
-function renderFilteredProducts(){
+function renderFilteredProducts() {
 
     const selectedStoreId =
-        document.getElementById(
-            'store-filter'
-        )?.value;
+        getSelectedStoreId();
 
-    /* WAJIB PILIH CABANG */
-    if(!selectedStoreId){
+    if (!selectedStoreId) {
 
         state.d.pgrid.innerHTML = `
-            <div class="
-                col-span-2
-                text-center
-                py-16
-            ">
-                <p class="
-                    text-sm
-                    text-slate-400
-                    font-medium
-                ">
+            <div class="col-span-2 text-center py-16">
+                <p class="text-sm text-slate-400 font-medium">
                     Pilih cabang terlebih dahulu
                 </p>
             </div>
@@ -295,7 +423,6 @@ function renderFilteredProducts(){
     let products =
         MM.getProducts();
 
-    /* FILTER STORE */
     products =
         products.filter(product =>
 
@@ -303,9 +430,7 @@ function renderFilteredProducts(){
             selectedStoreId
         );
 
-    /* FILTER CATEGORY */
-    if(state.selCat)
-    {
+    if (state.selCat) {
 
         products =
             products.filter(product =>
@@ -318,50 +443,59 @@ function renderFilteredProducts(){
     renderProds(products);
 }
 
-/* ── filtered categories ── */
 
-function renderFilteredCategories(){
+/* ============================================================
+   FILTERED CATEGORIES
+============================================================ */
+
+function renderFilteredCategories() {
 
     const selectedStoreId =
-        document.getElementById(
-            'store-filter'
-        )?.value;
+        getSelectedStoreId();
 
-    /* belum pilih cabang */
-    if(!selectedStoreId){
+    if (!selectedStoreId) {
 
-        state.d.catbar.innerHTML = '';
+        state.d.catbar.innerHTML =
+            '';
 
         return;
     }
 
-    const allCategories =
+    const categories =
         MM.getCategories();
 
- const filtered =
-    allCategories.filter(cat =>
+    const filtered =
+        categories.filter(category =>
 
-        cat.store_id ===
-        selectedStoreId
-    );
+            category.store_id ===
+            selectedStoreId
+        );
 
-renderCats(filtered);
+    renderCats(filtered);
 }
-/* ── stores ── */
 
-async function loadStoreFilter(){
+
+/* ============================================================
+   STORE FILTER
+============================================================ */
+
+async function loadStoreFilter() {
 
     const {
         data,
         error
     } = await window.supabaseClient
+
         .from('stores')
+
         .select('*')
+
         .order('name');
 
-    if(error){
+    if (error) {
 
         console.error(error);
+
         return;
     }
 
@@ -370,13 +504,13 @@ async function loadStoreFilter(){
             'store-filter'
         );
 
-    if(!select) return;
+    if (!select) return;
 
-   select.innerHTML = `
-    <option value="">
-        Pilih Cabang
-    </option>
-`;
+    select.innerHTML = `
+        <option value="">
+            Pilih Cabang
+        </option>
+    `;
 
     data.forEach(store => {
 
@@ -386,233 +520,474 @@ async function loadStoreFilter(){
             </option>
         `;
     });
+
+    const savedStoreId =
+        localStorage.getItem(
+            'lumora_selected_store'
+        );
+
+    if (savedStoreId) {
+
+        select.value =
+            savedStoreId;
+    }
 }
-/* ── init ── */
-async function init() {
 
-    cache();
-   state.d.inname =
-  document.getElementById(
-    'inname'
-  );
 
-state.d.inphone =
-  document.getElementById(
-    'inphone'
-  );
-    load();
+/* ============================================================
+   INPUT LISTENERS
+============================================================ */
 
-    /* 🔥 sync database setelah DOM siap */
-    await MM.syncProductsFromSupabase();
-    await MM.syncCategoriesFromSupabase();
-    await loadStoreFilter();
-   document
-    .getElementById(
-        'store-filter'
-    )
-    ?.addEventListener(
+function initInputListeners() {
+
+    state.d.inphone
+        .addEventListener(
+
+            'input',
+
+            function () {
+
+                this.value =
+                    this.value.replace(
+                        /[^0-9]/g,
+                        ''
+                    );
+
+                validate(false);
+            }
+        );
+
+    state.d.inname
+        .addEventListener(
+
+            'input',
+
+            function () {
+
+                validate(false);
+            }
+        );
+
+    state.d.inaddr
+        .addEventListener(
+
+            'input',
+
+            function () {
+
+                state.d.eaddr
+                    .classList.add(
+                        'hidden'
+                    );
+
+                state.d.inaddr
+                    .classList.remove(
+                        'err-input'
+                    );
+
+                validate(false);
+            }
+        );
+
+    let searchTimer =
+        null;
+
+    state.d.insearch
+        .addEventListener(
+
+            'input',
+
+            function () {
+
+                clearTimeout(
+                    searchTimer
+                );
+
+                const value =
+                    this.value;
+
+                searchTimer =
+                    setTimeout(
+
+                        function () {
+
+                            doSearch(
+                                value
+                            );
+
+                        },
+
+                        250
+                    );
+            }
+        );
+}
+
+
+/* ============================================================
+   STORE SWITCH
+============================================================ */
+
+function initStoreSwitch() {
+
+    const storeSelect =
+        document.getElementById(
+            'store-filter'
+        );
+
+    if (!storeSelect) {
+
+        return;
+    }
+
+    storeSelect.addEventListener(
 
         'change',
 
-      function(){
+        function () {
 
-    /* reset category */
-    state.selCat = '';
+            const selectedStoreId =
+                this.value;
 
-    /* reset cart */
-    state.cart = [];
+            localStorage.setItem(
 
-    /* reset search */
-    state.d.insearch.value = '';
+                'lumora_selected_store',
 
-    state.d.sres.innerHTML = '';
+                selectedStoreId
+            );
+
+            state.selCat = '';
+
+            state.d.insearch.value = '';
+
+            state.d.sres.innerHTML =
+                '';
+
+            loadStoreCart(
+                selectedStoreId
+            );
+
+            renderFilteredCategories();
+
+            renderFilteredProducts();
+        }
+    );
+}
+
+
+/* ============================================================
+   GLOBAL CLICK HANDLER
+============================================================ */
+
+function initGlobalClicks() {
+
+    document.addEventListener(
+
+        'click',
+
+        async function (e) {
+
+            let el;
+
+            /* cancel order */
+
+            const cancelBtn =
+                e.target.closest(
+                    '[data-cancel]'
+                );
+
+            if (cancelBtn) {
+
+                const id =
+                    cancelBtn.dataset.cancel;
+
+                const ok =
+                    confirm(
+                        'Batalkan pesanan ini?'
+                    );
+
+                if (!ok) return;
+
+                const success =
+                    await cancelOrder(id);
+
+                if (!success) {
+
+                    notify(
+                        'Gagal membatalkan pesanan'
+                    );
+
+                    return;
+                }
+
+                state.orders.forEach(order => {
+
+                    if (
+                        String(order.id) ===
+                        String(id)
+                    ) {
+
+                        order.status =
+                            'cancelled';
+                    }
+                });
+
+                notify(
+                    'Pesanan dibatalkan'
+                );
+
+                renderOrders();
+
+                return;
+            }
+
+            if (
+                e.target.closest(
+                    "[data-act='checkout']"
+                )
+            ) {
+
+                goToCheckout();
+
+                return;
+            }
+
+            el = e.target.closest('[data-a]');
+            if (el) {
+                addCart(el.dataset.a, 1);
+                return;
+            }
+
+            el = e.target.closest('[data-m]');
+            if (el) {
+                addCart(el.dataset.m, -1);
+                return;
+            }
+
+            el = e.target.closest('[data-cr]');
+            if (el) {
+                delCart(el.dataset.cr);
+                return;
+            }
+
+            el = e.target.closest('[data-cat]');
+
+            if (el) {
+
+                state.selCat =
+                    el.dataset.cat;
+
+                renderFilteredCategories();
+
+                renderFilteredProducts();
+
+                return;
+            }
+
+            el = e.target.closest('[data-nav]');
+
+            if (el) {
+
+                navTo(el.dataset.nav);
+
+                return;
+            }
+
+            if (
+                e.target.closest('#fab-cart')
+            ) {
+
+                openCart();
+
+                return;
+            }
+
+            if (
+                e.target.closest(
+                    "[data-act='close-cart']"
+                )
+            ) {
+
+                closeCart();
+
+                return;
+            }
+
+            if (
+                e.target.closest(
+                    "[data-act='back-to-cart']"
+                )
+            ) {
+
+                goToCart();
+
+                return;
+            }
+
+            el = e.target.closest('[data-ship]');
+
+            if (el) {
+
+                selShip(
+                    el.dataset.ship
+                );
+
+                return;
+            }
+
+            el = e.target.closest('[data-pay]');
+
+            if (el) {
+
+                selPay(
+                    el.dataset.pay
+                );
+
+                return;
+            }
+
+            if (
+                e.target.closest(
+                    "[data-act='open-vou']"
+                )
+            ) {
+
+                openVou();
+
+                return;
+            }
+
+            if (
+                e.target.closest(
+                    "[data-act='close-vou']"
+                )
+            ) {
+
+                closeVou();
+
+                return;
+            }
+
+            el = e.target.closest('[data-vou]');
+
+            if (el) {
+
+                selVou(
+                    parseInt(
+                        el.dataset.vou,
+                        10
+                    )
+                );
+
+                return;
+            }
+
+            if (
+                e.target.closest('#btn-order')
+            ) {
+
+                goToConfirm();
+
+                return;
+            }
+
+            if (
+                e.target.closest(
+                    "[data-act='edit-order']"
+                )
+            ) {
+
+                backToCheckout();
+
+                return;
+            }
+
+            if (
+                e.target.closest(
+                    "[data-act='do-co']"
+                )
+            ) {
+
+                goToInvoice();
+
+                return;
+            }
+
+            if (
+                e.target.closest('#btn-wa')
+            ) {
+
+                sendWA();
+
+                return;
+            }
+        }
+    );
+}
+
+
+/* ============================================================
+   INIT
+============================================================ */
+
+async function init() {
+
+    cache();
+
+    state.d.inname =
+        document.getElementById(
+            'inname'
+        );
+
+    state.d.inphone =
+        document.getElementById(
+            'inphone'
+        );
+
+    await MM.syncProductsFromSupabase();
+
+    await MM.syncCategoriesFromSupabase();
+
+    await loadStoreFilter();
+
+    initInputListeners();
+
+    initStoreSwitch();
+
+    initGlobalClicks();
+
+    const selectedStoreId =
+        getSelectedStoreId();
+
+    if (selectedStoreId) {
+
+        loadStoreCart(
+            selectedStoreId
+        );
+    }
+
+    renderFilteredCategories();
+
+    renderFilteredProducts();
 
     renderCart();
 
-    save();
-
-    patchBadge();
-
-    renderFilteredCategories();
-
-    renderFilteredProducts();
-}
-    );
-    initInputListeners();
-
-    renderFilteredCategories();
-    renderFilteredProducts();
     patchBadge();
 
     navTo('home');
-    state.currentPage = 'home';
+
+    state.currentPage =
+        'home';
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-} else {
-    init();
-}
 
-/* Scroll-lock failsafe every 3 s */
-setInterval(function () {
-    if (state.lockCnt > 3) {
-        console.warn('Scroll lock stuck at', state.lockCnt, ', force unlock');
-        state.lockCnt = 0; document.body.style.overflow = '';
-    }
-}, 3000);
+/* ============================================================
+   AUTO INIT
+============================================================ */
 
-/* Cross-tab sync */
-window.addEventListener('storage', function (e) {
-    if (e.key === window.MiniMarket.LS_PRODUCTS) onProductsUpdated();
-    if (e.key === window.MiniMarket.LS_CATEGORIES) renderFilteredCategories();
-});
-/* Same-tab sync */
-window.addEventListener('productsUpdated', onProductsUpdated);
-window.addEventListener(
-    'categoriesUpdated',
-
-    function () {
-
-        renderFilteredCategories();
-    }
-);
-
-/* ── global click handler ── */
 document.addEventListener(
 
-    'click',
+    'DOMContentLoaded',
 
-    async function (e) {
-
-        var el;
-
-       /* 🔥 CANCEL ORDER */
-const cancelBtn =
-
-    e.target.closest(
-        '[data-cancel]'
-    );
-
-if (cancelBtn) {
-
-    const id =
-
-        cancelBtn.dataset.cancel;
-
-    const ok =
-        confirm(
-            'Batalkan pesanan ini?'
-        );
-
-    if (!ok) return;
-
-    const success =
-
-        await cancelOrder(id);
-
-    if (!success) {
-
-        notify(
-            'Gagal membatalkan pesanan'
-        );
-
-        return;
-    }
-
-    for (
-        var i = 0;
-        i < state.orders.length;
-        i++
-    ) {
-
-        if (
-            String(state.orders[i].id) ===
-            String(id)
-        ) {
-
-            state.orders[i].status =
-                'cancelled';
-
-            break;
-        }
-    }
-
-    notify(
-        'Pesanan dibatalkan'
-    );
-
-    renderOrders();
-
-    return;
-}
-        /* handler lain bawah sini */
-
-    if (e.target.closest("[data-act='checkout']")) {
-        goToCheckout();
-        return;
-    }
-
-    el = e.target.closest('[data-a]');   if (el) { addCart(el.dataset.a,   1);  return; }
-    el = e.target.closest('[data-sa]');  if (el) { addCart(el.dataset.sa,  1);  return; }
-    el = e.target.closest('[data-p]');   if (el) { addCart(el.dataset.p,   1);  return; }
-    el = e.target.closest('[data-sp]');  if (el) { addCart(el.dataset.sp,  1);  return; }
-    el = e.target.closest('[data-cp]');  if (el) { addCart(el.dataset.cp,  1);  return; }
-    el = e.target.closest('[data-m]');   if (el) { addCart(el.dataset.m,  -1);  return; }
-    el = e.target.closest('[data-sm]');  if (el) { addCart(el.dataset.sm, -1);  return; }
-    el = e.target.closest('[data-cm]');  if (el) { addCart(el.dataset.cm, -1);  return; }
-    el = e.target.closest('[data-cr]');  if (el) { delCart(el.dataset.cr);       return; }
-
-  el = e.target.closest('[data-cat]');
-
-if (el) {
-
-    state.selCat =
-        el.dataset.cat;
-
-    renderFilteredCategories();
-
-    renderFilteredProducts();
-
-    return;
-}
-
-    el = e.target.closest('[data-nav]');
-    if (el) { navTo(el.dataset.nav); return; }
-
-    if (e.target.closest('#fab-cart'))                     { openCart();       return; }
-    if (e.target.closest("[data-act='close-cart']"))       { closeCart();      return; }
-    if (e.target.closest("[data-act='back-to-cart']"))     { goToCart();       return; }
-
-    el = e.target.closest('[data-ship]');
-    if (el) { selShip(el.dataset.ship); return; }
-
-    el = e.target.closest('[data-pay]');
-    if (el) { selPay(el.dataset.pay); return; }
-
-    if (e.target.closest("[data-act='open-vou']"))         { openVou();        return; }
-    if (e.target.closest("[data-act='close-vou']"))        { closeVou();       return; }
-
-    el = e.target.closest('[data-vou]');
-    if (el) { selVou(parseInt(el.dataset.vou, 10)); return; }
-
-    if (e.target.closest('#btn-order'))                    { goToConfirm();    return; }
-    if (e.target.closest("[data-act='edit-order']"))       { backToCheckout(); return; }
-    if (e.target.closest("[data-act='do-co']"))            { goToInvoice();    return; }
-    if (e.target.closest('#btn-wa'))                       { sendWA();         return; }
-
-    if (e.target.closest("[data-act='close-inv']")) {
-        state.d.pginv.classList.add('hidden'); unlock();
-        state.currentPage = 'home'; navTo('history'); return;
-    }
-
-    if (e.target.closest("[data-act='inv-home']"))         { goToHome();       return; }
-    if (e.target.closest("[data-act='search']"))           { openSearch();     return; }
-    if (e.target.closest("[data-act='close-search']"))     { closeSearch();    return; }
-    if (e.target.closest("[data-act='go-shop']"))          { navTo('home');    return; }
-
-    el = e.target.closest('[data-odet]');
-    if (el) { viewDetail(el.dataset.odet); return; }
-
-    if (e.target.closest('#dim')) { if (state.currentPage === 'cart') closeCart(); return; }
-});
+    init
+);
