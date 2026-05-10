@@ -1,6 +1,11 @@
-export const APP_CONFIG = {
+window.APP_CONFIG = {
+
   MAX_CART_QTY: 100,
-  MAX_IMAGE_SIZE: 2 * 1024 * 1024,
+
+  MAX_IMAGE_SIZE:
+    2 * 1024 * 1024,
+
   FREE_SHIPPING_MIN: 50000,
+
   DEFAULT_CURRENCY: 'IDR'
 };
