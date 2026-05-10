@@ -1,557 +1,824 @@
-/* ==============================================
-   MINIMARKET ADMIN — ORDERS SERVICE MODULE
-   Data layer: state, CRUD, filtering, Supabase
-   ============================================== */
+/* ============================================================
+   LUMORA — ORDERS SERVICE
+   Production-ready multistore order engine
+============================================================ */
 
-import {
-  ORDER_STATUS,
-  ORDER_STATUS_LIST,
-  ORDER_STATUS_LABELS,
-  ORDER_STATUS_FLOW
-} from '../constants/orderStatus.js';
+(function () {
 
-const OrdersService = (() => {
+'use strict';
 
-  /* ------------------------------------------
-     APPLICATION STATE
-     ------------------------------------------ */
+if (!window.AdminApp) {
+    window.AdminApp = {};
+}
 
-  let orders = [];
-  let currentFilter = 'all';
-  let searchQuery = '';
-  let deleteTargetId = null;
-  let statusTargetId = null;
 
-  /* ------------------------------------------
-     UTILITIES
-     ------------------------------------------ */
+/* ============================================================
+   CONSTANTS
+============================================================ */
 
-  function formatRupiah(n) {
+const ORDER_STATUS =
+    window.ORDER_STATUS;
 
-    return 'Rp ' + Number(n || 0)
-      .toLocaleString('id-ID');
-  }
+const ORDER_STATUS_LIST =
+    window.ORDER_STATUS_LIST;
 
-  function getOrderTotal(order) {
+const ORDER_STATUS_LABELS =
+    window.ORDER_STATUS_LABELS;
 
-    if (!order || !Array.isArray(order.products)) {
-      return 0;
-    }
+const ORDER_STATUS_FLOW =
+    window.ORDER_STATUS_FLOW;
 
-    return order.products.reduce(
 
-      (sum, product) => {
+/* ============================================================
+   INTERNAL STATE
+============================================================ */
 
-        return sum +
-          (
-            Number(product.price || 0) *
-            Number(product.qty || 0)
-          );
-      },
+let orders = [];
 
-      0
+let currentFilter =
+    'all';
+
+let searchQuery =
+    '';
+
+let deleteTargetId =
+    null;
+
+let statusTargetId =
+    null;
+
+let realtimeChannel =
+    null;
+
+
+/* ============================================================
+   HELPERS
+============================================================ */
+
+function getCurrentStoreId() {
+
+    return (
+        window.AdminSession?.store_id ||
+        null
     );
-  }
+}
 
-  function getTotalItemCount(order) {
+function isSuperAdmin() {
 
-    if (!order || !Array.isArray(order.products)) {
-      return 0;
-    }
-
-    return order.products.reduce(
-
-      (sum, product) => {
-
-        return sum +
-          Number(product.qty || 0);
-      },
-
-      0
+    return (
+        window.AdminSession?.role ===
+        'super_admin'
     );
-  }
+}
 
-  function getOrder(id) {
+function formatRupiah(amount) {
 
-    return orders.find(
-      o => o.id === id
-    ) || null;
-  }
+    return (
 
-  function getAvailableStatuses(order) {
+        'Rp ' +
 
-    if (!order) return [];
+        Number(amount || 0)
+            .toLocaleString('id-ID')
+    );
+}
 
-    const currentIdx =
-      ORDER_STATUS_LIST.indexOf(
-        order.status
-      );
 
-    return ORDER_STATUS_LIST
-      .slice(currentIdx + 1)
-      .filter(
-        s => s !== ORDER_STATUS.CANCELLED
-      );
-  }
+/* ============================================================
+   ORDER MAPPERS
+============================================================ */
 
-  /* ------------------------------------------
-     FILTERING & SEARCH
-     ------------------------------------------ */
+function normalizeOrder(order) {
 
-  function setFilter(filter) {
-
-    currentFilter = filter;
-  }
-
-  function getFilter() {
-
-    return currentFilter;
-  }
-
-  function setSearch(query) {
-
-    searchQuery = query;
-  }
-
-  function getSearch() {
-
-    return searchQuery;
-  }
-
-  function getFilteredOrders() {
-
-    return orders.filter(order => {
-
-      const matchFilter =
-
-        currentFilter === 'all' ||
-
-        order.status === currentFilter;
-
-      const q =
-        searchQuery.toLowerCase();
-
-      const matchSearch =
-
-        !q ||
-
-        order.id.toLowerCase()
-          .includes(q) ||
-
-        order.customer.toLowerCase()
-          .includes(q) ||
-
-        order.email.toLowerCase()
-          .includes(q);
-
-      return (
-        matchFilter &&
-        matchSearch
-      );
-    });
-  }
-
-  /* ------------------------------------------
-     CRUD OPERATIONS
-     ------------------------------------------ */
-
-  async function deleteOrder(id) {
-
-    try {
-
-      const storeId =
-        window.AdminSession?.store_id;
-
-      if (!storeId) {
-
-        console.error(
-          'Store ID tidak ditemukan'
-        );
-
-        return false;
-      }
-
-      const { error } =
-
-        await window.supabaseClient
-
-          .from('orders')
-
-          .delete()
-
-          .eq('id', id)
-
-          .eq('store_id', storeId);
-
-      if (error) {
-
-        console.error(error);
-
-        return false;
-      }
-
-      const idx =
-        orders.findIndex(
-          o => o.id === id
-        );
-
-      if (idx !== -1) {
-
-        orders.splice(idx, 1);
-      }
-
-      return true;
-
-    } catch (err) {
-
-      console.error(
-        'Delete order error:',
-        err
-      );
-
-      return false;
-    }
-  }
-
-  function updateStatus(id, newStatus) {
-
-    const order = getOrder(id);
-
-    if (!order) {
-
-      return {
-        success: false
-      };
-    }
-
-    const oldLabel =
-      ORDER_STATUS_LABELS[
-        order.status
-      ];
-
-    order.status = newStatus;
+    if (!order)
+        return null;
 
     return {
 
-      success: true,
+        id:
+            order.id,
 
-      oldLabel,
+        user_id:
+            order.user_id || null,
 
-      newLabel:
-        ORDER_STATUS_LABELS[
-          newStatus
-        ]
-    };
-  }
+        store_id:
+            order.store_id || null,
 
-  /* ------------------------------------------
-     DELETE TARGET STATE
-     ------------------------------------------ */
-
-  function setDeleteTarget(id) {
-
-    deleteTargetId = id;
-  }
-
-  function getDeleteTarget() {
-
-    return deleteTargetId;
-  }
-
-  function clearDeleteTarget() {
-
-    deleteTargetId = null;
-  }
-
-  /* ------------------------------------------
-     STATUS TARGET STATE
-     ------------------------------------------ */
-
-  function setStatusTarget(id) {
-
-    statusTargetId = id;
-  }
-
-  function getStatusTarget() {
-
-    return statusTargetId;
-  }
-
-  function clearStatusTarget() {
-
-    statusTargetId = null;
-  }
-
-  /* ------------------------------------------
-     SUPABASE OPERATIONS
-     ------------------------------------------ */
-
-  async function fetchOrders() {
-
-    try {
-
-      const storeId =
-        window.AdminSession?.store_id;
-
-      if (!storeId) {
-
-        console.error(
-          'Store ID tidak ditemukan'
-        );
-
-        return [];
-      }
-
-      const { data, error } =
-
-        await window.supabaseClient
-
-          .from('orders')
-
-          .select('*')
-
-          .eq(
-            'store_id',
-            storeId
-          )
-
-          .order(
-            'created_at',
-            {
-              ascending: false
-            }
-          );
-
-      if (error) {
-
-        console.error(error);
-
-        return [];
-      }
-
-      orders = (data || []).map(order => {
-
-        return {
-
-          id: order.id,
-
-          customer:
+        customer:
             order.customer_name || '-',
 
-          email: '-',
-
-          phone:
+        phone:
             order.phone || '-',
 
-          address:
+        address:
             order.address || '-',
 
-          status:
+        status:
             order.status ||
             ORDER_STATUS.PENDING,
 
-          date:
-            new Date(
-              order.created_at
-            ).toLocaleString('id-ID'),
+        subtotal:
+            Number(order.subtotal || 0),
 
-          products:
+        shipping_cost:
+            Number(
+                order.shipping_cost || 0
+            ),
+
+        discount:
+            Number(order.discount || 0),
+
+        total:
+            Number(order.total || 0),
+
+        payment_method:
+            order.payment_method || '-',
+
+        shipping_method:
+            order.shipping_method || '-',
+
+        notes:
+            order.notes || '',
+
+        created_at:
+            order.created_at,
+
+        date:
+            order.created_at
+                ? new Date(
+                    order.created_at
+                  ).toLocaleString(
+                    'id-ID'
+                  )
+                : '-',
+
+        products:
             Array.isArray(order.items)
-              ? order.items
-              : []
-        };
-      });
+                ? order.items
+                : []
+    };
+}
 
-      return orders;
 
-    } catch (err) {
+/* ============================================================
+   FILTERING
+============================================================ */
 
-      console.error(
-        'Fetch orders error:',
-        err
-      );
+function setFilter(filter) {
 
-      return [];
-    }
-  }
+    currentFilter =
+        filter || 'all';
+}
 
-  async function deleteOrderFromSupabase(id) {
+function getFilter() {
 
-    return Promise.resolve(
-      deleteOrder(id)
+    return currentFilter;
+}
+
+function setSearch(query) {
+
+    searchQuery =
+        String(query || '')
+            .trim()
+            .toLowerCase();
+}
+
+function getSearch() {
+
+    return searchQuery;
+}
+
+function getFilteredOrders() {
+
+    return orders.filter(order => {
+
+        const matchFilter =
+
+            currentFilter === 'all' ||
+
+            order.status ===
+            currentFilter;
+
+        if (!matchFilter)
+            return false;
+
+        if (!searchQuery)
+            return true;
+
+        return (
+
+            String(order.id)
+                .toLowerCase()
+                .includes(searchQuery)
+
+            ||
+
+            String(order.customer)
+                .toLowerCase()
+                .includes(searchQuery)
+
+            ||
+
+            String(order.phone)
+                .toLowerCase()
+                .includes(searchQuery)
+        );
+    });
+}
+
+
+/* ============================================================
+   GETTERS
+============================================================ */
+
+function getOrders() {
+
+    return orders;
+}
+
+function getOrder(id) {
+
+    return (
+
+        orders.find(order =>
+
+            String(order.id) ===
+            String(id)
+
+        ) || null
     );
-  }
+}
 
-  async function updateOrderStatusInSupabase(
-    id,
-    status
-  ) {
+function getOrderTotal(order) {
+
+    if (
+        !order ||
+        !Array.isArray(order.products)
+    ) {
+
+        return 0;
+    }
+
+    return order.products.reduce(
+
+        (sum, product) => {
+
+            return (
+
+                sum +
+
+                (
+                    Number(product.price || 0) *
+
+                    Number(product.qty || 0)
+                )
+            );
+
+        },
+
+        0
+    );
+}
+
+function getTotalItemCount(order) {
+
+    if (
+        !order ||
+        !Array.isArray(order.products)
+    ) {
+
+        return 0;
+    }
+
+    return order.products.reduce(
+
+        (sum, product) => {
+
+            return (
+                sum +
+                Number(product.qty || 0)
+            );
+
+        },
+
+        0
+    );
+}
+
+function getAvailableStatuses(order) {
+
+    if (!order)
+        return [];
+
+    const currentIndex =
+
+        ORDER_STATUS_LIST.indexOf(
+            order.status
+        );
+
+    return ORDER_STATUS_LIST
+
+        .slice(currentIndex + 1)
+
+        .filter(status =>
+
+            status !==
+            ORDER_STATUS.CANCELLED
+        );
+}
+
+
+/* ============================================================
+   TARGET STATES
+============================================================ */
+
+function setDeleteTarget(id) {
+
+    deleteTargetId =
+        id;
+}
+
+function getDeleteTarget() {
+
+    return deleteTargetId;
+}
+
+function clearDeleteTarget() {
+
+    deleteTargetId =
+        null;
+}
+
+function setStatusTarget(id) {
+
+    statusTargetId =
+        id;
+}
+
+function getStatusTarget() {
+
+    return statusTargetId;
+}
+
+function clearStatusTarget() {
+
+    statusTargetId =
+        null;
+}
+
+
+/* ============================================================
+   FETCH ORDERS
+============================================================ */
+
+async function fetchOrders() {
 
     try {
 
-      const storeId =
-        window.AdminSession?.store_id;
+        let query =
 
-      if (!storeId) {
+            window.supabaseClient
+
+                .from('orders')
+
+                .select('*')
+
+                .order(
+                    'created_at',
+                    {
+                        ascending: false
+                    }
+                );
+
+        const storeId =
+            getCurrentStoreId();
+
+        if (
+            !isSuperAdmin() &&
+            storeId
+        ) {
+
+            query = query.eq(
+                'store_id',
+                storeId
+            );
+        }
+
+        const {
+            data,
+            error
+        } = await query;
+
+        if (error) {
+
+            console.error(error);
+
+            return [];
+        }
+
+        orders =
+
+            (data || [])
+
+                .map(normalizeOrder)
+
+                .filter(order => order);
+
+        return orders;
+
+    } catch (err) {
 
         console.error(
-          'Store ID tidak ditemukan'
+            'Fetch orders error:',
+            err
+        );
+
+        return [];
+    }
+}
+
+
+/* ============================================================
+   DELETE ORDER
+============================================================ */
+
+async function deleteOrder(orderId) {
+
+    try {
+
+        let query =
+
+            window.supabaseClient
+
+                .from('orders')
+
+                .delete()
+
+                .eq(
+                    'id',
+                    orderId
+                );
+
+        const storeId =
+            getCurrentStoreId();
+
+        if (
+            !isSuperAdmin() &&
+            storeId
+        ) {
+
+            query = query.eq(
+                'store_id',
+                storeId
+            );
+        }
+
+        const { error } =
+            await query;
+
+        if (error) {
+
+            console.error(error);
+
+            return false;
+        }
+
+        orders = orders.filter(order =>
+
+            String(order.id) !==
+            String(orderId)
+        );
+
+        return true;
+
+    } catch (err) {
+
+        console.error(
+            'Delete order error:',
+            err
         );
 
         return false;
-      }
+    }
+}
 
-      const { error } =
+
+/* ============================================================
+   UPDATE STATUS
+============================================================ */
+
+async function updateStatus(
+    orderId,
+    newStatus
+) {
+
+    try {
+
+        const order =
+            getOrder(orderId);
+
+        if (!order) {
+
+            return {
+                success: false
+            };
+        }
+
+        let query =
+
+            window.supabaseClient
+
+                .from('orders')
+
+                .update({
+                    status:
+                        newStatus
+                })
+
+                .eq(
+                    'id',
+                    orderId
+                );
+
+        const storeId =
+            getCurrentStoreId();
+
+        if (
+            !isSuperAdmin() &&
+            storeId
+        ) {
+
+            query = query.eq(
+                'store_id',
+                storeId
+            );
+        }
+
+        const { error } =
+            await query;
+
+        if (error) {
+
+            console.error(error);
+
+            return {
+                success: false
+            };
+        }
+
+        const oldLabel =
+
+            ORDER_STATUS_LABELS[
+                order.status
+            ];
+
+        order.status =
+            newStatus;
+
+        return {
+
+            success: true,
+
+            oldLabel,
+
+            newLabel:
+
+                ORDER_STATUS_LABELS[
+                    newStatus
+                ]
+        };
+
+    } catch (err) {
+
+        console.error(
+            'Update status error:',
+            err
+        );
+
+        return {
+            success: false
+        };
+    }
+}
+
+
+/* ============================================================
+   BADGE
+============================================================ */
+
+async function getPendingOrdersCount() {
+
+    try {
+
+        let query =
+
+            window.supabaseClient
+
+                .from('orders')
+
+                .select('*', {
+
+                    count: 'exact',
+
+                    head: true
+                })
+
+                .eq(
+                    'status',
+                    ORDER_STATUS.PENDING
+                );
+
+        const storeId =
+            getCurrentStoreId();
+
+        if (
+            !isSuperAdmin() &&
+            storeId
+        ) {
+
+            query = query.eq(
+                'store_id',
+                storeId
+            );
+        }
+
+        const {
+            count,
+            error
+        } = await query;
+
+        if (error) {
+
+            console.error(error);
+
+            return 0;
+        }
+
+        return count || 0;
+
+    } catch (err) {
+
+        console.error(
+            'Badge count error:',
+            err
+        );
+
+        return 0;
+    }
+}
+
+
+/* ============================================================
+   REALTIME
+============================================================ */
+
+async function subscribeRealtime(callback) {
+
+    try {
+
+        if (realtimeChannel) {
+
+            await window.supabaseClient
+
+                .removeChannel(
+                    realtimeChannel
+                );
+        }
+
+        const storeId =
+            getCurrentStoreId();
+
+        let filter = '';
+
+        if (
+            !isSuperAdmin() &&
+            storeId
+        ) {
+
+            filter =
+                `store_id=eq.${storeId}`;
+        }
+
+        realtimeChannel =
+
+            window.supabaseClient
+
+                .channel(
+
+                    `orders-realtime-${
+                        storeId || 'global'
+                    }`
+                );
+
+        realtimeChannel.on(
+
+            'postgres_changes',
+
+            {
+
+                event: '*',
+
+                schema: 'public',
+
+                table: 'orders',
+
+                filter
+            },
+
+            async payload => {
+
+                console.log(
+                    'Realtime order:',
+                    payload.eventType
+                );
+
+                await fetchOrders();
+
+                if (
+                    typeof callback ===
+                    'function'
+                ) {
+
+                    callback({
+
+                        type:
+                            payload.eventType,
+
+                        orders:
+                            getFilteredOrders()
+                    });
+                }
+            }
+        );
+
+        realtimeChannel.subscribe();
+
+    } catch (err) {
+
+        console.error(
+            'Realtime subscribe error:',
+            err
+        );
+    }
+}
+
+
+/* ============================================================
+   CLEANUP
+============================================================ */
+
+async function destroyRealtime() {
+
+    try {
+
+        if (!realtimeChannel)
+            return;
 
         await window.supabaseClient
 
-          .from('orders')
-
-          .update({
-            status
-          })
-
-          .eq('id', id)
-
-          .eq(
-            'store_id',
-            storeId
-          );
-
-      if (error) {
-
-        console.error(error);
-
-        return false;
-      }
-
-      const result =
-        updateStatus(id, status);
-
-      return result.success;
-
-    } catch (err) {
-
-      console.error(
-        'Update status error:',
-        err
-      );
-
-      return false;
-    }
-  }
-
-  async function subscribeRealtime(callback) {
-
-    try {
-
-      if (!window.supabaseClient) {
-
-        console.error(
-          'Supabase client tidak ditemukan'
-        );
-
-        return;
-      }
-
-      const storeId =
-        window.AdminSession?.store_id;
-
-      if (!storeId) {
-
-        console.error(
-          'Store ID tidak ditemukan'
-        );
-
-        return;
-      }
-
-      const channel =
-
-        window.supabaseClient.channel(
-          `orders-realtime-${storeId}`
-        );
-
-      channel.on(
-
-        'postgres_changes',
-
-        {
-
-          event: '*',
-
-          schema: 'public',
-
-          table: 'orders',
-
-          filter:
-            `store_id=eq.${storeId}`
-        },
-
-        async () => {
-
-          await fetchOrders();
-
-          if (
-            typeof callback ===
-            'function'
-          ) {
-
-            callback(
-              getFilteredOrders()
+            .removeChannel(
+                realtimeChannel
             );
-          }
-        }
-      );
 
-      channel.subscribe();
+        realtimeChannel =
+            null;
 
     } catch (err) {
 
-      console.error(
-        'Realtime subscribe error:',
-        err
-      );
+        console.error(
+            'Destroy realtime error:',
+            err
+        );
     }
-  }
+}
 
-  async function syncOrders() {
 
-    return Promise.resolve(
-      orders
-    );
-  }
+/* ============================================================
+   PUBLIC API
+============================================================ */
 
-  /* ------------------------------------------
-     PUBLIC API
-     ------------------------------------------ */
+window.OrdersService = {
 
-  return {
-
-    // Constants
+    /* constants */
     ORDER_STATUS,
+    ORDER_STATUS_LIST,
     ORDER_STATUS_LABELS,
     ORDER_STATUS_FLOW,
 
-    // Utilities
-    formatRupiah,
-    getOrderTotal,
-    getTotalItemCount,
-    getOrder,
-    getAvailableStatuses,
-
-    // Filtering & search
+    /* filters */
     setFilter,
     getFilter,
     setSearch,
     getSearch,
     getFilteredOrders,
 
-    // CRUD
-    deleteOrder,
-    updateStatus,
+    /* getters */
+    getOrders,
+    getOrder,
+    getOrderTotal,
+    getTotalItemCount,
+    getAvailableStatuses,
 
-    // Target state
+    /* targets */
     setDeleteTarget,
     getDeleteTarget,
     clearDeleteTarget,
@@ -559,12 +826,18 @@ const OrdersService = (() => {
     getStatusTarget,
     clearStatusTarget,
 
-    // Supabase operations
+    /* database */
     fetchOrders,
-    deleteOrderFromSupabase,
-    updateOrderStatusInSupabase,
+    deleteOrder,
+    updateStatus,
+    getPendingOrdersCount,
+
+    /* realtime */
     subscribeRealtime,
-    syncOrders,
-  };
+    destroyRealtime,
+
+    /* utils */
+    formatRupiah
+};
 
 })();
