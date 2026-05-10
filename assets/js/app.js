@@ -361,9 +361,14 @@ window.addEventListener('storage', function (e) {
 });
 /* Same-tab sync */
 window.addEventListener('productsUpdated', onProductsUpdated);
-window.addEventListener('categoriesUpdated', function () {
-    renderCats();
-});
+window.addEventListener(
+    'categoriesUpdated',
+
+    function () {
+
+        renderFilteredCategories();
+    }
+);
 
 /* ── global click handler ── */
 document.addEventListener(
