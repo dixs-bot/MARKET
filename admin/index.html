@@ -918,15 +918,33 @@ await window.supabaseClient
     return;
   }
 
-  /* SAVE GLOBAL SESSION */
-   /* SAVE GLOBAL SESSION */
-  window.AdminSession =
-    profile;
+window.AdminSession =
+  profile;
 
-  console.log(
-    'ADMIN SESSION',
-    profile
-  );
+console.log(
+  'ADMIN SESSION',
+  profile
+);
+
+/* HANYA SUPER ADMIN
+   BOLEH LIHAT
+   TOMBOL ADMIN */
+
+if (
+  profile.role !==
+  'super_admin'
+) {
+
+  const addAdminBtn =
+    document.getElementById(
+      'btn-add-admin'
+    );
+
+  if (addAdminBtn) {
+
+    addAdminBtn.remove();
+  }
+}
 
 const storeSelect =
   document.getElementById(
