@@ -27,15 +27,44 @@ const FALLBACK_CAT_IMG =
     if (!p || typeof p !== "object") return null;
     if (!p.id) return null;
 
-    return {
-      id: String(p.id),
-      name: String(p.name || "").trim(),
-      price: Math.max(0, Number(p.price) || 0),
-      category: String(p.category || p.cat || ""),
-      stock: Math.max(0, Number(p.stock) || 0),
-      image: String(p.image || p.img || FALLBACK_IMG)
-    };
-  }
+  return {
+  id: String(p.id),
+
+  name:
+    String(
+      p.name || ""
+    ).trim(),
+
+  price:
+    Math.max(
+      0,
+      Number(p.price) || 0
+    ),
+
+  category:
+    String(
+      p.category ||
+      p.cat ||
+      ""
+    ),
+
+  stock:
+    Math.max(
+      0,
+      Number(p.stock) || 0
+    ),
+
+  image:
+    String(
+      p.image ||
+      p.img ||
+      FALLBACK_IMG
+    ),
+
+  /* 🔥 PENTING */
+  store_id:
+    p.store_id || null
+};
 
 function getProducts() {
   const raw = localStorage.getItem(LS_PRODUCTS);
@@ -43,55 +72,62 @@ function getProducts() {
   return data.map(normalizeProduct).filter(p => p);
 }
 
-/* 🔥 TAMBAHKAN DI SINI */
 async function syncProductsFromSupabase() {
 
-  const { data, error } =
-    await window.supabaseClient
-      .from('products')
-      .select('*');
+  try {
 
-  if (error) {
-    console.error(error);
+    let query =
+      window.supabaseClient
+        .from('products')
+        .select('*');
+
+    /* ADMIN CABANG */
+    if (
+      window.AdminSession?.role ===
+      'admin'
+    ) {
+
+      query =
+        query.eq(
+          'store_id',
+          window.AdminSession.store_id
+        );
+    }
+
+    const {
+      data,
+      error
+    } =
+    await query;
+
+    if (error) {
+
+      console.error(error);
+
+      return [];
+    }
+
+    localStorage.setItem(
+      LS_PRODUCTS,
+      JSON.stringify(data)
+    );
+
+    window.dispatchEvent(
+      new Event('productsUpdated')
+    );
+
+    return data;
+
+  } catch (err) {
+
+    console.error(
+      'Sync products error:',
+      err
+    );
+
     return [];
   }
-
-  localStorage.setItem(
-    LS_PRODUCTS,
-    JSON.stringify(data)
-  );
-
-  window.dispatchEvent(
-    new Event('productsUpdated')
-  );
-
-  return data;
 }
-
-  function saveProducts(products) {
-    if (!Array.isArray(products)) return false;
-
-    const map = {};
-    const clean = [];
-
-    for (let i = 0; i < products.length; i++) {
-      const p = normalizeProduct(products[i]);
-      if (!p) continue;
-      if (map[p.id]) continue;
-
-      map[p.id] = true;
-      clean.push(p);
-    }
-
-    try {
-      localStorage.setItem(LS_PRODUCTS, JSON.stringify(clean));
-      window.dispatchEvent(new Event("productsUpdated"));
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
   async function syncCategoriesFromSupabase() {
 
     const { data, error } =
@@ -378,8 +414,20 @@ async function atomicDeductStock(cart){
 
     return saveCategories(ordered);
   }
+/* 🔥 REALTIME PRODUCTS */
 
-  /* 🔥 REALTIME PRODUCTS */
+let productRealtimeFilter = '';
+
+/* ADMIN CABANG */
+if (
+  window.AdminSession?.role ===
+  'admin'
+) {
+
+  productRealtimeFilter =
+    `store_id=eq.${window.AdminSession.store_id}`;
+}
+
 window.supabaseClient
 
   .channel('products-realtime')
@@ -390,7 +438,11 @@ window.supabaseClient
     {
       event: '*',
       schema: 'public',
-      table: 'products'
+      table: 'products',
+
+      /* FILTER REALTIME */
+      filter:
+        productRealtimeFilter
     },
 
     async () => {
@@ -403,6 +455,7 @@ window.supabaseClient
     }
   )
 
+  .subscribe();
   .subscribe();
   window.MiniMarket = {
    
