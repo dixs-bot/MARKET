@@ -55,12 +55,29 @@
     await window.supabaseClient
         .from('categories')
         .insert([
-            {
-                id: cat.id,
-                name: cat.name,
-                image: cat.image
-            }
-        ])
+    {
+        id: cat.id,
+
+        name: cat.name,
+
+        image: cat.image,
+
+        store_id:
+
+            window.AdminSession?.role ===
+            'admin'
+
+                ?
+
+                window.AdminSession.store_id
+
+                :
+
+                document.getElementById(
+                    'product-store'
+                )?.value || null
+    }
+])
         .select()
         .single();
 
