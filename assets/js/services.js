@@ -471,18 +471,37 @@ export function reconcileCart(
 
 export function addCart(
     pid,
-    delta
+    delta = 1
 ) {
+
+    /* =========================
+       CLEAN INVALID CART
+    ========================= */
 
     reconcileCart({
         silent: true
     });
 
+    /* =========================
+       FIND PRODUCT
+    ========================= */
+
     const product =
         findProd(pid);
 
-    if (!product)
+    if (!product) {
+
+        console.warn(
+            'Product not found:',
+            pid
+        );
+
         return;
+    }
+
+    /* =========================
+       STOCK VALIDATION
+    ========================= */
 
     if (
         product.stock <= 0
@@ -495,17 +514,31 @@ export function addCart(
         return;
     }
 
+    /* =========================
+       MAX CART VALIDATION
+    ========================= */
+
     if (
-        state.cart.length >=
-        MAX_CART
+        delta > 0 &&
+        state.cart.length >= MAX_CART
     ) {
 
-        notify(
-            'Keranjang penuh'
-        );
+        const exists =
+            findCart(pid);
 
-        return;
+        if (!exists) {
+
+            notify(
+                'Keranjang penuh'
+            );
+
+            return;
+        }
     }
+
+    /* =========================
+       MULTI STORE VALIDATION
+    ========================= */
 
     if (
         state.cart.length
@@ -528,6 +561,10 @@ export function addCart(
         }
     }
 
+    /* =========================
+       FIND CART ITEM
+    ========================= */
+
     const found =
         findCart(pid);
 
@@ -536,10 +573,13 @@ export function addCart(
             ? found.it.qty
             : 0;
 
+    /* =========================
+       STOCK LIMIT
+    ========================= */
+
     if (
         delta > 0 &&
-        currentQty >=
-        product.stock
+        currentQty >= product.stock
     ) {
 
         notify(
@@ -548,6 +588,10 @@ export function addCart(
 
         return;
     }
+
+    /* =========================
+       UPDATE EXISTING ITEM
+    ========================= */
 
     if (found) {
 
@@ -559,6 +603,13 @@ export function addCart(
         found.it.image =
             product.image;
 
+        found.it.stock =
+            product.stock;
+
+        /* =====================
+           REMOVE IF ZERO
+        ===================== */
+
         if (
             found.it.qty <= 0
         ) {
@@ -569,7 +620,13 @@ export function addCart(
             );
         }
 
-    } else if (delta > 0) {
+    }
+
+    /* =========================
+       ADD NEW ITEM
+    ========================= */
+
+    else if (delta > 0) {
 
         state.cart.push({
 
@@ -596,16 +653,47 @@ export function addCart(
         });
     }
 
+    /* =========================
+       SAVE STATE
+    ========================= */
+
     save();
 
-    patchQty(pid, false);
+    /* =========================
+       PATCH PRODUCT CARD
+    ========================= */
 
-    patchQty(pid, true);
+    patchQty(
+        pid,
+        false
+    );
+
+    patchQty(
+        pid,
+        true
+    );
+
+    /* =========================
+       UPDATE BADGE
+    ========================= */
 
     patchBadge();
 
+    /* =========================
+       RE-RENDER UI
+    ========================= */
+
     renderCart();
+
+    renderFilteredProducts();
+
+    renderSummary();
 }
+
+
+/* ============================================================
+   DELETE CART ITEM
+============================================================ */
 
 export function delCart(pid) {
 
@@ -615,18 +703,49 @@ export function delCart(pid) {
     if (!found)
         return;
 
+    /* =========================
+       REMOVE ITEM
+    ========================= */
+
     state.cart.splice(
         found.i,
         1
     );
 
+    /* =========================
+       SAVE STATE
+    ========================= */
+
     save();
+
+    /* =========================
+       PATCH PRODUCT CARD
+    ========================= */
+
+    patchQty(
+        pid,
+        false
+    );
+
+    /* =========================
+       UPDATE BADGE
+    ========================= */
+
+    patchBadge();
+
+    /* =========================
+       RE-RENDER UI
+    ========================= */
 
     renderCart();
 
-    patchQty(pid, false);
+    renderFilteredProducts();
 
-    patchBadge();
+    renderSummary();
+
+    /* =========================
+       AUTO CLOSE CART
+    ========================= */
 
     if (
         !state.cart.length
@@ -635,8 +754,6 @@ export function delCart(pid) {
         closeCart();
     }
 }
-
-
 /* ============================================================
    CHECKOUT STATE
 ============================================================ */
