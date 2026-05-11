@@ -897,6 +897,10 @@ function initGlobalClicks() {
                 return;
             }
 
+        }
+    );
+}
+
             /* =========================
                OPEN SEARCH
             ========================= */
