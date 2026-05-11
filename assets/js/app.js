@@ -859,48 +859,44 @@ function initGlobalClicks() {
                 return;
             }
 
-            /* =========================================
-               FINAL CHECKOUT
-            ========================================= */
+         /* =========================================
+   FINAL CHECKOUT
+========================================= */
 
-            if (
-                e.target.closest(
-                    "[data-act='do-co']"
-                )
-            ) {
+if (
+    e.target.closest(
+        "[data-act='do-co']"
+    )
+) {
 
-                goToInvoice();
+    goToInvoice();
 
-                return;
-            }
+    return;
+}
+
+/* =========================
+   EDIT ORDER
+========================= */
+
+if (
+    e.target.closest(
+        "[data-act='edit-order']"
+    )
+) {
+
+    if (state.d.mconf) {
+
+        state.d.mconf.classList.add(
+            'hidden'
+        );
+    }
+
+    return;
+}
+
         }
     );
 }
-
-            /* =========================
-               EDIT ORDER
-            ========================= */
-
-            if (
-                e.target.closest(
-                    "[data-act='edit-order']"
-                )
-            ) {
-
-                if (state.d.mconf) {
-
-                    state.d.mconf.classList.add(
-                        'hidden'
-                    );
-                }
-
-                return;
-            }
-
-        }
-    );
-}
-
             /* =========================
                OPEN SEARCH
             ========================= */
