@@ -266,48 +266,44 @@ export function patchQty(
 
 export function patchBadge() {
 
-    if (
-        !state.d.badge ||
-        !state.d.fab
-    ) {
-
-        console.warn(
-            'badge/fab missing'
+    const badge =
+        document.getElementById(
+            'cbadge'
         );
 
+    const fab =
+        document.getElementById(
+            'fab-cart'
+        );
+
+    if (!badge || !fab)
         return;
-    }
 
-    const c =
-        cartQty();
+    const total =
+        state.cart.reduce(
 
-    state.d.badge.textContent = c;
+            (sum, item) =>
+                sum + item.qty,
 
-    if (c > 0) {
+            0
+        );
 
-        state.d.fab.classList.remove(
+    badge.textContent =
+        total;
+
+    if (total > 0) {
+
+        fab.classList.remove(
             'hidden'
-        );
-
-        state.d.badge.classList.remove(
-            'pop'
-        );
-
-        void state.d.badge.offsetWidth;
-
-        state.d.badge.classList.add(
-            'pop'
         );
 
     } else {
 
-        state.d.fab.classList.add(
+        fab.classList.add(
             'hidden'
         );
     }
 }
-
-
 /* =========================================================
    RENDER CATEGORIES
 ========================================================= */
