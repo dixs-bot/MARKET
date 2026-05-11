@@ -1382,3 +1382,13 @@ export function renderOrders(orders = []) {
     state.d.olist.innerHTML =
         html;
 }
+
+/* ============================================================
+   EXPORT FROM RENDERERS
+============================================================ */
+
+export {
+
+    renderFilteredProducts
+
+} from './renderers.js';
