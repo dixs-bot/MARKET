@@ -1383,12 +1383,4 @@ export function renderOrders(orders = []) {
         html;
 }
 
-/* ============================================================
-   EXPORT FROM RENDERERS
-============================================================ */
 
-export {
-
-    renderFilteredProducts
-
-} from './renderers.js';
