@@ -22,21 +22,12 @@ import {
     renderSummary,
     renderInv,
     renderProds,
+    renderFilteredProducts,
     closeCart,
     closeVou,
     animateIn
 
 } from './ui.js';
-
-import {
-
-    renderCart,
-
-    renderFilteredProducts,
-
-    renderSummary
-
-} from './renderers.js';
 
 const MM =
     window.MiniMarket;
