@@ -1004,4 +1004,4 @@ export function renderPays() {
 
         }).join('');
 }
-}
+
