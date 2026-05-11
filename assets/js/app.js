@@ -708,6 +708,10 @@ function initGlobalClicks() {
 
             let el;
 
+            /* =========================
+               ADD CART
+            ========================= */
+
             el = e.target.closest(
                 '[data-a]'
             );
@@ -721,6 +725,10 @@ function initGlobalClicks() {
 
                 return;
             }
+
+            /* =========================
+               MINUS CART
+            ========================= */
 
             el = e.target.closest(
                 '[data-m]'
@@ -736,6 +744,10 @@ function initGlobalClicks() {
                 return;
             }
 
+            /* =========================
+               REMOVE CART
+            ========================= */
+
             el = e.target.closest(
                 '[data-cr]'
             );
@@ -748,6 +760,10 @@ function initGlobalClicks() {
 
                 return;
             }
+
+            /* =========================
+               CATEGORY FILTER
+            ========================= */
 
             el = e.target.closest(
                 '[data-cat]'
@@ -767,6 +783,10 @@ function initGlobalClicks() {
                 return;
             }
 
+            /* =========================
+               BOTTOM NAV
+            ========================= */
+
             el = e.target.closest(
                 '[data-nav]'
             );
@@ -780,6 +800,10 @@ function initGlobalClicks() {
                 return;
             }
 
+            /* =========================
+               OPEN CART
+            ========================= */
+
             if (
                 e.target.closest(
                     '#fab-cart'
@@ -790,6 +814,10 @@ function initGlobalClicks() {
 
                 return;
             }
+
+            /* =========================
+               CLOSE CART
+            ========================= */
 
             if (
                 e.target.closest(
@@ -802,16 +830,72 @@ function initGlobalClicks() {
                 return;
             }
 
+            /* =========================
+               OPEN CHECKOUT
+            ========================= */
+
             if (
                 e.target.closest(
-                    "[data-act='checkout']"
+                    "[data-act='open-checkout']"
                 )
             ) {
 
-                goToCheckout();
+                if (
+                    !state.cart.length
+                ) {
+
+                    toast(
+                        'Keranjang kosong'
+                    );
+
+                    return;
+                }
+
+                closeCart();
+
+                if (state.d.pgco) {
+
+                    state.d.pgco.classList.remove(
+                        'hidden'
+                    );
+                }
+
+                lock();
+
+                renderShips();
+
+                renderPays();
+
+                renderSummary();
 
                 return;
             }
+
+            /* =========================
+               CLOSE CHECKOUT
+            ========================= */
+
+            if (
+                e.target.closest(
+                    "[data-act='close-checkout']"
+                )
+            ) {
+
+                if (state.d.pgco) {
+
+                    state.d.pgco.classList.add(
+                        'hidden'
+                    );
+                }
+
+                unlock();
+
+                return;
+            }
+
+            /* =========================
+               ORDER BUTTON
+            ========================= */
 
             if (
                 e.target.closest(
@@ -824,6 +908,10 @@ function initGlobalClicks() {
                 return;
             }
 
+            /* =========================
+               CONFIRM ORDER
+            ========================= */
+
             if (
                 e.target.closest(
                     "[data-act='do-co']"
@@ -834,10 +922,79 @@ function initGlobalClicks() {
 
                 return;
             }
+
+            /* =========================
+               EDIT ORDER
+            ========================= */
+
+            if (
+                e.target.closest(
+                    "[data-act='edit-order']"
+                )
+            ) {
+
+                if (state.d.mconf) {
+
+                    state.d.mconf.classList.add(
+                        'hidden'
+                    );
+                }
+
+                return;
+            }
+
+            /* =========================
+               OPEN SEARCH
+            ========================= */
+
+            if (
+                e.target.closest(
+                    "[data-act='open-search']"
+                )
+            ) {
+
+                const pg =
+                    document.getElementById(
+                        'pg-search'
+                    );
+
+                if (pg) {
+
+                    pg.classList.remove(
+                        'hidden'
+                    );
+                }
+
+                return;
+            }
+
+            /* =========================
+               CLOSE SEARCH
+            ========================= */
+
+            if (
+                e.target.closest(
+                    "[data-act='close-search']"
+                )
+            ) {
+
+                const pg =
+                    document.getElementById(
+                        'pg-search'
+                    );
+
+                if (pg) {
+
+                    pg.classList.add(
+                        'hidden'
+                    );
+                }
+
+                return;
+            }
         }
     );
 }
-
 
 /* ============================================================
    INIT
