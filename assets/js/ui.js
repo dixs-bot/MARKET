@@ -601,3 +601,57 @@ export function renderCart() {
     state.d.ctotal.textContent =
         fmt(subTotal());
 }
+
+/* =========================================================
+   CART OPEN/CLOSE
+========================================================= */
+
+export function openCart() {
+
+    if (
+        !state.d.csheet ||
+        !state.d.dim
+    ) {
+
+        console.warn(
+            'cart sheet missing'
+        );
+
+        return;
+    }
+
+    state.d.dim.classList.remove(
+        'hidden'
+    );
+
+    state.d.csheet.classList.remove(
+        'translate-y-full'
+    );
+
+    lock();
+}
+
+export function closeCart() {
+
+    if (
+        !state.d.csheet ||
+        !state.d.dim
+    ) {
+
+        console.warn(
+            'cart sheet missing'
+        );
+
+        return;
+    }
+
+    state.d.dim.classList.add(
+        'hidden'
+    );
+
+    state.d.csheet.classList.add(
+        'translate-y-full'
+    );
+
+    unlock();
+}
