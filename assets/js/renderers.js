@@ -97,20 +97,20 @@ function qtyHTML(
     const disabled =
         stock <= 0;
 
-    const addAttr =
-        isSearch
-            ? 'data-sa'
-            : 'data-cp=';
+   const addAttr =
+    isSearch
+        ? 'data-sa'
+        : 'data-cp';
 
-    const minusAttr =
-        isSearch
-            ? 'data-sm'
-            : 'data-cm=';
+const minusAttr =
+    isSearch
+        ? 'data-sm'
+        : 'data-cm';
 
-    const plusAttr =
-        isSearch
-            ? 'data-sp'
-            : 'data-p';
+const plusAttr =
+    isSearch
+        ? 'data-sp'
+        : 'data-cp';
 
     if (qty > 0) {
 
