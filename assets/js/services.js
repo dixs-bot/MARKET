@@ -28,9 +28,6 @@ import {
 
 } from './ui.js';
 
-const MM =
-    window.MiniMarket;
-
 import {
 
     renderCart,
@@ -40,6 +37,11 @@ import {
     renderSummary
 
 } from './renderers.js';
+
+const MM =
+    window.MiniMarket;
+
+
 /* ============================================================
    STORAGE HELPERS
 ============================================================ */
