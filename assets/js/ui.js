@@ -1129,3 +1129,120 @@ export function renderShips() {
 
         }).join('');
 }
+/* =========================================================
+   RENDER CHECKOUT SUMMARY
+========================================================= */
+
+export function renderSummary() {
+
+    if (
+        !state.d.coitems ||
+        !state.d.ssub ||
+        !state.d.sship ||
+        !state.d.stotal
+    ) {
+
+        console.warn(
+            'summary DOM missing'
+        );
+
+        return;
+    }
+
+    let itemsHTML = '';
+
+    for (
+        let i = 0;
+        i < state.cart.length;
+        i++
+    ) {
+
+        const item =
+            state.cart[i];
+
+        itemsHTML += `
+
+            <div class="
+                flex
+                items-center
+                justify-between
+                text-sm
+            ">
+
+                <div>
+
+                    <p class="
+                        text-slate-800
+                        font-medium
+                    ">
+                        ${item.name}
+                    </p>
+
+                    <p class="
+                        text-xs
+                        text-slate-400
+                    ">
+                        ${item.qty} x ${fmt(item.price)}
+                    </p>
+
+                </div>
+
+                <span class="
+                    font-semibold
+                    text-slate-700
+                ">
+                    ${fmt(
+                        item.qty * item.price
+                    )}
+                </span>
+
+            </div>
+        `;
+    }
+
+    state.d.coitems.innerHTML =
+        itemsHTML;
+
+    const sub =
+        subTotal();
+
+    const ship =
+        state.selectedShipPrice || 0;
+
+    const disc =
+        state.discount || 0;
+
+    const total =
+        sub + ship - disc;
+
+    state.d.ssub.textContent =
+        fmt(sub);
+
+    state.d.sship.textContent =
+        fmt(ship);
+
+    state.d.stotal.textContent =
+        fmt(total);
+
+    if (
+        state.d.discr &&
+        state.d.sdisc
+    ) {
+
+        if (disc > 0) {
+
+            state.d.discr.classList.remove(
+                'hidden'
+            );
+
+            state.d.sdisc.textContent =
+                '- ' + fmt(disc);
+
+        } else {
+
+            state.d.discr.classList.add(
+                'hidden'
+            );
+        }
+    }
+}
