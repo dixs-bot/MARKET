@@ -703,5 +703,180 @@ export function closeVou() {
         'hidden'
     );
 
+
     unlock();
+}
+
+/* =========================================================
+   RENDER INVOICE
+========================================================= */
+
+export function renderInv(order) {
+
+    if (
+        !state.d.invbody ||
+        !order
+    ) {
+
+        console.warn(
+            'invoice DOM missing'
+        );
+
+        return;
+    }
+
+    let itemsHTML = '';
+
+    const items =
+        order.items || [];
+
+    for (
+        let i = 0;
+        i < items.length;
+        i++
+    ) {
+
+        const item =
+            items[i];
+
+        itemsHTML += `
+
+            <div class="
+                flex
+                justify-between
+                py-2
+                border-b
+                border-slate-200
+            ">
+
+                <div>
+
+                    <p class="
+                        text-sm
+                        font-medium
+                        text-slate-800
+                    ">
+                        ${item.name}
+                    </p>
+
+                    <p class="
+                        text-xs
+                        text-slate-400
+                    ">
+                        ${item.qty} x ${fmt(item.price)}
+                    </p>
+
+                </div>
+
+                <p class="
+                    text-sm
+                    font-semibold
+                    text-slate-700
+                ">
+                    ${fmt(
+                        item.price * item.qty
+                    )}
+                </p>
+
+            </div>
+        `;
+    }
+
+    state.d.invbody.innerHTML = `
+
+        <div class="space-y-4">
+
+            <div class="text-center">
+
+                <h2 class="
+                    text-lg
+                    font-bold
+                    text-slate-800
+                ">
+                    Invoice
+                </h2>
+
+                <p class="
+                    text-xs
+                    text-slate-400
+                ">
+                    ${order.id || '-'}
+                </p>
+
+            </div>
+
+            <div class="
+                bg-white
+                rounded-xl
+                p-4
+                border
+                border-slate-200
+            ">
+
+                <div class="space-y-1">
+
+                    <div class="
+                        flex
+                        justify-between
+                        text-sm
+                    ">
+                        <span class="text-slate-500">
+                            Nama
+                        </span>
+
+                        <span class="font-medium">
+                            ${order.name || '-'}
+                        </span>
+                    </div>
+
+                    <div class="
+                        flex
+                        justify-between
+                        text-sm
+                    ">
+                        <span class="text-slate-500">
+                            Telepon
+                        </span>
+
+                        <span class="font-medium">
+                            ${order.phone || '-'}
+                        </span>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="
+                bg-white
+                rounded-xl
+                p-4
+                border
+                border-slate-200
+            ">
+
+                ${itemsHTML}
+
+                <div class="
+                    flex
+                    justify-between
+                    pt-3
+                    mt-3
+                    border-t
+                    border-slate-200
+                    font-bold
+                ">
+
+                    <span>Total</span>
+
+                    <span class="text-blue-600">
+                        ${fmt(order.total || 0)}
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+    `;
 }
