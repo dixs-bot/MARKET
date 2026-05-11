@@ -880,3 +880,127 @@ export function renderInv(order) {
         </div>
     `;
 }
+
+/* =========================================================
+   RENDER PAYMENT METHODS
+========================================================= */
+
+export function renderPays() {
+
+    const wrap =
+        state.d.paylist;
+
+    if (!wrap) {
+
+        console.warn(
+            'paylist not found'
+        );
+
+        return;
+    }
+
+    const pays =
+        state.payments || [];
+
+    if (!pays.length) {
+
+        wrap.innerHTML = `
+            <div class="
+                text-xs
+                text-slate-400
+                text-center
+                py-4
+            ">
+                Metode pembayaran kosong
+            </div>
+        `;
+
+        return;
+    }
+
+    wrap.innerHTML =
+        pays.map(pay => {
+
+            const active =
+                state.selectedPayment === pay.id;
+
+            return `
+
+                <button
+                    class="
+                        w-full
+                        flex
+                        items-center
+                        justify-between
+                        p-3
+                        rounded-xl
+                        border
+                        transition-all
+                        ${
+                            active
+                                ? 'border-blue-600 bg-blue-50'
+                                : 'border-slate-200 bg-white'
+                        }
+                    "
+
+                    data-pay="${pay.id}"
+                >
+
+                    <div class="
+                        flex
+                        flex-col
+                        items-start
+                    ">
+
+                        <span class="
+                            text-sm
+                            font-semibold
+                            text-slate-800
+                        ">
+                            ${pay.name}
+                        </span>
+
+                        <span class="
+                            text-xs
+                            text-slate-400
+                        ">
+                            ${pay.desc || ''}
+                        </span>
+
+                    </div>
+
+                    <div class="
+                        w-4
+                        h-4
+                        rounded-full
+                        border-2
+                        flex
+                        items-center
+                        justify-center
+                        ${
+                            active
+                                ? 'border-blue-600'
+                                : 'border-slate-300'
+                        }
+                    ">
+
+                        ${
+                            active
+                                ? `
+                                    <div class="
+                                        w-2
+                                        h-2
+                                        rounded-full
+                                        bg-blue-600
+                                    "></div>
+                                `
+                                : ''
+                        }
+
+                    </div>
+
+                </button>
+            `;
+
+        }).join('');
+}
