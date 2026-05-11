@@ -643,18 +643,29 @@ export function renderProds(products) {
 ============================================================ */
 
 export function renderCart() {
-if (
-    !state.d.clist ||
-    !state.d.ccnt ||
-    !state.d.ctotal
-) {
 
-    console.warn(
-        'renderCart DOM missing'
-    );
+    /* ========================================================
+       SAFE DOM CHECK
+    ======================================================== */
 
-    return;
-}
+    if (
+        !state.d.clist ||
+        !state.d.ccnt ||
+        !state.d.ctotal ||
+        !state.d.cnone ||
+        !state.d.cft
+    ) {
+
+        console.warn(
+            'renderCart DOM missing'
+        );
+
+        return;
+    }
+
+    /* ========================================================
+       CLEAN INVALID ITEMS
+    ======================================================== */
 
     cleanupInvalidCartItems();
 
@@ -667,10 +678,20 @@ if (
     const count =
         cartQty();
 
+    /* ========================================================
+       UPDATE COUNT
+    ======================================================== */
+
     state.d.ccnt.textContent =
-        count + ' item';
+        `${count} item`;
+
+    /* ========================================================
+       EMPTY CART
+    ======================================================== */
 
     if (!cart.length) {
+
+        state.d.clist.innerHTML = '';
 
         state.d.clist.classList.add(
             'hidden'
@@ -684,8 +705,15 @@ if (
             'hidden'
         );
 
+        state.d.ctotal.textContent =
+            fmt(0);
+
         return;
     }
+
+    /* ========================================================
+       SHOW CART
+    ======================================================== */
 
     state.d.clist.classList.remove(
         'hidden'
@@ -698,6 +726,10 @@ if (
     state.d.cft.classList.remove(
         'hidden'
     );
+
+    /* ========================================================
+       RENDER ITEMS
+    ======================================================== */
 
     let html = '';
 
@@ -892,13 +924,20 @@ if (
         `;
     }
 
+    /* ========================================================
+       PATCH HTML
+    ======================================================== */
+
     state.d.clist.innerHTML =
         html;
+
+    /* ========================================================
+       UPDATE TOTAL
+    ======================================================== */
 
     state.d.ctotal.textContent =
         fmt(subTotal());
 }
-
 
 /* ============================================================
    SHIPPING
