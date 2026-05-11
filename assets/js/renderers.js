@@ -637,7 +637,12 @@ export function renderProds(products) {
         renderLock = false;
     }
 }
+}
+/* ============================================================
+   CART
+============================================================ */
 
+export function renderCart() {
 if (
     !state.d.clist ||
     !state.d.ccnt ||
@@ -650,11 +655,6 @@ if (
 
     return;
 }
-/* ============================================================
-   CART
-============================================================ */
-
-export function renderCart() {
 
     cleanupInvalidCartItems();
 
