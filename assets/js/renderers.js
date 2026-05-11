@@ -100,12 +100,12 @@ function qtyHTML(
     const addAttr =
         isSearch
             ? 'data-sa'
-            : 'data-a';
+            : 'data-cp=';
 
     const minusAttr =
         isSearch
             ? 'data-sm'
-            : 'data-m';
+            : 'data-cm=';
 
     const plusAttr =
         isSearch
