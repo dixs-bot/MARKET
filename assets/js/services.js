@@ -27,7 +27,7 @@ import {
     renderSummary,
     renderInv,
     renderProds,
-    renderFilteredProducts,
+  
 
     closeCart,
     closeVou,
