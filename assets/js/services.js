@@ -31,7 +31,15 @@ import {
 const MM =
     window.MiniMarket;
 
+import {
 
+    renderCart,
+
+    renderFilteredProducts,
+
+    renderSummary
+
+} from './renderers.js';
 /* ============================================================
    STORAGE HELPERS
 ============================================================ */
