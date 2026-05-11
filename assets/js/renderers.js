@@ -632,11 +632,10 @@ export function renderProds(products) {
             err
         );
 
-    } finally {
+      } finally {
 
         renderLock = false;
     }
-}
 }
 /* ============================================================
    CART
