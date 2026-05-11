@@ -931,36 +931,65 @@ async function init() {
             'coscroll'
         );
 
-    state.d.border =
-        document.getElementById(
-            'btn-order'
-        );
+  state.d.btnOrder =
+    document.getElementById(
+        'btn-order'
+    );
 
-    state.d.hint =
-        document.getElementById(
-            'checkout-hint'
-        );
+state.d.hint =
+    document.getElementById(
+        'hint'
+    );
 
-    state.d.vlbl =
-        document.getElementById(
-            'voucher-label'
-        );
+state.d.vlbl =
+    document.getElementById(
+        'vlbl'
+    );
 
-    state.d.eaddr =
-        document.getElementById(
-            'eaddr'
-        );
+state.d.shiplist =
+    document.getElementById(
+        'shiplist'
+    );
 
-    state.d.eship =
-        document.getElementById(
-            'eship'
-        );
+state.d.paylist =
+    document.getElementById(
+        'paylist'
+    );
 
-    state.d.epay =
-        document.getElementById(
-            'epay'
-        );
+state.d.coitems =
+    document.getElementById(
+        'co-items'
+    );
 
+state.d.ctotal =
+    document.getElementById(
+        'ctotal'
+    );
+
+state.d.ccnt =
+    document.getElementById(
+        'ccnt'
+    );
+
+state.d.clist =
+    document.getElementById(
+        'clist'
+    );
+
+state.d.cbadge =
+    document.getElementById(
+        'cbadge'
+    );
+
+state.d.cnone =
+    document.getElementById(
+        'cnone'
+    );
+
+state.d.cft =
+    document.getElementById(
+        'cft'
+    );
     /* ========================================================
        INITIAL LOAD
     ======================================================== */
