@@ -2,7 +2,7 @@ import { state } from './utils.js';
 
 import {
 
-    addCart,
+    addCart, 
     delCart,
     selShip,
     selPay,
@@ -701,50 +701,51 @@ function initInfiniteScroll() {
 function initGlobalClicks() {
 
     document.addEventListener(
-
         'click',
 
         async function (e) {
 
             let el;
 
-            /* =========================
-               ADD CART
-            ========================= */
+            /* =========================================
+               CART PLUS
+            ========================================= */
 
-         el = e.target.closest(
-    '[data-cp]'
-);
+            el = e.target.closest(
+                '[data-cp]'
+            );
 
-if (el) {
+            if (el) {
 
-    addCart(
-        el.dataset.cp,
-        1
-    );
+                addCart(
+                    el.dataset.cp,
+                    1
+                );
 
-    return;
-}
-            /* =========================
-               MINUS CART
-            ========================= */
+                return;
+            }
 
-      el = e.target.closest(
-    '[data-cm]'
-);
+            /* =========================================
+               CART MINUS
+            ========================================= */
 
-if (el) {
+            el = e.target.closest(
+                '[data-cm]'
+            );
 
-    addCart(
-        el.dataset.cm,
-        -1
-    );
+            if (el) {
 
-    return;
-}
-            /* =========================
+                addCart(
+                    el.dataset.cm,
+                    -1
+                );
+
+                return;
+            }
+
+            /* =========================================
                REMOVE CART
-            ========================= */
+            ========================================= */
 
             el = e.target.closest(
                 '[data-cr]'
@@ -759,9 +760,9 @@ if (el) {
                 return;
             }
 
-            /* =========================
-               CATEGORY FILTER
-            ========================= */
+            /* =========================================
+               CATEGORY
+            ========================================= */
 
             el = e.target.closest(
                 '[data-cat]'
@@ -781,9 +782,9 @@ if (el) {
                 return;
             }
 
-            /* =========================
-               BOTTOM NAV
-            ========================= */
+            /* =========================================
+               NAVIGATION
+            ========================================= */
 
             el = e.target.closest(
                 '[data-nav]'
@@ -798,9 +799,9 @@ if (el) {
                 return;
             }
 
-            /* =========================
+            /* =========================================
                OPEN CART
-            ========================= */
+            ========================================= */
 
             if (
                 e.target.closest(
@@ -813,9 +814,9 @@ if (el) {
                 return;
             }
 
-            /* =========================
+            /* =========================================
                CLOSE CART
-            ========================= */
+            ========================================= */
 
             if (
                 e.target.closest(
@@ -828,9 +829,9 @@ if (el) {
                 return;
             }
 
-            /* =========================
+            /* =========================================
                OPEN CHECKOUT
-            ========================= */
+            ========================================= */
 
             if (
                 e.target.closest(
@@ -838,62 +839,14 @@ if (el) {
                 )
             ) {
 
-                if (
-                    !state.cart.length
-                ) {
-
-                    toast(
-                        'Keranjang kosong'
-                    );
-
-                    return;
-                }
-
-                closeCart();
-
-                if (state.d.pgco) {
-
-                    state.d.pgco.classList.remove(
-                        'hidden'
-                    );
-                }
-
-                lock();
-
-                renderShips();
-
-                renderPays();
-
-                renderSummary();
+                openCheckout();
 
                 return;
             }
 
-            /* =========================
-               CLOSE CHECKOUT
-            ========================= */
-
-            if (
-                e.target.closest(
-                    "[data-act='close-checkout']"
-                )
-            ) {
-
-                if (state.d.pgco) {
-
-                    state.d.pgco.classList.add(
-                        'hidden'
-                    );
-                }
-
-                unlock();
-
-                return;
-            }
-
-            /* =========================
+            /* =========================================
                ORDER BUTTON
-            ========================= */
+            ========================================= */
 
             if (
                 e.target.closest(
@@ -906,9 +859,9 @@ if (el) {
                 return;
             }
 
-            /* =========================
-               CONFIRM ORDER
-            ========================= */
+            /* =========================================
+               FINAL CHECKOUT
+            ========================================= */
 
             if (
                 e.target.closest(
@@ -920,6 +873,9 @@ if (el) {
 
                 return;
             }
+        }
+    );
+}
 
             /* =========================
                EDIT ORDER
