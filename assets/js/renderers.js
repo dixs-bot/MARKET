@@ -125,9 +125,8 @@ function qtyHTML(
                 p-0.5
             ">
 
-               <button
-    data-cm="${p.id}"
->
+             <button
+    ${minusAttr}="${pid}"
 
                     class="
                         w-8
