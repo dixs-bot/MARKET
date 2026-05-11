@@ -897,31 +897,44 @@ if (
         }
     );
 }
-            /* =========================
-               OPEN SEARCH
-            ========================= */
+        /* =========================
+             OPEN SEARCH
+           ========================= */
 
-            if (
-                e.target.closest(
-                    "[data-act='open-search']"
-                )
-            ) {
+if (
+    e.target.closest(
+        "[data-act='open-search']"
+    )
+) {
 
-                const pg =
-                    document.getElementById(
-                        'pg-search'
-                    );
+    const pgSearch =
+        document.getElementById(
+            'pg-search'
+        );
 
-                if (pg) {
+    if (!pgSearch)
+        return;
 
-                    pg.classList.remove(
-                        'hidden'
-                    );
-                }
+    pgSearch.classList.remove(
+        'hidden'
+    );
 
-                return;
-            }
+    const inputSearch =
+        document.getElementById(
+            'insearch'
+        );
 
+    if (inputSearch) {
+
+        setTimeout(() => {
+
+            inputSearch.focus();
+
+        }, 100);
+    }
+
+    return;
+}
             /* =========================
                CLOSE SEARCH
             ========================= */
