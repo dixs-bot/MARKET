@@ -707,9 +707,9 @@ function initGlobalClicks() {
 
             let el;
 
-            /* =========================================
+            /* =========================
                CART PLUS
-            ========================================= */
+            ========================= */
 
             el = e.target.closest(
                 '[data-cp]'
@@ -725,9 +725,9 @@ function initGlobalClicks() {
                 return;
             }
 
-            /* =========================================
+            /* =========================
                CART MINUS
-            ========================================= */
+            ========================= */
 
             el = e.target.closest(
                 '[data-cm]'
@@ -743,9 +743,9 @@ function initGlobalClicks() {
                 return;
             }
 
-            /* =========================================
+            /* =========================
                REMOVE CART
-            ========================================= */
+            ========================= */
 
             el = e.target.closest(
                 '[data-cr]'
@@ -760,9 +760,9 @@ function initGlobalClicks() {
                 return;
             }
 
-            /* =========================================
+            /* =========================
                CATEGORY
-            ========================================= */
+            ========================= */
 
             el = e.target.closest(
                 '[data-cat]'
@@ -782,9 +782,9 @@ function initGlobalClicks() {
                 return;
             }
 
-            /* =========================================
+            /* =========================
                NAVIGATION
-            ========================================= */
+            ========================= */
 
             el = e.target.closest(
                 '[data-nav]'
@@ -799,9 +799,9 @@ function initGlobalClicks() {
                 return;
             }
 
-            /* =========================================
+            /* =========================
                OPEN CART
-            ========================================= */
+            ========================= */
 
             if (
                 e.target.closest(
@@ -814,9 +814,9 @@ function initGlobalClicks() {
                 return;
             }
 
-            /* =========================================
+            /* =========================
                CLOSE CART
-            ========================================= */
+            ========================= */
 
             if (
                 e.target.closest(
@@ -829,9 +829,9 @@ function initGlobalClicks() {
                 return;
             }
 
-            /* =========================================
+            /* =========================
                OPEN CHECKOUT
-            ========================================= */
+            ========================= */
 
             if (
                 e.target.closest(
@@ -844,9 +844,9 @@ function initGlobalClicks() {
                 return;
             }
 
-            /* =========================================
-               ORDER BUTTON
-            ========================================= */
+            /* =========================
+               BTN ORDER
+            ========================= */
 
             if (
                 e.target.closest(
@@ -859,83 +859,80 @@ function initGlobalClicks() {
                 return;
             }
 
-         /* =========================================
-   FINAL CHECKOUT
-========================================= */
+            /* =========================
+               FINAL CHECKOUT
+            ========================= */
 
-if (
-    e.target.closest(
-        "[data-act='do-co']"
-    )
-) {
+            if (
+                e.target.closest(
+                    "[data-act='do-co']"
+                )
+            ) {
 
-    goToInvoice();
+                goToInvoice();
 
-    return;
-}
+                return;
+            }
 
-/* =========================
-   EDIT ORDER
-========================= */
+            /* =========================
+               EDIT ORDER
+            ========================= */
 
-if (
-    e.target.closest(
-        "[data-act='edit-order']"
-    )
-) {
+            if (
+                e.target.closest(
+                    "[data-act='edit-order']"
+                )
+            ) {
 
-    if (state.d.mconf) {
+                if (state.d?.mconf) {
 
-        state.d.mconf.classList.add(
-            'hidden'
-        );
-    }
+                    state.d.mconf.classList.add(
+                        'hidden'
+                    );
+                }
 
-    return;
-}
+                return;
+            }
 
-/* =========================
-   OPEN SEARCH
-========================= */
+            /* =========================
+               OPEN SEARCH
+            ========================= */
 
-if (
-    e.target.closest(
-        "[data-act='open-search']"
-    )
-) {
+            if (
+                e.target.closest(
+                    "[data-act='open-search']"
+                )
+            ) {
 
-    const pgSearch =
-        document.getElementById(
-            'pg-search'
-        );
+                const pgSearch =
+                    document.getElementById(
+                        'pg-search'
+                    );
 
-    if (!pgSearch)
-        return;
+                if (!pgSearch)
+                    return;
 
-    pgSearch.classList.remove(
-        'hidden'
-    );
+                pgSearch.classList.remove(
+                    'hidden'
+                );
 
-    const inputSearch =
-        document.getElementById(
-            'insearch'
-        );
+                const inputSearch =
+                    document.getElementById(
+                        'insearch'
+                    );
 
-    if (inputSearch) {
+                if (inputSearch) {
 
-        setTimeout(() => {
+                    setTimeout(() => {
 
-            inputSearch.focus();
+                        inputSearch.focus();
 
-        }, 100);
-    }
+                    }, 100);
+                }
 
-    return;
-}
+                return;
+            }
 
-        }
-    );
-}
             /* =========================
                CLOSE SEARCH
             ========================= */
@@ -946,14 +943,14 @@ if (
                 )
             ) {
 
-                const pg =
+                const pgSearch =
                     document.getElementById(
                         'pg-search'
                     );
 
-                if (pg) {
+                if (pgSearch) {
 
-                    pg.classList.add(
+                    pgSearch.classList.add(
                         'hidden'
                     );
                 }
@@ -963,7 +960,6 @@ if (
         }
     );
 }
-
 /* ============================================================
    INIT
 ============================================================ */
