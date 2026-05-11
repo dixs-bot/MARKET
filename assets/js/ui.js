@@ -887,20 +887,19 @@ export function renderInv(order) {
 
 export function renderPays() {
 
-   const wrap =
-    state.d.pays;
+    const wrap = state.d.pays;
 
     if (!wrap) {
 
-        console.warn(
-            'paylist not found'
-        );
+        console.warn('paylist not found');
 
         return;
     }
 
     const pays =
-        state.payments || [];
+        state.payments ||
+        PAYS ||
+        [];
 
     if (!pays.length) {
 
@@ -918,91 +917,97 @@ export function renderPays() {
         return;
     }
 
-    wrap.innerHTML =
-        pays.map(pay => {
+    let html = '';
 
-            const active =
-                state.selectedPayment === pay.id;
+    for (let i = 0; i < pays.length; i++) {
 
-            return `
+        const pay = pays[i];
 
-                <button
-                    class="
-                        w-full
-                        flex
-                        items-center
-                        justify-between
-                        p-3
-                        rounded-xl
-                        border
-                        transition-all
-                        ${
-                            active
-                                ? 'border-blue-600 bg-blue-50'
-                                : 'border-slate-200 bg-white'
-                        }
-                    "
+        const active =
+            state.selectedPayment === pay.id;
 
-                    data-pay="${pay.id}"
-                >
+        html += `
 
-                    <div class="
-                        flex
-                        flex-col
-                        items-start
+            <button
+                data-pay="${pay.id}"
+
+                class="
+                    w-full
+                    flex
+                    items-center
+                    justify-between
+                    p-3
+                    rounded-xl
+                    border
+                    transition-all
+
+                    ${
+                        active
+                        ? 'border-blue-600 bg-blue-50'
+                        : 'border-slate-200 bg-white'
+                    }
+                "
+            >
+
+                <div class="
+                    flex
+                    flex-col
+                    items-start
+                ">
+
+                    <span class="
+                        text-sm
+                        font-semibold
+                        text-slate-800
                     ">
+                        ${pay.name}
+                    </span>
 
-                        <span class="
-                            text-sm
-                            font-semibold
-                            text-slate-800
-                        ">
-                            ${pay.name}
-                        </span>
-
-                        <span class="
-                            text-xs
-                            text-slate-400
-                        ">
-                            ${pay.desc || ''}
-                        </span>
-
-                    </div>
-
-                    <div class="
-                        w-4
-                        h-4
-                        rounded-full
-                        border-2
-                        flex
-                        items-center
-                        justify-center
-                        ${
-                            active
-                                ? 'border-blue-600'
-                                : 'border-slate-300'
-                        }
+                    <span class="
+                        text-xs
+                        text-slate-400
                     ">
+                        ${pay.desc || ''}
+                    </span>
 
-                        ${
-                            active
-                                ? `
-                                    <div class="
-                                        w-2
-                                        h-2
-                                        rounded-full
-                                        bg-blue-600
-                                    "></div>
-                                `
-                                : ''
-                        }
+                </div>
 
-                    </div>
+                <div class="
+                    w-4
+                    h-4
+                    rounded-full
+                    border-2
+                    flex
+                    items-center
+                    justify-center
 
-                </button>
-            `;
+                    ${
+                        active
+                        ? 'border-blue-600'
+                        : 'border-slate-300'
+                    }
+                ">
 
-        }).join('');
+                    ${
+                        active
+                        ? `
+                            <div class="
+                                w-2
+                                h-2
+                                rounded-full
+                                bg-blue-600
+                            "></div>
+                        `
+                        : ''
+                    }
+
+                </div>
+
+            </button>
+        `;
+    }
+
+    wrap.innerHTML = html;
 }
 /* =========================================================
    RENDER SHIPPING METHODS
