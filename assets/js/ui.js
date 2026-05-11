@@ -1251,3 +1251,134 @@ export function renderSummary() {
         }
     }
 }
+/* =========================================================
+   RENDER ORDERS
+========================================================= */
+
+export function renderOrders(orders = []) {
+
+    if (
+        !state.d.olist ||
+        !state.d.oempty
+    ) {
+
+        console.warn(
+            'orders DOM missing'
+        );
+
+        return;
+    }
+
+    if (!orders.length) {
+
+        state.d.olist.innerHTML = '';
+
+        state.d.oempty.classList.remove(
+            'hidden'
+        );
+
+        return;
+    }
+
+    state.d.oempty.classList.add(
+        'hidden'
+    );
+
+    let html = '';
+
+    for (
+        let i = 0;
+        i < orders.length;
+        i++
+    ) {
+
+        const ord =
+            orders[i];
+
+        const total =
+            fmt(ord.total || 0);
+
+        const items =
+            ord.items || [];
+
+        let itemCount = 0;
+
+        for (
+            let j = 0;
+            j < items.length;
+            j++
+        ) {
+
+            itemCount +=
+                items[j].qty || 0;
+        }
+
+        html += `
+
+            <div class="
+                bg-white
+                border
+                border-slate-200
+                rounded-2xl
+                p-4
+                space-y-2
+            ">
+
+                <div class="
+                    flex
+                    items-center
+                    justify-between
+                ">
+
+                    <div>
+
+                        <p class="
+                            text-sm
+                            font-bold
+                            text-slate-800
+                        ">
+                            Order #${ord.id || '-'}
+                        </p>
+
+                        <p class="
+                            text-xs
+                            text-slate-400
+                        ">
+                            ${itemCount} item
+                        </p>
+
+                    </div>
+
+                    <span class="
+                        text-xs
+                        font-semibold
+                        text-blue-600
+                    ">
+                        ${total}
+                    </span>
+
+                </div>
+
+                <button
+                    data-open-order="${ord.id}"
+
+                    class="
+                        w-full
+                        py-2
+                        rounded-xl
+                        bg-slate-100
+                        text-slate-700
+                        text-xs
+                        font-semibold
+                    "
+                >
+                    Lihat Detail
+                </button>
+
+            </div>
+        `;
+    }
+
+    state.d.olist.innerHTML =
+        html;
+}
