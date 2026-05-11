@@ -887,8 +887,8 @@ export function renderInv(order) {
 
 export function renderPays() {
 
-    const wrap =
-        state.d.paylist;
+   const wrap =
+    state.d.pays;
 
     if (!wrap) {
 
@@ -1003,4 +1003,5 @@ export function renderPays() {
             `;
 
         }).join('');
+}
 }
