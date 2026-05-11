@@ -637,6 +637,19 @@ export function renderProds(products) {
         renderLock = false;
     }
 }
+
+if (
+    !state.d.clist ||
+    !state.d.ccnt ||
+    !state.d.ctotal
+) {
+
+    console.warn(
+        'renderCart DOM missing'
+    );
+
+    return;
+}
 /* ============================================================
    CART
 ============================================================ */
