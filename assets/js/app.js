@@ -712,34 +712,36 @@ function initGlobalClicks() {
                ADD CART
             ========================= */
 
-          el = e.target.closest(
+         el = e.target.closest(
     '[data-cp]'
 );
 
-            addCart(
-    el.dataset.cp,
-    1
-);
+if (el) {
 
-                return;
-            }
+    addCart(
+        el.dataset.cp,
+        1
+    );
 
+    return;
+}
             /* =========================
                MINUS CART
             ========================= */
 
-        el = e.target.closest(
+      el = e.target.closest(
     '[data-cm]'
 );
 
-           addCart(
-    el.dataset.cm,
-    -1
-);
+if (el) {
 
-                return;
-            }
+    addCart(
+        el.dataset.cm,
+        -1
+    );
 
+    return;
+}
             /* =========================
                REMOVE CART
             ========================= */
