@@ -694,11 +694,11 @@ export function addCart(
        RE-RENDER UI
     ========================= */
 
-    renderCart();
+  renderCart();
 
-    renderFilteredProducts();
+renderProds();
 
-    renderSummary();
+renderSummary();
 }
 
 
@@ -750,9 +750,9 @@ export function delCart(pid) {
 
     renderCart();
 
-    renderFilteredProducts();
+renderProds();
 
-    renderSummary();
+renderSummary();
 
     /* =========================
        AUTO CLOSE CART
@@ -892,15 +892,14 @@ export function validate(showErr) {
         payValid &&
         cartValid;
 
-    state.d.border.disabled =
-        !ok;
+   state.d.btnOrder.disabled = !ok;
 
-    state.d.border.classList.toggle(
+    state.d.btnOrder.classList.toggle(
         'btn-off',
         !ok
     );
 
-    state.d.border.classList.toggle(
+    state.d.btnOrder.classList.toggle(
         'btn-on',
         ok
     );
