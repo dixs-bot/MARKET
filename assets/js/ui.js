@@ -655,3 +655,53 @@ export function closeCart() {
 
     unlock();
 }
+
+/* =========================================================
+   VOUCHER OPEN/CLOSE
+========================================================= */
+
+export function openVou() {
+
+    const pg =
+        document.getElementById(
+            'pg-vou'
+        );
+
+    if (!pg) {
+
+        console.warn(
+            'pg-vou missing'
+        );
+
+        return;
+    }
+
+    pg.classList.remove(
+        'hidden'
+    );
+
+    lock();
+}
+
+export function closeVou() {
+
+    const pg =
+        document.getElementById(
+            'pg-vou'
+        );
+
+    if (!pg) {
+
+        console.warn(
+            'pg-vou missing'
+        );
+
+        return;
+    }
+
+    pg.classList.add(
+        'hidden'
+    );
+
+    unlock();
+}
