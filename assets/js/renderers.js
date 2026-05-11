@@ -82,8 +82,6 @@ function getLiveProductMap() {
 
 function getLiveCart() {
 
-    cleanupInvalidCartItems();
-
     return state.cart;
 }
 
@@ -666,7 +664,6 @@ export function renderCart() {
        CLEAN INVALID ITEMS
     ======================================================== */
 
-    cleanupInvalidCartItems();
 
     const liveMap =
         getLiveProductMap();
