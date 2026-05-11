@@ -1,3 +1,7 @@
+/* ============================================================
+   IMPORTS
+============================================================ */
+
 import {
 
     state,
@@ -16,6 +20,7 @@ import {
     notify,
     patchQty,
     patchBadge,
+
     renderCart,
     renderShips,
     renderPays,
@@ -23,16 +28,21 @@ import {
     renderInv,
     renderProds,
     renderFilteredProducts,
+
     closeCart,
     closeVou,
+
     animateIn
 
 } from './ui.js';
 
+
+/* ============================================================
+   GLOBAL MINI MARKET
+============================================================ */
+
 const MM =
     window.MiniMarket;
-
-
 /* ============================================================
    STORAGE HELPERS
 ============================================================ */
