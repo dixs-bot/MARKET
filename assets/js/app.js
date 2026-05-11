@@ -712,16 +712,14 @@ function initGlobalClicks() {
                ADD CART
             ========================= */
 
-            el = e.target.closest(
-                '[data-a]'
-            );
+          el = e.target.closest(
+    '[data-cp]'
+);
 
-            if (el) {
-
-                addCart(
-                    el.dataset.a,
-                    1
-                );
+            addCart(
+    el.dataset.cp,
+    1
+);
 
                 return;
             }
@@ -730,16 +728,14 @@ function initGlobalClicks() {
                MINUS CART
             ========================= */
 
-            el = e.target.closest(
-                '[data-m]'
-            );
+        el = e.target.closest(
+    '[data-cm]'
+);
 
-            if (el) {
-
-                addCart(
-                    el.dataset.m,
-                    -1
-                );
+           addCart(
+    el.dataset.cm,
+    -1
+);
 
                 return;
             }
