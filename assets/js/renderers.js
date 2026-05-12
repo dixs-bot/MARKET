@@ -20,7 +20,9 @@ import {
     subTotal,
     cleanupInvalidCartItems
 
-} from './sevices/services.js';
+} from './services/cart.service.js';
+
+
 
 
 /* ============================================================
