@@ -13,14 +13,14 @@ import {
     cartQty,
     FREE_SHIP_MIN
 
-} from './utils.js';
+} from './js/utils.js';
 
 import {
 
     subTotal,
     cleanupInvalidCartItems
 
-} from './services.js';
+} from './sevices/services.js';
 
 
 /* ============================================================
