@@ -829,21 +829,20 @@ function initGlobalClicks() {
                 return;
             }
 
-            /* =========================
-               OPEN CHECKOUT
-            ========================= */
+          /* =========================
+   OPEN CHECKOUT
+========================= */
 
-            if (
-                e.target.closest(
-                    "[data-act='open-checkout']"
-                )
-            ) {
+if (
+    e.target.closest(
+        "[data-act='open-checkout']"
+    )
+) {
 
-                openCheckout();
+    goToCheckout();
 
-                return;
-            }
-
+    return;
+}
             /* =========================
                BTN ORDER
             ========================= */
