@@ -178,12 +178,11 @@ function navTo(pageName) {
     window.scrollTo(0, 0);
 }
 
-
-/* ============================================================
-   PAGE FLOW
-============================================================ */
-
 function goToHome() {
+
+    /* =========================
+       HIDE INVOICE
+    ========================= */
 
     if (state.d.pginv) {
 
@@ -192,7 +191,61 @@ function goToHome() {
         );
     }
 
+    /* =========================
+       HIDE CHECKOUT
+    ========================= */
+
+    if (state.d.pgco) {
+
+        state.d.pgco.classList.add(
+            'hidden'
+        );
+
+        state.d.pgco.classList.remove(
+            'flex'
+        );
+    }
+
+    /* =========================
+       HIDE DIM
+    ========================= */
+
+    if (state.d.dim) {
+
+        state.d.dim.classList.add(
+            'hidden'
+        );
+    }
+
+    /* =========================
+       CLOSE CART SHEET
+    ========================= */
+
+    if (state.d.csheet) {
+
+        state.d.csheet.classList.add(
+            'translate-y-full'
+        );
+    }
+
+    /* =========================
+       UNLOCK BODY
+    ========================= */
+
     unlock();
+
+    /* =========================
+       SAVE PAGE
+    ========================= */
+
+    localStorage.setItem(
+        'lumora_page',
+        'home'
+    );
+
+    /* =========================
+       RESET STATE
+    ========================= */
 
     state.currentPage =
         'home';
@@ -200,12 +253,27 @@ function goToHome() {
     state.curOrder =
         null;
 
+    /* =========================
+       NAVIGATE
+    ========================= */
+
     navTo('home');
 }
+/* ============================================================
+   PAGE FLOW
+============================================================ */
 
 function goToCheckout() {
 
+    /* =========================
+       RECONCILE CART
+    ========================= */
+
     reconcileCart();
+
+    /* =========================
+       VALIDATE CART
+    ========================= */
 
     if (!state.cart.length) {
 
@@ -216,19 +284,48 @@ function goToCheckout() {
         return;
     }
 
+    /* =========================
+       SAVE CURRENT PAGE
+    ========================= */
+
+    localStorage.setItem(
+        'lumora_page',
+        'checkout'
+    );
+
+    /* =========================
+       CLOSE CART SHEET
+    ========================= */
+
     if (state.d.csheet) {
 
         state.d.csheet.classList.remove(
             'open'
         );
+
+        state.d.csheet.classList.add(
+            'translate-y-full'
+        );
     }
+
+    /* =========================
+       HIDE DIM BACKDROP
+    ========================= */
 
     if (state.d.dim) {
 
         state.d.dim.classList.remove(
             'on'
         );
+
+        state.d.dim.classList.add(
+            'hidden'
+        );
     }
+
+    /* =========================
+       LOCK BODY SCROLL
+    ========================= */
 
     if (
         state.lockCnt === 0
@@ -236,6 +333,10 @@ function goToCheckout() {
 
         lock();
     }
+
+    /* =========================
+       RENDER CHECKOUT UI
+    ========================= */
 
     renderShips();
 
@@ -245,10 +346,18 @@ function goToCheckout() {
 
     validate(false);
 
+    /* =========================
+       OPEN CHECKOUT PAGE
+    ========================= */
+
     if (state.d.pgco) {
 
         state.d.pgco.classList.remove(
             'hidden'
+        );
+
+        state.d.pgco.classList.add(
+            'flex'
         );
 
         animateIn(
@@ -256,34 +365,13 @@ function goToCheckout() {
         );
     }
 
+    /* =========================
+       SAVE STATE
+    ========================= */
+
     state.currentPage =
         'checkout';
 }
-
-function goToConfirm() {
-
-    if (
-        !validate(true)
-    ) {
-
-        notify(
-            'Lengkapi data!'
-        );
-
-        return;
-    }
-
-    if (state.d.mconf) {
-
-        state.d.mconf.classList.remove(
-            'hidden'
-        );
-    }
-
-    state.currentPage =
-        'confirm';
-}
-
 
 /* ============================================================
    PRODUCT FILTERING
@@ -855,26 +943,7 @@ if (
     )
 ) {
 
-    if (state.d.pgco) {
-
-        state.d.pgco.classList.add(
-            'hidden'
-        );
-    }
-
-    if (state.d.pginv) {
-
-        state.d.pginv.classList.add(
-            'hidden'
-        );
-    }
-
-    unlock();
-
-    navTo('home');
-
-    state.currentPage =
-        'home';
+    goToHome();
 
     return;
 }
@@ -1175,10 +1244,22 @@ state.d.cft =
 
     patchBadge();
 
-    navTo('home');
+   const savedPage =
+    localStorage.getItem(
+        'lumora_page'
+    );
 
-    state.currentPage =
-        'home';
+if (
+    savedPage === 'checkout' &&
+    state.cart.length
+) {
+
+    goToCheckout();
+
+} else {
+
+    goToHome();
+}
 }
 
 
