@@ -45,8 +45,25 @@ input:focus,textarea:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3p
 .toast.show{transform:translateY(0);opacity:1}
 .back-link{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:#64748b;font-weight:500;padding:4px 0}
 .back-link:active{color:#2563eb}
-#pg-checkout:not(.hidden){display:flex!important;flex-direction:column;height:100dvh;overflow:hidden}
-#pg-checkout.hidden{display:none!important}
-#checkout-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* =========================================================
+   CHECKOUT OVERLAY — FIXED: ID cocok dengan HTML (pgco)
+   Header title "Checkout" sekarang center sempurna
+========================================================= */
+#pgco:not(.hidden){display:flex!important;flex-direction:column;height:100dvh;overflow:hidden}
+#pgco.hidden{display:none!important}
+
+/* Header checkout: judul center, tombol kiri absolute */
+#pgco>header{flex-shrink:0;position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid #f1f5f9}
+#pgco>header>div{position:relative;height:56px;display:flex;align-items:center;justify-content:center}
+#pgco>header h1{font-size:16px;font-weight:700;color:#1e293b;white-space:nowrap;text-align:center;line-height:1;margin:0;padding:0}
+#pgco>header button[data-act="close-checkout"]{position:absolute;left:16px;font-size:14px;font-weight:500;color:#64748b;z-index:10;background:none;border:none;cursor:pointer;padding:0}
+#pgco>header button[data-act="close-checkout"]:active{color:#2563eb}
+
+/* Scroll area checkout */
+#coscroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;display:flex;flex-direction:column;gap:16px;padding-bottom:calc(120px + env(safe-area-inset-bottom,0px))}
+
+/* Footer checkout sticky bawah */
 #checkout-footer{flex-shrink:0;background:#fff;border-top:1px solid #f1f5f9;padding:16px;padding-bottom:calc(16px + env(safe-area-inset-bottom))}
+
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
