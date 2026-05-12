@@ -844,6 +844,20 @@ if (
     return;
 }
             /* =========================
+   CLOSE CHECKOUT
+========================= */
+
+if (
+    e.target.closest(
+        "[data-act='close-checkout']"
+    )
+) {
+
+    goToHome();
+
+    return;
+}
+            /* =========================
                BTN ORDER
             ========================= */
 
