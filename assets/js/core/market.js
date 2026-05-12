@@ -1,19 +1,4 @@
-/**
- * ============================================
-   LUMORA — MARKET CORE
- * ============================================
- * 
- * Objek MiniMarket global:
- * - Cache produk & kategori
- * - Getter & sync dari Supabase
- * - Storage key generators
- * - Atomic stock deduction
- * - Order validation
- * - Format currency (wrapper)
- * - Realtime subscription
- */
-
-```js
+```js id="26m1p2"
 /**
  * ============================================
  * LUMORA — MARKET CORE
