@@ -800,4 +800,3 @@ window.MiniMarket = {
 
 
 export default window.MiniMarket;
-```
