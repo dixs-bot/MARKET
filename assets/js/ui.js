@@ -170,24 +170,8 @@ export function notify(m) {
 
 export function qtyHTML(
     pid,
-    qty,
-    isSearch
+    qty
 ) {
-
-    const a =
-        isSearch
-            ? 'data-sa'
-            : 'data-a';
-
-    const m =
-        isSearch
-            ? 'data-sm'
-            : 'data-m';
-
-    const p =
-        isSearch
-            ? 'data-sp'
-            : 'data-p';
 
     if (qty > 0) {
 
@@ -195,7 +179,7 @@ export function qtyHTML(
             <div class="flex items-center justify-between bg-blue-50 rounded-xl p-0.5">
 
                 <button
-                    ${m}="${pid}"
+                    data-cm="${pid}"
                     class="w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center"
                 >
                     ${SVG_MI}
@@ -206,7 +190,7 @@ export function qtyHTML(
                 </span>
 
                 <button
-                    ${p}="${pid}"
+                    data-cp="${pid}"
                     class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center"
                 >
                     ${SVG_PL}
@@ -218,7 +202,7 @@ export function qtyHTML(
 
     return `
         <button
-            ${a}="${pid}"
+            data-cp="${pid}"
             class="w-full py-2 bg-blue-600 text-white rounded-xl text-xs font-semibold"
         >
             + Tambah
@@ -226,24 +210,15 @@ export function qtyHTML(
     `;
 }
 
-
 /* =========================================================
    PATCH QTY
 ========================================================= */
 
-export function patchQty(
-    pid,
-    isSearch
-) {
-
-    const pre =
-        isSearch
-            ? 'sq'
-            : 'pq';
+export function patchQty(pid) {
 
     const el =
         document.getElementById(
-            pre + '-' + pid
+            'pq-' + pid
         );
 
     if (!el) return;
@@ -254,12 +229,9 @@ export function patchQty(
     el.innerHTML =
         qtyHTML(
             pid,
-            f ? f.it.qty : 0,
-            isSearch
+            f ? f.it.qty : 0
         );
 }
-
-
 /* =========================================================
    PATCH BADGE
 ========================================================= */
