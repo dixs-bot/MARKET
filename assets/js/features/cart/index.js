@@ -24,12 +24,7 @@ import {
 
 } from '../../services.js';
 
-import {
-
-    openCart,
-    closeCart
-
-} from '../../ui.js';
+import { openCart, closeCart } from '../../ui/index.js';
 
 
 /* ============================================================
