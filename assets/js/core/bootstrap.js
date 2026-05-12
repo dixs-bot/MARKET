@@ -12,7 +12,7 @@ import { validate } from '../services/validation.service.js';
 
 import { renderCart } from '../renderers.js';
 
-import { cache, patchBadge } from '../ui.js';
+import { cache, patchBadge } from '../ui/index.js';
 
 import { go as navTo } from './router.js';
 
