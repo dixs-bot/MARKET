@@ -13,9 +13,7 @@
 
 import { state } from '../../utils.js';
 
-import {
-    renderCats
-} from '../../renderers.js';
+import { renderCats } from '../../ui/index.js';
 
 
 /* ============================================================
