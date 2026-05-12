@@ -13,7 +13,7 @@ import {
     cartQty,
     FREE_SHIP_MIN
 
-} from './js/utils.js';
+} from './utils.js';
 
 import {
 
