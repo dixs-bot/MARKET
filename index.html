@@ -879,10 +879,6 @@ tailwind.config = {
      CHECKOUT OVERLAY
 ========================================================= -->
 
-<!-- =========================================================
-     CHECKOUT OVERLAY
-========================================================= -->
-
 <div
     id="pgco"
 
@@ -892,79 +888,62 @@ tailwind.config = {
         bg-white
         z-50
         hidden
-        flex
-        flex-col
-        w-screen
-        h-screen
     "
 >
-
-    <!-- HEADER -->
 
     <header class="
         sticky
         top-0
         bg-white
+        z-10
         border-b
         border-slate-100
-        z-10
-        shrink-0
     ">
 
         <div class="
-            relative
             flex
             items-center
-            justify-center
-            h-14
+            justify-between
             px-4
+            h-14
         ">
-
-            <!-- BACK BUTTON -->
 
             <button
                 data-act="close-checkout"
 
                 class="
-                    absolute
-                    left-4
                     text-sm
-                    font-medium
                     text-slate-500
+                    font-medium
                 "
             >
                 Kembali
             </button>
 
-            <!-- TITLE -->
-
             <h1 class="
-                text-base
+                text-sm
                 font-bold
                 text-slate-800
             ">
                 Checkout
             </h1>
 
+            <div class="w-16"></div>
+
         </div>
 
     </header>
-
-    <!-- SCROLL AREA -->
 
     <div
         id="coscroll"
 
         class="
-            flex-1
-            overflow-y-auto
             p-4
             space-y-4
             pb-40
+            overflow-y-auto
         "
     >
-
-        <!-- FORM -->
 
         <input
             id="inname"
@@ -980,6 +959,8 @@ tailwind.config = {
                 border-slate-200
                 text-sm
                 outline-none
+                focus:ring-2
+                focus:ring-blue-500
             "
         >
 
@@ -997,6 +978,8 @@ tailwind.config = {
                 border-slate-200
                 text-sm
                 outline-none
+                focus:ring-2
+                focus:ring-blue-500
             "
         >
 
@@ -1010,16 +993,16 @@ tailwind.config = {
             class="
                 w-full
                 p-3
-                rounded-xl
                 border
                 border-slate-200
+                rounded-xl
                 resize-none
                 text-sm
                 outline-none
+                focus:ring-2
+                focus:ring-blue-500
             "
         ></textarea>
-
-        <!-- SHIPPING -->
 
         <div>
 
@@ -1039,8 +1022,6 @@ tailwind.config = {
 
         </div>
 
-        <!-- PAYMENT -->
-
         <div>
 
             <p class="
@@ -1059,19 +1040,151 @@ tailwind.config = {
 
         </div>
 
-    </div>
+        <div class="
+            flex
+            items-center
+            justify-between
+            p-4
+            rounded-2xl
+            bg-slate-50
+        ">
 
-    <!-- FOOTER -->
+            <div>
+
+                <p class="
+                    text-sm
+                    font-semibold
+                ">
+                    Voucher
+                </p>
+
+                <p
+                    id="vlbl"
+
+                    class="
+                        text-xs
+                        text-slate-400
+                    "
+                >
+                    Opsional
+                </p>
+
+            </div>
+
+            <button
+                data-act="open-vou"
+
+                class="
+                    text-blue-600
+                    text-sm
+                    font-semibold
+                "
+            >
+                Pilih
+            </button>
+
+        </div>
+
+        <div class="
+            p-4
+            rounded-2xl
+            bg-slate-50
+        ">
+
+            <div
+                id="co-items"
+
+                class="
+                    space-y-2
+                    mb-4
+                "
+            ></div>
+
+            <div class="
+                space-y-2
+                text-sm
+            ">
+
+                <div class="
+                    flex
+                    justify-between
+                ">
+                    <span>Subtotal</span>
+                    <span id="s-sub">Rp 0</span>
+                </div>
+
+                <div class="
+                    flex
+                    justify-between
+                ">
+                    <span>Ongkir</span>
+                    <span id="s-ship">Rp 0</span>
+                </div>
+
+                <!-- Fixed hidden/flex conflict -->
+                <div
+                    id="s-disc-row"
+
+                    class="hidden"
+                >
+                    <div class="flex justify-between">
+                        <span>Diskon</span>
+                        <span id="s-disc">-Rp 0</span>
+                    </div>
+                </div>
+
+                <div class="
+                    flex
+                    justify-between
+                    font-bold
+                    pt-2
+                    border-t
+                    border-slate-200
+                ">
+                    <span>Total</span>
+                    <span id="s-total">Rp 0</span>
+                </div>
+
+            </div>
+
+        </div>
+
+        <textarea
+            id="innote"
+
+            rows="2"
+
+            placeholder="Catatan tambahan"
+
+            class="
+                w-full
+                p-3
+                border
+                border-slate-200
+                rounded-xl
+                resize-none
+                text-sm
+                outline-none
+                focus:ring-2
+                focus:ring-blue-500
+            "
+        ></textarea>
+
+    </div>
 
     <div
         id="checkout-footer"
 
         class="
+            fixed
+            bottom-0
+            left-0
+            right-0
+            bg-white
             border-t
             border-slate-100
-            bg-white
             p-4
-            shrink-0
+            safe-bottom
         "
     >
 
@@ -1082,18 +1195,38 @@ tailwind.config = {
                 w-full
                 py-3.5
                 rounded-xl
-                bg-blue-600
-                text-white
                 font-bold
                 text-sm
+                bg-blue-600
+                text-white
+                disabled:bg-slate-200
+                disabled:text-slate-400
+                active:scale-[0.98]
+                transition-transform
             "
+
+            disabled
         >
             Pesan Sekarang
         </button>
 
+        <p
+            id="hint"
+
+            class="
+                text-center
+                text-[10px]
+                text-slate-400
+                mt-2
+            "
+        >
+            Lengkapi semua data
+        </p>
+
     </div>
 
 </div>
+
 <!-- =========================================================
      INVOICE OVERLAY
 ========================================================= -->
