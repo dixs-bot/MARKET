@@ -22,16 +22,7 @@ import {
 
 } from '../utils.js';
 
-import {
-
-    notify,
-    patchQty,
-    patchBadge,
-    renderCart,
-    renderSummary,
-    closeCart
-
-} from '../ui.js';
+import { notify, patchQty, patchBadge, renderCart, renderSummary, closeCart } from '../ui/index.js';
 
 import {
 
