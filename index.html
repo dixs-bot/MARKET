@@ -891,22 +891,21 @@ tailwind.config = {
     "
 >
 
-  <header class="
+ <header class="
     sticky
     top-0
     bg-white
-    z-10
+    z-20
     border-b
     border-slate-100
 ">
 
     <div class="
         relative
+        h-14
         flex
         items-center
         justify-center
-        h-14
-        px-4
     ">
 
         <!-- BACK BUTTON -->
@@ -917,9 +916,12 @@ tailwind.config = {
             class="
                 absolute
                 left-4
+                top-1/2
+                -translate-y-1/2
                 text-sm
                 text-slate-500
                 font-medium
+                z-10
             "
         >
             Kembali
@@ -928,12 +930,11 @@ tailwind.config = {
         <!-- TITLE -->
 
         <h1 class="
-            absolute
-            left-1/2
-            -translate-x-1/2
-            text-sm
+            text-base
             font-bold
             text-slate-800
+            tracking-tight
+            pointer-events-none
         ">
             Checkout
         </h1>
@@ -953,7 +954,7 @@ tailwind.config = {
         h-[calc(100vh-56px-96px)]
     "
 >
-    >
+    
 
         <input
             id="inname"
