@@ -19,7 +19,8 @@ import { go as navTo } from './router.js';
 import {
     handleClick as productsClick,
     renderFilteredProducts,
-    initInfiniteScroll
+    initInfiniteScroll,
+    initSearchListener
 } from '../features/products/index.js';
 
 import {
@@ -39,6 +40,8 @@ import {
 
 /* ============================================================
    INPUT LISTENERS
+   NOTE: Search listener dipindah ke products/search.js
+   Dipanggil via initSearchListener() di bawah
 ============================================================ */
 
 function initInputListeners() {
@@ -87,36 +90,6 @@ function initInputListeners() {
                 function () {
 
                     validate(false);
-                }
-            );
-    }
-
-    if (state.d.insearch) {
-
-        state.d.insearch
-            .addEventListener(
-
-                'input',
-
-                function () {
-
-                    clearTimeout(
-                        searchTimer
-                    );
-
-                    searchTimer =
-                        setTimeout(
-
-                            function () {
-
-                                renderFilteredProducts(
-                                    true
-                                );
-
-                            },
-
-                            250
-                        );
                 }
             );
     }
@@ -311,6 +284,8 @@ async function init() {
     await loadStoreFilter();
 
     initInputListeners();
+
+    initSearchListener();
 
     initStoreSwitch();
 
