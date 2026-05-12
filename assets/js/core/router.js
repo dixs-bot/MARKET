@@ -17,7 +17,7 @@
  * memanggil Router.go() langsung.
  */
 
-import { renderOrders } from '../ui.js';
+import { renderOrders } from '../ui/index.js';
 
 const Router = (() => {
 
