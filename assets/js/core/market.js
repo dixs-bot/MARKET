@@ -1,4 +1,4 @@
-```js
+```javascript
 /**
  * ============================================
  * LUMORA — MARKET CORE
@@ -25,6 +25,10 @@ import {
     isAdminCabang
 } from './helpers.js';
 
+
+/* ============================================================
+   STORAGE KEYS
+============================================================ */
 
 const LS_PRODUCTS =
     'mm_products_customer';
@@ -68,7 +72,7 @@ function getSelectedCustomerStoreId() {
         return null;
     }
 }
-```
+
 
 /* ============================================================
    PRODUCTS — NORMALIZE
@@ -210,6 +214,9 @@ function saveProducts(products) {
 async function syncProductsFromSupabase() {
 
     try {
+
+        if (!window.supabaseClient)
+            return [];
 
         let query =
             window.supabaseClient
@@ -394,6 +401,9 @@ async function syncCategoriesFromSupabase() {
 
     try {
 
+        if (!window.supabaseClient)
+            return [];
+
         let query =
             window.supabaseClient
                 .from('categories')
@@ -447,202 +457,6 @@ async function syncCategoriesFromSupabase() {
 
         return [];
     }
-}
-
-
-/* ============================================================
-   CATEGORIES — EDIT
-============================================================ */
-
-function editCategory(
-    id,
-    newName,
-    newImage
-) {
-
-    if (!id)
-        return false;
-
-    const cats =
-        getCategories();
-
-    let target =
-        null;
-
-    for (
-        let i = 0;
-        i < cats.length;
-        i++
-    ) {
-
-        if (
-            cats[i].id === id
-        ) {
-
-            target =
-                cats[i];
-
-            break;
-        }
-    }
-
-    if (!target)
-        return false;
-
-    if (
-        typeof newName ===
-        'string'
-    ) {
-
-        const trimmed =
-            newName.trim();
-
-        if (!trimmed)
-            return false;
-
-        target.name =
-            trimmed;
-    }
-
-    if (
-        typeof newImage ===
-        'string'
-    ) {
-
-        const trimmed =
-            newImage.trim();
-
-        if (trimmed)
-            target.image =
-                trimmed;
-    }
-
-    return saveCategories(cats);
-}
-
-
-/* ============================================================
-   CATEGORIES — DELETE
-============================================================ */
-
-function deleteCategory(id) {
-
-    if (!id)
-        return false;
-
-    const cats =
-        getCategories();
-
-    const exists =
-        cats.some(
-            c => c.id === id
-        );
-
-    if (!exists)
-        return false;
-
-    const prods =
-        getProducts();
-
-    let changed =
-        false;
-
-    for (
-        let i = 0;
-        i < prods.length;
-        i++
-    ) {
-
-        if (
-            prods[i].category ===
-            id
-        ) {
-
-            prods[i].category =
-                '';
-
-            changed = true;
-        }
-    }
-
-    if (changed)
-        saveProducts(prods);
-
-    const updated =
-        cats.filter(
-            c => c.id !== id
-        );
-
-    return saveCategories(updated);
-}
-
-
-/* ============================================================
-   CATEGORIES — REORDER
-============================================================ */
-
-function reorderCategories(newOrder) {
-
-    if (
-        !Array.isArray(
-            newOrder
-        )
-    ) return false;
-
-    const cats =
-        getCategories();
-
-    const map = {};
-
-    for (
-        let i = 0;
-        i < cats.length;
-        i++
-    ) {
-
-        map[
-            cats[i].id
-        ] = cats[i];
-    }
-
-    const ordered = [];
-
-    for (
-        let i = 0;
-        i < newOrder.length;
-        i++
-    ) {
-
-        const id =
-            newOrder[i];
-
-        if (map[id]) {
-
-            ordered.push(
-                map[id]
-            );
-
-            delete map[id];
-        }
-    }
-
-    for (let key in map) {
-
-        if (
-            map.hasOwnProperty(
-                key
-            )
-        ) {
-
-            ordered.push(
-                map[key]
-            );
-        }
-    }
-
-    return saveCategories(
-        ordered
-    );
 }
 
 
@@ -768,12 +582,6 @@ async function atomicDeductStock(cart) {
             p.stock =
                 newStock;
 
-            it.price =
-                p.price;
-
-            it.image =
-                p.image;
-
             const { error } =
                 await window
                     .supabaseClient
@@ -789,9 +597,7 @@ async function atomicDeductStock(cart) {
 
             if (error) {
 
-                console.error(
-                    error
-                );
+                console.error(error);
 
                 return {
                     ok: false,
@@ -837,23 +643,29 @@ function validateOrder(o) {
     if (
         !o.items ||
         !o.items.length
-    )
+    ) {
+
         return {
             ok: false,
             reason: 'no items'
         };
+    }
 
-    if (!o.address)
+    if (!o.address) {
+
         return {
             ok: false,
             reason: 'no address'
         };
+    }
 
-    if (!o.total)
+    if (!o.total) {
+
         return {
             ok: false,
             reason: 'invalid total'
         };
+    }
 
     return {
         ok: true
@@ -863,150 +675,144 @@ function validateOrder(o) {
 
 /* ============================================================
    REALTIME SYNC
-   Otomatis sync produk & kategori saat ada
-   perubahan di Supabase
 ============================================================ */
 
-(function initRealtimeSync() {
+function initRealtimeSync() {
 
-    const storeId =
-        getCurrentStoreId();
+    try {
 
-    let productFilter = '';
+        if (!window.supabaseClient)
+            return;
 
-    let categoryFilter = '';
+        const storeId =
+            getCurrentStoreId();
 
-    if (
-        isAdminCabang() &&
-        storeId
-    ) {
+        let productFilter = '';
 
-        productFilter =
-            `store_id=eq.${storeId}`;
+        let categoryFilter = '';
 
-        categoryFilter =
-            `store_id=eq.${storeId}`;
+        if (
+            isAdminCabang() &&
+            storeId
+        ) {
+
+            productFilter =
+                `store_id=eq.${storeId}`;
+
+            categoryFilter =
+                `store_id=eq.${storeId}`;
+        }
+
+        window.supabaseClient
+
+            .channel(
+                `products-realtime-${storeId || 'global'}`
+            )
+
+            .on(
+
+                'postgres_changes',
+
+                {
+                    event: '*',
+
+                    schema: 'public',
+
+                    table: 'products',
+
+                    filter:
+                        productFilter
+                },
+
+                async () => {
+
+                    await syncProductsFromSupabase();
+                }
+            )
+
+            .subscribe();
+
+
+        window.supabaseClient
+
+            .channel(
+                `categories-realtime-${storeId || 'global'}`
+            )
+
+            .on(
+
+                'postgres_changes',
+
+                {
+                    event: '*',
+
+                    schema: 'public',
+
+                    table: 'categories',
+
+                    filter:
+                        categoryFilter
+                },
+
+                async () => {
+
+                    await syncCategoriesFromSupabase();
+                }
+            )
+
+            .subscribe();
+
+    } catch (err) {
+
+        console.error(
+            'Realtime init error:',
+            err
+        );
     }
-
-    /* =========================
-       PRODUCTS CHANNEL
-    ========================= */
-
-    window.supabaseClient
-
-        .channel(
-            `products-realtime-${storeId || 'global'}`
-        )
-
-        .on(
-
-            'postgres_changes',
-
-            {
-                event: '*',
-
-                schema: 'public',
-
-                table: 'products',
-
-                filter:
-                    productFilter
-            },
-
-            async () => {
-
-                console.log(
-                    'Realtime products update'
-                );
-
-                await syncProductsFromSupabase();
-            }
-        )
-
-        .subscribe();
-
-    /* =========================
-       CATEGORIES CHANNEL
-    ========================= */
-
-    window.supabaseClient
-
-        .channel(
-            `categories-realtime-${storeId || 'global'}`
-        )
-
-        .on(
-
-            'postgres_changes',
-
-            {
-                event: '*',
-
-                schema: 'public',
-
-                table: 'categories',
-
-                filter:
-                    categoryFilter
-            },
-
-            async () => {
-
-                console.log(
-                    'Realtime categories update'
-                );
-
-                await syncCategoriesFromSupabase();
-            }
-        )
-
-        .subscribe();
-
-})();
+}
 
 
 /* ============================================================
-   ATTACH TO WINDOW
+   INIT REALTIME
+============================================================ */
+
+initRealtimeSync();
+
+
+/* ============================================================
+   GLOBAL EXPORT
 ============================================================ */
 
 window.MiniMarket = {
 
-    /* storage keys */
     LS_PRODUCTS,
     LS_CATEGORIES,
 
-    /* storage helpers */
     getCartStorageKey,
     getOrderStorageKey,
     getSelectedCustomerStoreId,
 
-    /* utils */
     fmt,
+
     FALLBACK_IMG,
     FALLBACK_CAT_IMG,
 
-    /* products */
     getProducts,
     saveProducts,
     normalizeProduct,
     syncProductsFromSupabase,
 
-    /* categories */
     normalizeCategory,
     getCategories,
     saveCategories,
-    editCategory,
-    deleteCategory,
-    reorderCategories,
     syncCategoriesFromSupabase,
 
-    /* orders */
     loadOrders,
 
-    /* advanced */
     atomicDeductStock,
     validateOrder
 };
 
 
 export default window.MiniMarket;
+```
