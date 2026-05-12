@@ -1,17 +1,3 @@
-/**
- * ============================================
- * LUMORA — CHECKOUT SERVICE
- * ============================================
- * 
- * Menangani logika checkout:
- * - Pilih shipping method
- * - Pilih payment method
- * - Pilih voucher
- * - Reset checkout state
- * - Submit pesanan ke Supabase
- * - Tampilkan invoice
- */
-
 import {
 
     state,
@@ -22,7 +8,24 @@ import {
 
 } from '../utils.js';
 
-import { notify, renderShips, renderPays, renderSummary, lock, unlock, animateIn } from '../../ui/index.js';
+
+import {
+
+    notify,
+    renderShips,
+    renderPays,
+    renderSummary,
+    lock,
+    unlock,
+    animateIn,
+    renderCart,
+    patchBadge,
+    renderInv,
+    closeVou
+
+} from '../ui/index.js';
+
+
 
 import {
 
