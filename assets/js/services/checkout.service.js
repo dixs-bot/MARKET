@@ -22,17 +22,7 @@ import {
 
 } from '../utils.js';
 
-import {
-
-    notify,
-    renderShips,
-    renderPays,
-    renderSummary,
-    renderInv,
-    closeVou,
-    animateIn
-
-} from '../ui.js';
+import { notify, renderShips, renderPays, renderSummary, lock, unlock, animateIn } from '../../ui/index.js';
 
 import {
 
