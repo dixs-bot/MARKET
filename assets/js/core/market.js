@@ -696,11 +696,11 @@ function initRealtimeSync() {
             storeId
         ) {
 
-            productFilter =
-                `store_id=eq.${storeId}`;
+           productFilter =
+    `store_id=eq.${storeId}`;
 
-            categoryFilter =
-                `store_id=eq.${storeId}`;
+        categoryFilter =
+    `store_id=eq.${storeId}`;
         }
 
         window.supabaseClient
