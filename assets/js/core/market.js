@@ -17,15 +17,13 @@ import { safeParse } from './storage.js';
 
 import { fmt } from './formatter.js';
 
-import {
-
-    FALLBACK_IMG,
-    FALLBACK_CAT_IMG,
-    getCurrentStoreId,
-    isAdminCabang
-
-} from './helpers.js';
-
+formatter.js  → (tanpa dep)
+storage.js    → (tanpa dep)
+helpers.js    → (butuh window.MiniMarket, LAZY di dalam fungsi)
+market.js     → (butuh helpers.js: FALLBACK_IMG, getCurrentStoreId, isAdminCabang)
+                  (butuh formatter.js: fmt)
+                  (butuh storage.js: safeParse)
+                  → menulis ke window.MiniMarket saat load
 
 /* ============================================================
    STORAGE KEYS
