@@ -694,9 +694,7 @@ export function addCart(
        RE-RENDER UI
     ========================= */
 
-  renderCart();
-
-renderProds();
+renderCart();
 
 renderSummary();
 }
@@ -750,7 +748,6 @@ export function delCart(pid) {
 
     renderCart();
 
-renderProds();
 
 renderSummary();
 
@@ -1270,8 +1267,6 @@ export async function goToInvoice() {
         save();
 
         renderCart();
-
-        renderProds();
 
         patchBadge();
 
