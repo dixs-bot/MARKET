@@ -809,24 +809,32 @@ tailwind.config = {
     "
 >
 
-    <header class="
-        sticky
-        top-0
-        bg-white
-        border-b
-        border-slate-100
-        z-10
-        px-4
-        h-14
+   <header class="
+    sticky
+    top-0
+    bg-white
+    z-10
+    border-b
+    border-slate-100
+">
+
+    <div class="
+        relative
         flex
         items-center
-        gap-2
+        justify-center
+        h-14
+        px-4
     ">
 
+        <!-- BACK BUTTON -->
+
         <button
-            data-act="close-search"
+            data-act="close-checkout"
 
             class="
+                absolute
+                left-4
                 text-sm
                 text-slate-500
                 font-medium
@@ -835,25 +843,22 @@ tailwind.config = {
             Kembali
         </button>
 
-        <input
-            id="insearch"
-            type="text"
-            placeholder="Cari produk..."
+        <!-- TITLE -->
 
-            class="
-                flex-1
-                h-10
-                px-4
-                rounded-xl
-                bg-slate-100
-                text-sm
-                outline-none
-                focus:ring-2
-                focus:ring-blue-500
-            "
-        >
+        <h1 class="
+            absolute
+            left-1/2
+            -translate-x-1/2
+            text-sm
+            font-bold
+            text-slate-800
+        ">
+            Checkout
+        </h1>
 
-    </header>
+    </div>
+
+</header>
 
     <div
         id="sres"
