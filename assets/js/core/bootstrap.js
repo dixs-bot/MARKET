@@ -2,37 +2,17 @@
  * ============================================
  * LUMORA — BOOTSTRAP
  * ============================================
- * 
- * Entry point utama aplikasi.
- * Menjalankan semua init dalam urutan yang benar.
- * 
- * URUTAN EKSEKUSI:
- * 1. cache()             → DOM cache dasar dari ui.js
- * 2. DOM cache manual    → Cache elemen ke state.d
- * 3. Supabase sync       → Products & categories
- * 4. loadStoreFilter     → Populate dropdown cabang
- * 5. initInputListeners  → Form input events
- * 6. initStoreSwitch     → Cabang change handler
- * 7. initInfiniteScroll  → Scroll pagination
- * 8. initGlobalClicks    → Delegated click handler
- * 9. Initial renders     → Categories, products, cart
- * 10. Saved page restore → Checkout atau home
  */
 
 import { state } from '../utils.js';
 
-import {
-    reconcileCart
-} from '../services.js';
+import { reconcileCart } from '../services/cart.service.js';
 
-import {
-    renderCart
-} from '../renderers.js';
+import { validate } from '../services/validation.service.js';
 
-import {
-    cache,
-    patchBadge
-} from '../ui.js';
+import { renderCart } from '../renderers.js';
+
+import { cache, patchBadge } from '../ui.js';
 
 import { go as navTo } from './router.js';
 
@@ -48,9 +28,7 @@ import {
     loadStoreFilter
 } from '../features/categories/index.js';
 
-import {
-    handleClick as cartClick
-} from '../features/cart/index.js';
+import { handleClick as cartClick } from '../features/cart/index.js';
 
 import {
     handleClick as checkoutClick,
@@ -144,19 +122,6 @@ function initInputListeners() {
     }
 }
 
-/* ============================================================
-   VALIDATE IMPORT (dari services.js)
-============================================================ */
-
-let validate;
-
-async function importValidate() {
-
-    const mod =
-        await import('../services.js');
-
-    validate = mod.validate;
-}
 
 /* ============================================================
    STORE SWITCH
@@ -205,8 +170,6 @@ function initStoreSwitch() {
 
 /* ============================================================
    GLOBAL CLICK HANDLER
-   Delegasi ke feature modules secara berurutan.
-   Return true = sudah ditangani, stop propagasi.
 ============================================================ */
 
 function initGlobalClicks() {
@@ -216,46 +179,10 @@ function initGlobalClicks() {
 
         async function (e) {
 
-            /* =========================
-               PRODUCTS
-            ========================= */
-
-            if (productsClick(e)) {
-
-                return;
-            }
-
-            /* =========================
-               CATEGORIES
-            ========================= */
-
-            if (categoriesClick(e)) {
-
-                return;
-            }
-
-            /* =========================
-               CART
-            ========================= */
-
-            if (cartClick(e)) {
-
-                return;
-            }
-
-            /* =========================
-               CHECKOUT
-            ========================= */
-
-            if (checkoutClick(e)) {
-
-                return;
-            }
-
-            /* =========================
-               NAVIGATION
-               (handled here di router)
-            ========================= */
+            if (productsClick(e)) return;
+            if (categoriesClick(e)) return;
+            if (cartClick(e)) return;
+            if (checkoutClick(e)) return;
 
             const navEl =
                 e.target.closest(
@@ -281,10 +208,6 @@ function initGlobalClicks() {
 
 async function init() {
 
-    /* ========================================================
-       DOM CACHE DASAR (dari ui.js)
-    ======================================================== */
-
     cache();
 
     /* ========================================================
@@ -292,157 +215,94 @@ async function init() {
     ======================================================== */
 
     state.d.inname =
-        document.getElementById(
-            'inname'
-        );
+        document.getElementById('inname');
 
     state.d.inphone =
-        document.getElementById(
-            'inphone'
-        );
+        document.getElementById('inphone');
 
     state.d.inaddr =
-        document.getElementById(
-            'inaddr'
-        );
+        document.getElementById('inaddr');
 
     state.d.innote =
-        document.getElementById(
-            'innote'
-        );
+        document.getElementById('innote');
 
     state.d.insearch =
-        document.getElementById(
-            'insearch'
-        );
+        document.getElementById('insearch');
 
     state.d.pgrid =
-        document.getElementById(
-            'pgrid'
-        );
+        document.getElementById('pgrid');
 
     state.d.pcnt =
-        document.getElementById(
-            'pcnt'
-        );
+        document.getElementById('pcnt');
 
     state.d.catbar =
-        document.getElementById(
-            'catbar'
-        );
+        document.getElementById('catbar');
 
     state.d.sres =
-        document.getElementById(
-            'sres'
-        );
+        document.getElementById('sres');
 
     state.d.csheet =
-        document.getElementById(
-            'csheet'
-        );
+        document.getElementById('csheet');
 
     state.d.dim =
-        document.getElementById(
-            'dim'
-        );
+        document.getElementById('dim');
 
     state.d.pgco =
-        document.getElementById(
-            'pgco'
-        );
+        document.getElementById('pgco');
 
     state.d.pginv =
-        document.getElementById(
-            'pginv'
-        );
+        document.getElementById('pginv');
 
     state.d.mconf =
-        document.getElementById(
-            'mconf'
-        );
+        document.getElementById('mconf');
 
     state.d.mload =
-        document.getElementById(
-            'mload'
-        );
+        document.getElementById('mload');
 
     state.d.coscroll =
-        document.getElementById(
-            'coscroll'
-        );
+        document.getElementById('coscroll');
 
     state.d.btnOrder =
-        document.getElementById(
-            'btn-order'
-        );
+        document.getElementById('btn-order');
 
     state.d.hint =
-        document.getElementById(
-            'hint'
-        );
+        document.getElementById('hint');
 
     state.d.vlbl =
-        document.getElementById(
-            'vlbl'
-        );
+        document.getElementById('vlbl');
 
     state.d.shiplist =
-        document.getElementById(
-            'shiplist'
-        );
+        document.getElementById('shiplist');
 
     state.d.paylist =
-        document.getElementById(
-            'paylist'
-        );
+        document.getElementById('paylist');
 
     state.d.coitems =
-        document.getElementById(
-            'co-items'
-        );
+        document.getElementById('co-items');
 
     state.d.ctotal =
-        document.getElementById(
-            'ctotal'
-        );
+        document.getElementById('ctotal');
 
     state.d.ccnt =
-        document.getElementById(
-            'ccnt'
-        );
+        document.getElementById('ccnt');
 
     state.d.clist =
-        document.getElementById(
-            'clist'
-        );
+        document.getElementById('clist');
 
     state.d.cbadge =
-        document.getElementById(
-            'cbadge'
-        );
+        document.getElementById('cbadge');
 
     state.d.cnone =
-        document.getElementById(
-            'cnone'
-        );
+        document.getElementById('cnone');
 
     state.d.cft =
-        document.getElementById(
-            'cft'
-        );
-
-    /* ========================================================
-       IMPORT VALIDATE (diperlukan oleh initInputListeners)
-    ======================================================== */
-
-    await importValidate();
+        document.getElementById('cft');
 
     /* ========================================================
        INITIAL LOAD
     ======================================================== */
 
-    const MM =
-        window.MiniMarket;
+    const MM = window.MiniMarket;
 
     await MM.syncProductsFromSupabase();
 
@@ -462,9 +322,7 @@ async function init() {
 
     renderFilteredCategories();
 
-    renderFilteredProducts(
-        true
-    );
+    renderFilteredProducts(true);
 
     renderCart();
 
@@ -475,9 +333,7 @@ async function init() {
     ======================================================== */
 
     const savedPage =
-        localStorage.getItem(
-            'lumora_page'
-        );
+        localStorage.getItem('lumora_page');
 
     if (
         savedPage === 'checkout' &&
