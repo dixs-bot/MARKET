@@ -16,13 +16,13 @@
  * dan letakkan di folder ui/ bersama file lainnya.
  */
 
-export { cache, animateIn } from './animation.js'
+export { cache, animateIn } from './ui/animation.js'
 
-export { lock, unlock } from './loading.js';
+export { lock, unlock } from './ui/loading.js';
 
-export { notify } from './toast.js';
+export { notify } from './ui/toast.js';
 
-export { openVou, closeVou } from './modal.js';
+export { openVou, closeVou } from './ui/modal.js';
 
 export {
     qtyHTML,
@@ -34,15 +34,15 @@ export {
     renderCart,
     openCart,
     closeCart
-} from './cart.ui.js';
+} from './ui/cart.ui.js';
 
 export {
     renderShips,
     renderPays,
     renderSummary
-} from './checkout.ui.js';
+} from './ui/checkout.ui.js';
 
 export {
     renderInv,
     renderOrders
-} from './invoice.ui.js';
+} from './ui/invoice.ui.js';
