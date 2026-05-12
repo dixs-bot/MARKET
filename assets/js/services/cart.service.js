@@ -1,0 +1,853 @@
+/**
+ * ============================================
+ * LUMORA — CART SERVICE
+ * ============================================
+ * 
+ * Menangani logika keranjang belanja:
+ * - Load/save cart dari localStorage
+ * - Tambah item ke cart
+ * - Hapus item dari cart
+ * - Reconcile cart (hapus item invalid)
+ * - Hitung subtotal
+ * - Hitung jumlah item cart
+ * - Cross-tab storage sync
+ */
+
+import {
+
+    state,
+    findCart,
+    findProd,
+    MAX_CART
+
+} from '../utils.js';
+
+import {
+
+    notify,
+    patchQty,
+    patchBadge,
+    renderCart,
+    renderSummary,
+    closeCart
+
+} from '../ui.js';
+
+import {
+
+    getCurrentStoreId,
+    getCartKey,
+    getOrderKey
+
+} from './stores.service.js';
+
+
+/* ============================================================
+   GLOBAL MINI MARKET
+============================================================ */
+
+const MM =
+    window.MiniMarket;
+
+
+/* ============================================================
+   STORAGE LOAD
+============================================================ */
+
+export function load() {
+
+    try {
+
+        const cartRaw =
+            localStorage.getItem(
+                getCartKey()
+            );
+
+        const orderRaw =
+            localStorage.getItem(
+                getOrderKey()
+            );
+
+        state.cart =
+            cartRaw
+                ? JSON.parse(cartRaw)
+                : [];
+
+        state.orders =
+            orderRaw
+                ? JSON.parse(orderRaw)
+                : [];
+
+        if (
+            !Array.isArray(state.cart)
+        ) {
+
+            state.cart = [];
+        }
+
+        if (
+            !Array.isArray(state.orders)
+        ) {
+
+            state.orders = [];
+        }
+
+        reconcileCart({
+            silent: true
+        });
+
+    } catch (err) {
+
+        console.error(
+            'Storage load error:',
+            err
+        );
+
+        state.cart = [];
+
+        state.orders = [];
+    }
+}
+
+
+/* ============================================================
+   STORAGE SAVE
+============================================================ */
+
+export function save() {
+
+    try {
+
+        localStorage.setItem(
+            getCartKey(),
+            JSON.stringify(state.cart)
+        );
+
+        localStorage.setItem(
+            getOrderKey(),
+            JSON.stringify(state.orders)
+        );
+
+    } catch (err) {
+
+        console.error(
+            'Storage save error:',
+            err
+        );
+    }
+}
+
+
+/* ============================================================
+   SUBTOTAL
+============================================================ */
+
+export function subTotal() {
+
+    const products =
+        MM.getProducts();
+
+    const map = {};
+
+    for (
+        let i = 0;
+        i < products.length;
+        i++
+    ) {
+
+        map[
+            products[i].id
+        ] = products[i];
+    }
+
+    let total = 0;
+
+    for (
+        let j = 0;
+        j < state.cart.length;
+        j++
+    ) {
+
+        const item =
+            state.cart[j];
+
+        const live =
+            map[item.id];
+
+        const price =
+            live
+                ? live.price
+                : item.price;
+
+        item.price =
+            price;
+
+        total +=
+            price * item.qty;
+    }
+
+    return total;
+}
+
+
+/* ============================================================
+   CART CLEANUP — REMOVE INVALID ITEMS
+============================================================ */
+
+export function cleanupInvalidCartItems() {
+
+    const products =
+        MM.getProducts();
+
+    const map = {};
+
+    for (
+        let i = 0;
+        i < products.length;
+        i++
+    ) {
+
+        map[
+            products[i].id
+        ] = products[i];
+    }
+
+    let changed =
+        false;
+
+    state.cart =
+        state.cart.filter(item => {
+
+            const live =
+                map[item.id];
+
+            if (!live) {
+
+                changed = true;
+
+                return false;
+            }
+
+            if (
+                live.stock <= 0
+            ) {
+
+                changed = true;
+
+                return false;
+            }
+
+            if (
+                live.store_id !==
+                item.store_id
+            ) {
+
+                changed = true;
+
+                return false;
+            }
+
+            if (
+                item.qty >
+                live.stock
+            ) {
+
+                item.qty =
+                    live.stock;
+
+                changed = true;
+            }
+
+            item.price =
+                live.price;
+
+            item.image =
+                live.image;
+
+            return true;
+        });
+
+    if (changed) {
+
+        save();
+    }
+
+    return changed;
+}
+
+
+/* ============================================================
+   CART CLEANUP — REMOVE DELETED PRODUCTS
+============================================================ */
+
+export function cleanupDeletedProducts() {
+
+    const products =
+        MM.getProducts();
+
+    const validIds =
+        new Set();
+
+    for (
+        let i = 0;
+        i < products.length;
+        i++
+    ) {
+
+        validIds.add(
+            products[i].id
+        );
+    }
+
+    const before =
+        state.cart.length;
+
+    state.cart =
+        state.cart.filter(item =>
+
+            validIds.has(item.id)
+        );
+
+    const changed =
+        before !==
+        state.cart.length;
+
+    if (changed) {
+
+        save();
+    }
+
+    return changed;
+}
+
+
+/* ============================================================
+   CART CLEANUP — NORMALIZE QTY TO STOCK
+============================================================ */
+
+export function normalizeCartQty() {
+
+    const products =
+        MM.getProducts();
+
+    const map = {};
+
+    for (
+        let i = 0;
+        i < products.length;
+        i++
+    ) {
+
+        map[
+            products[i].id
+        ] = products[i];
+    }
+
+    let changed =
+        false;
+
+    for (
+        let j = 0;
+        j < state.cart.length;
+        j++
+    ) {
+
+        const item =
+            state.cart[j];
+
+        const live =
+            map[item.id];
+
+        if (!live)
+            continue;
+
+        const stock =
+            Number(
+                live.stock || 0
+            );
+
+        if (stock <= 0) {
+
+            item.qty = 0;
+
+            changed = true;
+
+            continue;
+        }
+
+        if (
+            item.qty > stock
+        ) {
+
+            item.qty = stock;
+
+            changed = true;
+        }
+
+        item.price =
+            live.price;
+
+        item.image =
+            live.image;
+    }
+
+    state.cart =
+        state.cart.filter(item =>
+
+            item.qty > 0
+        );
+
+    if (changed) {
+
+        save();
+    }
+
+    return changed;
+}
+
+
+/* ============================================================
+   SYNC CART WITH PRODUCTS (all cleanups)
+============================================================ */
+
+export function syncCartWithProducts() {
+
+    const removed =
+        cleanupDeletedProducts();
+
+    const normalized =
+        normalizeCartQty();
+
+    const cleaned =
+        cleanupInvalidCartItems();
+
+    return (
+
+        removed ||
+
+        normalized ||
+
+        cleaned
+    );
+}
+
+
+/* ============================================================
+   RECONCILE CART
+============================================================ */
+
+export function reconcileCart(
+    options = {}
+) {
+
+    try {
+
+        const {
+
+            silent = false
+
+        } = options;
+
+        const changed =
+            syncCartWithProducts();
+
+        if (!changed)
+            return false;
+
+        if (!silent) {
+
+            renderCart();
+
+            patchBadge();
+        }
+
+        return true;
+
+    } catch (err) {
+
+        console.error(
+            'Cart reconciliation error:',
+            err
+        );
+
+        return false;
+    }
+}
+
+
+/* ============================================================
+   ADD TO CART
+============================================================ */
+
+export function addCart(
+    pid,
+    delta = 1
+) {
+
+    /* =========================
+       CLEAN INVALID CART
+    ========================= */
+
+    reconcileCart({
+        silent: true
+    });
+
+    /* =========================
+       FIND PRODUCT
+    ========================= */
+
+    const product =
+        findProd(pid);
+
+    if (!product) {
+
+        console.warn(
+            'Product not found:',
+            pid
+        );
+
+        return;
+    }
+
+    /* =========================
+       STOCK VALIDATION
+    ========================= */
+
+    if (
+        product.stock <= 0
+    ) {
+
+        notify(
+            'Stok habis'
+        );
+
+        return;
+    }
+
+    /* =========================
+       MAX CART VALIDATION
+    ========================= */
+
+    if (
+        delta > 0 &&
+        state.cart.length >= MAX_CART
+    ) {
+
+        const exists =
+            findCart(pid);
+
+        if (!exists) {
+
+            notify(
+                'Keranjang penuh'
+            );
+
+            return;
+        }
+    }
+
+    /* =========================
+       MULTI STORE VALIDATION
+    ========================= */
+
+    if (
+        state.cart.length
+    ) {
+
+        const cartStoreId =
+            state.cart[0]
+                .store_id;
+
+        if (
+            cartStoreId !==
+            product.store_id
+        ) {
+
+            notify(
+                'Keranjang hanya bisa berisi produk dari cabang yang sama'
+            );
+
+            return;
+        }
+    }
+
+    /* =========================
+       FIND CART ITEM
+    ========================= */
+
+    const found =
+        findCart(pid);
+
+    const currentQty =
+        found
+            ? found.it.qty
+            : 0;
+
+    /* =========================
+       STOCK LIMIT
+    ========================= */
+
+    if (
+        delta > 0 &&
+        currentQty >= product.stock
+    ) {
+
+        notify(
+            'Stok tidak cukup'
+        );
+
+        return;
+    }
+
+    /* =========================
+       UPDATE EXISTING ITEM
+    ========================= */
+
+    if (found) {
+
+        found.it.qty += delta;
+
+        found.it.price =
+            product.price;
+
+        found.it.image =
+            product.image;
+
+        found.it.stock =
+            product.stock;
+
+        /* =====================
+           REMOVE IF ZERO
+        ===================== */
+
+        if (
+            found.it.qty <= 0
+        ) {
+
+            state.cart.splice(
+                found.i,
+                1
+            );
+        }
+
+    }
+
+    /* =========================
+       ADD NEW ITEM
+    ========================= */
+
+    else if (delta > 0) {
+
+        state.cart.push({
+
+            id:
+                product.id,
+
+            name:
+                product.name,
+
+            price:
+                product.price,
+
+            image:
+                product.image,
+
+            qty:
+                1,
+
+            stock:
+                product.stock,
+
+            store_id:
+                product.store_id
+        });
+    }
+
+    /* =========================
+       SAVE STATE
+    ========================= */
+
+    save();
+
+    /* =========================
+       PATCH PRODUCT CARD
+    ========================= */
+
+    patchQty(
+        pid,
+        false
+    );
+
+    patchQty(
+        pid,
+        true
+    );
+
+    /* =========================
+       UPDATE BADGE
+    ========================= */
+
+    patchBadge();
+
+    /* =========================
+       RE-RENDER UI
+    ========================= */
+
+    renderCart();
+
+    renderSummary();
+}
+
+
+/* ============================================================
+   DELETE CART ITEM
+============================================================ */
+
+export function delCart(pid) {
+
+    const found =
+        findCart(pid);
+
+    if (!found)
+        return;
+
+    /* =========================
+       REMOVE ITEM
+    ========================= */
+
+    state.cart.splice(
+        found.i,
+        1
+    );
+
+    /* =========================
+       SAVE STATE
+    ========================= */
+
+    save();
+
+    /* =========================
+       PATCH PRODUCT CARD
+    ========================= */
+
+    patchQty(
+        pid,
+        false
+    );
+
+    /* =========================
+       UPDATE BADGE
+    ========================= */
+
+    patchBadge();
+
+    /* =========================
+       RE-RENDER UI
+    ========================= */
+
+    renderCart();
+
+    renderSummary();
+
+    /* =========================
+       AUTO CLOSE CART
+    ========================= */
+
+    if (
+        !state.cart.length
+    ) {
+
+        closeCart();
+    }
+}
+
+
+/* ============================================================
+   CART TOTALS HELPERS
+============================================================ */
+
+export function getCartTotal() {
+
+    return subTotal();
+}
+
+export function getCartCount() {
+
+    let count = 0;
+
+    for (
+        let i = 0;
+        i < state.cart.length;
+        i++
+    ) {
+
+        count +=
+            state.cart[i].qty;
+    }
+
+    return count;
+}
+
+export function clearCart() {
+
+    state.cart = [];
+
+    save();
+}
+
+
+/* ============================================================
+   CROSS TAB STORAGE SYNC
+============================================================ */
+
+window.addEventListener(
+
+    'storage',
+
+    function (event) {
+
+        if (!event.key)
+            return;
+
+        const cartKey =
+            getCartKey();
+
+        if (
+            event.key !==
+            cartKey
+        ) {
+
+            return;
+        }
+
+        try {
+
+            const latest =
+                event.newValue
+                    ? JSON.parse(
+                        event.newValue
+                    )
+                    : [];
+
+            state.cart =
+                Array.isArray(latest)
+                    ? latest
+                    : [];
+
+            reconcileCart({
+                silent: true
+            });
+
+            renderCart();
+
+            patchBadge();
+
+        } catch (err) {
+
+            console.error(
+                'Cross-tab sync error:',
+                err
+            );
+        }
+    }
+);
