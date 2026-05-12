@@ -11,9 +11,7 @@
 
 import { state } from '../../utils.js';
 
-import {
-    renderProds
-} from '../../renderers.js';
+import { renderProds } from '../../ui/index.js';
 
 import {
 
