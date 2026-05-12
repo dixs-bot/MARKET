@@ -829,7 +829,7 @@ function initGlobalClicks() {
                 return;
             }
 
-          /* =========================
+ /* =========================
    OPEN CHECKOUT
 ========================= */
 
@@ -843,7 +843,9 @@ if (
 
     return;
 }
-            /* =========================
+
+
+/* =========================
    CLOSE CHECKOUT
 ========================= */
 
@@ -853,7 +855,26 @@ if (
     )
 ) {
 
-    goToHome();
+    if (state.d.pgco) {
+
+        state.d.pgco.classList.add(
+            'hidden'
+        );
+    }
+
+    if (state.d.pginv) {
+
+        state.d.pginv.classList.add(
+            'hidden'
+        );
+    }
+
+    unlock();
+
+    navTo('home');
+
+    state.currentPage =
+        'home';
 
     return;
 }
