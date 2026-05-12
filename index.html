@@ -883,8 +883,7 @@ tailwind.config = {
 
 
 <!-- =========================================================
-     CHECKOUT OVERLAY — FIXED: duplikat header dihapus,
-     judul "Checkout" sekarang center sempurna
+     CHECKOUT OVERLAY
 ========================================================= -->
 
 <div
@@ -1428,12 +1427,21 @@ tailwind.config = {
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="/assets/js/supabase.js"></script>
-<script src="/assets/js/shared.js"></script>
 
+<!-- UTILS (menggantikan shared.js) -->
+<script type="module" src="/assets/js/utils.js"></script>
+
+<!-- UI barrel (menggantikan ui.js langsung) -->
 <script type="module" src="/assets/js/ui.js"></script>
+
+<!-- Renderers — pastikan import path di dalamnya: -->
+<!-- from './ui.js'  →  from './ui/index.js' -->
 <script type="module" src="/assets/js/renderers.js"></script>
-<script type="module" src="/assets/js/services.js"></script>
+
+<!-- ENTRY POINT — memuat core/ + features/ + services/ otomatis -->
+<!-- services.js sudah dihapus dari sini karena dimuat oleh app.js -->
 <script type="module" src="/assets/js/app.js"></script>
 
 </body>
+
 </html>
