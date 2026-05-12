@@ -891,48 +891,67 @@ tailwind.config = {
     "
 >
 
-    <header class="
+   <header
+    class="
         sticky
         top-0
         bg-white
-        z-10
+        z-20
         border-b
         border-slate-100
-    ">
+        shrink-0
+    "
+>
 
-        <div class="
+    <div
+        class="
+            relative
             flex
             items-center
-            justify-between
-            px-4
+            justify-center
             h-14
-        ">
+            px-4
+        "
+    >
 
-            <button
-                data-act="close-checkout"
+        <!-- BACK BUTTON -->
 
-                class="
-                    text-sm
-                    text-slate-500
-                    font-medium
-                "
-            >
-                Kembali
-            </button>
+        <button
+            data-act="close-checkout"
 
-            <h1 class="
+            class="
+                absolute
+                left-4
+                top-1/2
+                -translate-y-1/2
                 text-sm
+                text-slate-500
+                font-medium
+                active:opacity-70
+            "
+        >
+            Kembali
+        </button>
+
+        <!-- TITLE -->
+
+        <h1
+            class="
+                text-base
                 font-bold
+                tracking-tight
                 text-slate-800
-            ">
-                Checkout
-            </h1>
+                text-center
+                w-full
+                pointer-events-none
+            "
+        >
+            Checkout
+        </h1>
 
-            <div class="w-16"></div>
+    </div>
 
-        </div>
-
-    </header>
+</header>
 
     <div
         id="coscroll"
